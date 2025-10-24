@@ -13,7 +13,6 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QTextEdit,
     QDialog,
-    QVBoxLayout,
     QTextBrowser,
     QPushButton,
     QTableView,
@@ -706,6 +705,7 @@ def show_qtextedit_context_menu(widget, pos, app_instance):
     # 메뉴 표시
     menu.exec(widget.mapToGlobal(pos))
 
+
 def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance=None):
     print("[DEBUG] 📋 show_textbrowser_context_menu() 호출됨")
     print(f"[DEBUG] viewport_pos: {viewport_pos}")
@@ -713,7 +713,8 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
     menu = QMenu(tb.viewport())  # ✅ viewport 기준으로 메뉴 생성
 
     # ✅ 스타일 강제 지정 (다크 테마에서도 메뉴 항목이 보이도록)
-    menu.setStyleSheet("""
+    menu.setStyleSheet(
+        """
         QMenu::item {
             color: white;
             padding: 6px 12px;
@@ -721,7 +722,8 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
         QMenu::item:disabled {
             color: #888;
         }
-    """)
+    """
+    )
 
     has_sel = bool(tb.textCursor().hasSelection())
     selected_text = tb.textCursor().selectedText()
@@ -754,12 +756,12 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
         print("[DEBUG] 메뉴 선택 없음 (사용자 취소)")
         return
 
-
     if chosen is act_copy:
         print("[DEBUG] 📋 Copy 선택됨")
         tb.copy()
         try:
             from qt_copy_feedback import show_copy_feedback
+
             show_copy_feedback(app_instance, "복사됨")
         except Exception as e:
             print(f"[DEBUG] show_copy_feedback 실패: {e}")
@@ -773,6 +775,7 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
         QGuiApplication.clipboard().setText(anchor)
         try:
             from qt_copy_feedback import show_copy_feedback
+
             show_copy_feedback(app_instance, "링크 복사됨")
         except Exception as e:
             print(f"[DEBUG] show_copy_feedback 실패: {e}")
@@ -794,12 +797,13 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
         else:
             print("[ERROR] ❌ tab_widget을 가진 객체를 찾을 수 없습니다.")
             if hasattr(app_instance, "log_message"):
-                app_instance.log_message("❌ tab_widget을 가진 객체를 찾을 수 없습니다.", "ERROR")
+                app_instance.log_message(
+                    "❌ tab_widget을 가진 객체를 찾을 수 없습니다.", "ERROR"
+                )
 
     elif chosen is act_select_all:
         print("[DEBUG] 🧲 Select All 선택됨")
         tb.selectAll()
-
 
 
 def _search_in_nlk_tab(app_instance, title_text):
@@ -819,7 +823,9 @@ def _search_in_nlk_tab(app_instance, title_text):
         # IntegratedSearchApp 인스턴스
         main_window = app_instance.main_window
         print(f"[DEBUG] app_instance.main_window 사용")
-    elif hasattr(app_instance, "app_instance") and hasattr(app_instance.app_instance, "main_window"):
+    elif hasattr(app_instance, "app_instance") and hasattr(
+        app_instance.app_instance, "main_window"
+    ):
         # 탭 인스턴스 (app_instance.app_instance.main_window)
         main_window = app_instance.app_instance.main_window
         print(f"[DEBUG] app_instance.app_instance.main_window 사용")
@@ -845,24 +851,16 @@ def _search_in_nlk_tab(app_instance, title_text):
         nlk_tab.input_widgets["year"].clear()
 
         # DDC 입력창이 있으면 초기화
-        if hasattr(nlk_tab, 'ddc_input'):
+        if hasattr(nlk_tab, "ddc_input"):
             nlk_tab.ddc_input.clear()
 
         # 4. 제목 입력 필드에 텍스트 설정
         nlk_tab.input_widgets["title"].setText(title_text)
         print(f"[DEBUG] 제목 입력 완료: '{title_text}' → input_widgets['title'] 사용")
 
-        # 5. 제목 체크박스만 활성화 (다른 체크박스는 비활성화)
-        nlk_tab.title_check.setChecked(True)
-        nlk_tab.author_check.setChecked(False)
-        nlk_tab.isbn_check.setChecked(False)
-        nlk_tab.year_check.setChecked(False)
-
-        if hasattr(nlk_tab, 'ddc_check'):
-            nlk_tab.ddc_check.setChecked(False)
-
-        # 6. ✅ [중요] 타이밍 이슈 해결: GUI 이벤트 처리를 위해 약간의 지연 추가
+        # 5. ✅ [중요] 타이밍 이슈 해결: GUI 이벤트 처리를 위해 약간의 지연 추가
         from PySide6.QtCore import QTimer
+
         print(f"[DEBUG] 검색 실행 준비 완료 → 200ms 후 검색 시작")
         QTimer.singleShot(200, nlk_tab.start_search)
 
@@ -870,16 +868,22 @@ def _search_in_nlk_tab(app_instance, title_text):
         real_app = None
         if hasattr(app_instance, "log_message"):
             real_app = app_instance
-        elif hasattr(app_instance, "app_instance") and hasattr(app_instance.app_instance, "log_message"):
+        elif hasattr(app_instance, "app_instance") and hasattr(
+            app_instance.app_instance, "log_message"
+        ):
             real_app = app_instance.app_instance
 
         if real_app:
-            real_app.log_message(f"✅ NLK 탭에서 '{title_text}' 제목 검색을 시작합니다.", "INFO")
+            real_app.log_message(
+                f"✅ NLK 탭에서 '{title_text}' 제목 검색을 시작합니다.", "INFO"
+            )
 
     except Exception as e:
         print(f"[ERROR] _search_in_nlk_tab 예외 발생: {e}")
         import traceback
+
         traceback.print_exc()
+
 
 def setup_widget_context_menu(widget, app_instance):
     """✅ [모델/뷰 전용] 위젯에 컨텍스트 메뉴 자동 설정 - QTableWidget 완전 폐기"""
@@ -1708,6 +1712,7 @@ def show_cell_detail_dialog(cell_value, column_name, app_instance):
 
         # ✅ 컨텍스트 메뉴는 viewport에 걸어야 함 (QTextBrowser는 스크롤 영역이 따로 있음)
         from qt_context_menus import show_textbrowser_context_menu
+
         text_browser.viewport().setContextMenuPolicy(Qt.CustomContextMenu)
         text_browser.viewport().customContextMenuRequested.connect(
             # pos는 이미 viewport 좌표 → 빌더로 그대로 전달
