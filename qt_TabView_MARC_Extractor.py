@@ -53,7 +53,89 @@ import re
 
 def _generate_marcedit_style_string(raw_marc_text, parsed_data):
     \"\"\" MARC 데이터를 MARCedit 스타일 문자열로 변환하는 헬퍼 함수 \"\"\"
-    # ... (기존 DEFAULT_MARC_LOGIC_CODE의 모든 내용) ...
+    output_lines = []
+    try:
+        start_index = raw_marc_text.find('LDR')
+        end_index = raw_marc_text.find('참고정보')
+        if start_index == -1: return "오류: MARC 데이터(LDR)를 찾을 수 없습니다."
+        marc_block = raw_marc_text[start_index:] if end_index == -1 else raw_marc_text[start_index:end_index]
+
+        ldr_values = parsed_data.get('LDR', '').replace(' ', '')
+        output_lines.append(f"=LDR  {ldr_values.ljust(5)} 22     c 4500")
+        output_lines.append(f"=007  {parsed_data.get('007', '')}")
+
+        match_008 = re.search(r'008\\s*\\n(.*?)(?=\\n\\s*020)', marc_block, re.DOTALL)
+        if match_008:
+            output_lines.append("=008")
+            content = match_008.group(1).strip()
+            lines = [line.strip() for line in content.split('\\n') if line.strip()]
+            i = 0
+            while i < len(lines):
+                label = lines[i]
+                if (i + 1) < len(lines) and ':' not in lines[i+1] and not re.match(r'^[가-힣]', lines[i+1]):
+                    value = lines[i+1]
+                    output_lines.append(f"  {label}: {value}")
+                    i += 2
+                else:
+                    output_lines.append(f"  {label}")
+                    i += 1
+
+        for tag in sorted(parsed_data.keys()):
+            if tag.isdigit() and tag >= '020':
+                for field in parsed_data[tag]:
+                    ind1 = field.get('ind1', ' ').strip() or '\\\\'
+                    ind2 = field.get('ind2', ' ').strip() or '\\\\'
+                    subfield_strings = [f"${code}{value}" for code, value in field.get('subfields', [])]
+                    all_subfields = "".join(subfield_strings)
+                    output_lines.append(f"={tag}  {ind1}{ind2}{all_subfields}")
+        return "\\n".join(output_lines)
+    except Exception as e:
+        return f"Full MARC 생성 중 오류 발생: {e}"
+
+def custom_extract_marc_data(raw_marc_text, app_instance):
+    \"\"\" F1-10 딕셔너리와 Full MARC 문자열을 모두 반환하는 메인 함수 \"\"\"
+    # 1. 내장된 F1-F10 추출 로직 실행
+    f_fields = extract_marc_data_to_f_fields(raw_marc_text, app_instance)
+
+    # 2. Full MARC 문자열 생성을 위한 별도의 파서 실행 (UI 표시용)
+    # 이 파서는 _generate_marcedit_style_string에서 사용할 데이터 구조를 만듭니다.
+    parsed_data_for_string = {}
+    try:
+        start_index = raw_marc_text.find('LDR')
+        end_index = raw_marc_text.find('참고정보')
+        if start_index != -1:
+            marc_block = raw_marc_text[start_index:] if end_index == -1 else raw_marc_text[start_index:end_index]
+            ldr_match = re.search(r'LDR\\s*\\n(.*?)(?=\\n\\s*007)', marc_block, re.DOTALL)
+            if ldr_match:
+                ldr_content = ldr_match.group(1).strip()
+                ldr_values = [line.strip() for line in ldr_content.split('\\n') if not re.search(r'[가-힣]', line)]
+                parsed_data_for_string['LDR'] = ' '.join(filter(None, ldr_values))
+
+            field_007_match = re.search(r'007\\s*([^\\n]+)', marc_block)
+            if field_007_match:
+                parsed_data_for_string['007'] = field_007_match.group(1).strip()
+
+            variable_fields_block_start = marc_block.find('020') if '020' in marc_block else -1
+            if variable_fields_block_start != -1:
+                variable_fields_block = marc_block[variable_fields_block_start:]
+                fields = re.split(r'^\\s*(\\d{3})', variable_fields_block, flags=re.MULTILINE)
+                for i in range(1, len(fields), 2):
+                    tag, content = fields[i], fields[i+1]
+                    if '▼' not in content: continue
+                    parts = content.split('▼', 1)
+                    indicators_raw, data = parts[0], '▼' + parts[1]
+                    indicators = re.findall(r'\\S', indicators_raw)
+                    ind1 = indicators[0] if indicators else ' '
+                    ind2 = indicators[1] if len(indicators) > 1 else ' '
+                    subfields = [(sf[0], sf[1:]) for sf in data.strip('▲\\n').split('▼') if sf]
+                    field_entry = {'ind1': ind1, 'ind2': ind2, 'subfields': subfields}
+                    if tag not in parsed_data_for_string: parsed_data_for_string[tag] = []
+                    parsed_data_for_string[tag].append(field_entry)
+    except Exception:
+        pass # 오류가 나도 일단 진행
+
+    # 3. Full MARC 문자열 생성
+    full_marc_string = _generate_marcedit_style_string(raw_marc_text, parsed_data_for_string)
 
     # 4. 두 개의 결과물을 튜플로 반환
     return (f_fields, full_marc_string)

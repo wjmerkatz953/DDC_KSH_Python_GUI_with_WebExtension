@@ -7,6 +7,10 @@ Search_CiNii.py - CiNii Books API 검색 모듈
 GAS 버전의 CiNii Books 검색 로직을 Python으로 포팅하여 NDL 탭과 통합
 """
 
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+configure_ssl_certificates()
+
 import requests
 import xml.etree.ElementTree as ET
 from urllib.parse import quote_plus

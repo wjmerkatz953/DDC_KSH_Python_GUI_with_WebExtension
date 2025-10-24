@@ -4,6 +4,10 @@
 # 수정일시: 2025-09-20 KST
 # 설명: NLK OpenAPI 통합 검색 모듈. Search_UPenn.py 스타일의 계층적 구조로 리팩토링됨.
 
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+configure_ssl_certificates()
+
 import requests
 import xml.etree.ElementTree as ET
 import re

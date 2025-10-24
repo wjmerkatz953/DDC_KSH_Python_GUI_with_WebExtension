@@ -8,6 +8,10 @@ Version: v1.0.0
 API 문서: https://www.nl.go.kr/seoji/SearchApi.do
 """
 
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+configure_ssl_certificates()
+
 import requests
 import json
 import time

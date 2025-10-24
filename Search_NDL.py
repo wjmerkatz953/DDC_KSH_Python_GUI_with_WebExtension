@@ -7,6 +7,10 @@ Search_NDL.py - 일본 국립국회도서관(NDL) SRU API 검색 로직을 포�
 이 모듈은 NDL SRU API를 사용하여 서지 정보를 검색하고, 필요한 경우 텍스트를 번역합니다.
 """
 
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+configure_ssl_certificates()
+
 import requests
 import xml.etree.ElementTree as ET
 from urllib.parse import quote_plus

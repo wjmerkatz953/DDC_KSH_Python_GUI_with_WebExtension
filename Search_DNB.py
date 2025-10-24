@@ -8,6 +8,10 @@ Search_DNB.py - 독일 국립도서관(DNB) SRU 카탈로그를 검색하는 로
 Google Apps Script 버전의 로직을 Python으로 포팅했으며, Tab_LC.py와 호환되는 형식으로 결과를 반환합니다.
 """
 
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+configure_ssl_certificates()
+
 import requests
 import xml.etree.ElementTree as ET
 import re

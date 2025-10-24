@@ -20,7 +20,6 @@ Search_Naver.py - 네이버 검색을 위한 하이브리드 도서 정보 수�
 
 GAS(Google Apps Script)의 `fetchNaverBookInfo` 함수를 파이썬으로 포팅한 것을 시작으로, 현재는 훨씬 더 고도화된 데이터 수집 및 처리 기능을 수행하도록 확장되었습니다.
 """
-
 import requests
 import xml.etree.ElementTree as ET
 import re
@@ -33,6 +32,11 @@ from database_manager import DatabaseManager
 
 import re as _re
 import unicodedata as _ud
+
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+
+configure_ssl_certificates()
 
 _MEDIA_STOPWORDS = (
     "뉴욕 타임스",
@@ -52,6 +56,11 @@ _MEDIA_STOPWORDS = (
     "People",
     "Us Weekly",
     "TIME",
+    "조선일보",
+    "중앙일보",
+    "한겨레",
+    "경향신문",
+    "동아일보",
 )
 
 _EDGE_QUOTES_RE = _re.compile(r'^[《〈<«≪『「“"\']+|[》〉>»≫』」”"\']+$')
@@ -377,13 +386,13 @@ def search_naver_catalog(
 
                             # ✅ 1. 네이버 API 기본 결과
                             naver_record = {
+                                "검색소스": "Naver",
                                 "서명": title,
                                 "저자": author,
                                 "분류 정보 취합": description,
                                 "저자소개": "",  # 네이버 API는 제공 안함
                                 "목차": "",  # 네이버 API는 제공 안함
                                 "서평": description,
-                                "검색소스": "Naver",
                                 "ISBN": isbn,
                                 "출판사": publisher,
                                 "출간일": pubdate,
@@ -458,13 +467,13 @@ def search_naver_catalog(
 
                                     # ✅ [핵심 추가] 예스24 행 생성 및 append (빠져있던 부분)
                                     yes24_record = {
+                                        "검색소스": "Yes24",
                                         "서명": title,
                                         "저자": author,
                                         "분류 정보 취합": "\n\n".join(review_parts_y24),
                                         "저자소개": author_intro_y24,
                                         "목차": toc_y24,
                                         "서평": review_y24,
-                                        "검색소스": "Yes24",
                                         "ISBN": isbn,
                                         "출판사": publisher,
                                         "출간일": pubdate,
@@ -489,13 +498,13 @@ def search_naver_catalog(
                                         review_parts_kb.append(f"3. 서평\n{review_kb}")
 
                                     kyobo_record = {
+                                        "검색소스": "Kyobo Book",
                                         "서명": title,
                                         "저자": author,
                                         "분류 정보 취합": "\n\n".join(review_parts_kb),
                                         "저자소개": author_intro_kb,
                                         "목차": toc_kb,
                                         "서평": review_kb,
-                                        "검색소스": "Kyobo Book",
                                         "ISBN": isbn,
                                         "출판사": publisher,
                                         "출간일": pubdate,
@@ -574,6 +583,7 @@ def search_naver_catalog(
 
                                     # 4번째 행 — AI-Feed Merge
                                     merged_record = {
+                                        "검색소스": "AI-Feed Merge",
                                         "서명": title,
                                         "저자": author,
                                         "분류 정보 취합": "\n\n".join(
@@ -582,8 +592,6 @@ def search_naver_catalog(
                                         "저자소개": merged_author,
                                         "목차": merged_toc,
                                         "서평": merged_review,
-                                        "다른 작품": ", ".join(other_works_flat),
-                                        "검색소스": "AI-Feed Merge",
                                         "ISBN": isbn,
                                         "출판사": publisher,
                                         "출간일": pubdate,
@@ -592,18 +600,18 @@ def search_naver_catalog(
                                         or kyobo_info.get("상품링크")
                                         or link,
                                     }
+                                    results.append(merged_record)
 
                                     # 5번째 행 — OtherWorks Merge (저자별 패턴)
                                     if groups:
                                         otherworks_record = {
+                                            "검색소스": "OtherWorks Merge",
                                             "서명": title,
                                             "저자": author,
                                             "분류 정보 취합": pattern_text,  # 저자A/작품/원서명 형식
                                             "저자소개": "",
                                             "목차": "",
                                             "서평": "",
-                                            "다른 작품": ", ".join(other_works_flat),
-                                            "검색소스": "OtherWorks Merge",
                                             "ISBN": isbn,
                                             "출판사": publisher,
                                             "출간일": pubdate,

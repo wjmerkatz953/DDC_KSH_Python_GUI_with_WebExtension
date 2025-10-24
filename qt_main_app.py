@@ -871,23 +871,39 @@ class MainApplicationWindow(QMainWindow):
         self.log_display.setTextCursor(cursor)
 
     def get_current_tab(self):
-        """✅ [유지] 현재 활성 탭 반환 (모델/뷰 호환)"""
-        current_index = self.tab_widget.currentIndex()
-        return self.tab_widget.widget(current_index)
-        # 이 메서드는 QTabWidget 자체를 사용하므로 수정 불필요
+        """✅ [수정] 현재 활성 탭 반환 (탭 모드 + 트리뷰 모드 모두 지원)"""
+        if self.tab_widget is not None:
+            # 탭 모드
+            current_index = self.tab_widget.currentIndex()
+            return self.tab_widget.widget(current_index)
+        elif self.tree_navigation is not None:
+            # 트리뷰 모드
+            return self.tree_navigation.current_tab_widget
+        return None
 
     def get_tab_by_name(self, name):
-        """이름으로 탭 위젯 인스턴스를 찾습니다."""
+        """✅ [수정] 이름으로 탭 위젯 인스턴스를 찾습니다. 트리뷰 모드에서는 필요시 자동 생성합니다."""
         if self.tab_widget is not None:
+            # 탭 모드: 기존 로직 유지
             for i in range(self.tab_widget.count()):
                 if self.tab_widget.tabText(i) == name:
                     return self.tab_widget.widget(i)
         elif self.tree_navigation is not None:
-            # 트리 네비게이션 모드일 경우, 내부 딕셔너리에서 위젯을 찾습니다.
-            # 이는 create_tree_menu_navigation 구현에 따라 달라질 수 있습니다.
-            # qt_tree_menu_navigation.py를 확인해야 정확한 구현이 가능합니다.
+            # 트리뷰 모드: 이미 생성된 탭 찾기
             if hasattr(self.tree_navigation, "tab_widgets"):
-                return self.tree_navigation.tab_widgets.get(name)
+                existing_tab = self.tree_navigation.tab_widgets.get(name)
+                if existing_tab:
+                    return existing_tab
+
+                # ✅ [핵심 추가] 탭이 아직 생성되지 않았으면 자동 생성
+                # (데이터 전송을 위해 백그라운드에서 탭을 미리 만듦)
+                new_tab = self.tree_navigation.create_tab_widget(name)
+                if new_tab:
+                    self.tree_navigation.tab_widgets[name] = new_tab
+                    self.app_instance.log_message(
+                        f"ℹ️ 데이터 전송을 위해 '{name}' 탭을 백그라운드에서 생성했습니다.", "INFO"
+                    )
+                    return new_tab
         return None
 
     # 메뉴 액션들

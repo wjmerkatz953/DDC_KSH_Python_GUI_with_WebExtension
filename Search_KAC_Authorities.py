@@ -2,6 +2,10 @@
 # Version: v1.0.1
 # 수정일시: 2025-08-04 15:20 KST (저작물 목록 링크 URL 형식 수정)
 
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+configure_ssl_certificates()
+
 import requests
 import json
 import re

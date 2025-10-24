@@ -6,6 +6,10 @@
 Search_LC.py - LC(Library of Congress) SRU 카탈로그를 검색하는 로직을 포함합니다.
 """
 
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+configure_ssl_certificates()
+
 import requests
 import xml.etree.ElementTree as ET
 import re

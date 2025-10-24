@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 # 파일명: qt_data_transfer_manager.py
 # 설명: 탭 간 데이터 전송을 관리하는 중앙 모듈
 
@@ -125,7 +125,7 @@ def handle_ai_feed_to_gemini(ai_feed_tab):
     for row in range(model.rowCount()):
         source_index = model.index(row, source_col_idx)
         compile_index = model.index(row, compile_col_idx)
-        
+
         source = model.data(source_index, Qt.DisplayRole)
         content = model.data(compile_index, Qt.DisplayRole)
 
@@ -148,7 +148,6 @@ def handle_ai_feed_to_gemini(ai_feed_tab):
     final_text = f"[네이버 책 소개]\n{naver_content}\n\n[종합 정보]\n{chosen_content}"
 
     # 3. Gemini 탭으로 데이터 전송
-    # -------------------
     # ✅ [수정] 자동 검색을 위한 start_search_now=True 플래그 추가
     _transfer_to_tabs(
         app_instance,
@@ -157,7 +156,6 @@ def handle_ai_feed_to_gemini(ai_feed_tab):
         switch_priority=True,
         start_search_now=True,
     )
-    # -------------------
 
 
 def _transfer_to_tabs(app_instance, tab_names, **data):

@@ -3,8 +3,7 @@
 # 설명: PySide6용 컨텍스트 메뉴 시스템 (QTableWidget 완전 대응)
 # 버전: 2.1.0 - QTableWidget -> QTableView
 # 생성일: 2025-09-25
-# 수정일: 2025-10-21
-# QTextBrowser CONTEXT MENU에서 텍스트 선택 후 NLK탭 연동 검색 기능 추가
+
 
 from __future__ import annotations
 import re
@@ -14,6 +13,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QTextEdit,
     QDialog,
+    QVBoxLayout,
     QTextBrowser,
     QPushButton,
     QTableView,
@@ -29,6 +29,7 @@ from PySide6.QtCore import QThread, Signal
 from qt_api_clients import translate_text
 from functools import partial
 
+
 # 프로젝트 모듈 import
 from qt_copy_feedback import copy_to_clipboard_with_feedback, show_copy_feedback
 from text_utils import open_google_translate, open_dictionary, open_naver_dictionary
@@ -37,6 +38,7 @@ from qt_utils import (
     enable_modal_close_on_outside_click,
     linkify_text,
 )
+
 
 from typing import Protocol, runtime_checkable, Any, Callable
 
@@ -133,7 +135,9 @@ def show_info_dialog(title, content, app_instance):
 
         layout = QVBoxLayout(dialog)
 
+        # -------------------
         # QDialog를 먼저 생성해야 sizeHint가 정상 작동하므로 순서 유지
+
         text_browser = QTextBrowser()
         text_browser.setReadOnly(True)
 
@@ -158,6 +162,7 @@ def show_info_dialog(title, content, app_instance):
         close_button.clicked.connect(dialog.accept)
         layout.addWidget(close_button)
 
+        # ----------------------------------------
         # ✅ [수정] 다이얼로그를 부모 앱 중앙에 위치시키기
         # 'isWidgetType' 오류 해결을 위해, 'geometry' 속성을 가지고 있는지 확인하는 방식으로 변경합니다.
         # 또한, exec() 전에 move를 호출하기 위해 setMinimumSize() 이후에 위치 계산을 시도합니다.
@@ -701,7 +706,6 @@ def show_qtextedit_context_menu(widget, pos, app_instance):
     # 메뉴 표시
     menu.exec(widget.mapToGlobal(pos))
 
-
 def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance=None):
     print("[DEBUG] 📋 show_textbrowser_context_menu() 호출됨")
     print(f"[DEBUG] viewport_pos: {viewport_pos}")
@@ -709,8 +713,7 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
     menu = QMenu(tb.viewport())  # ✅ viewport 기준으로 메뉴 생성
 
     # ✅ 스타일 강제 지정 (다크 테마에서도 메뉴 항목이 보이도록)
-    menu.setStyleSheet(
-        """
+    menu.setStyleSheet("""
         QMenu::item {
             color: white;
             padding: 6px 12px;
@@ -718,8 +721,7 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
         QMenu::item:disabled {
             color: #888;
         }
-    """
-    )
+    """)
 
     has_sel = bool(tb.textCursor().hasSelection())
     selected_text = tb.textCursor().selectedText()
@@ -752,10 +754,12 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
         print("[DEBUG] 메뉴 선택 없음 (사용자 취소)")
         return
 
+
     if chosen is act_copy:
         print("[DEBUG] 📋 Copy 선택됨")
         tb.copy()
         try:
+            from qt_copy_feedback import show_copy_feedback
             show_copy_feedback(app_instance, "복사됨")
         except Exception as e:
             print(f"[DEBUG] show_copy_feedback 실패: {e}")
@@ -769,7 +773,6 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
         QGuiApplication.clipboard().setText(anchor)
         try:
             from qt_copy_feedback import show_copy_feedback
-
             show_copy_feedback(app_instance, "링크 복사됨")
         except Exception as e:
             print(f"[DEBUG] show_copy_feedback 실패: {e}")
@@ -791,49 +794,49 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
         else:
             print("[ERROR] ❌ tab_widget을 가진 객체를 찾을 수 없습니다.")
             if hasattr(app_instance, "log_message"):
-                app_instance.log_message(
-                    "❌ tab_widget을 가진 객체를 찾을 수 없습니다.", "ERROR"
-                )
+                app_instance.log_message("❌ tab_widget을 가진 객체를 찾을 수 없습니다.", "ERROR")
 
     elif chosen is act_select_all:
         print("[DEBUG] 🧲 Select All 선택됨")
         tb.selectAll()
 
 
+
 def _search_in_nlk_tab(app_instance, title_text):
-    print(f"[DEBUG] _search_in_nlk_tab() 호출됨 → '{title_text}'")
-
-    if not hasattr(app_instance, "tab_widget"):
-        print("[ERROR] ❌ app_instance에 tab_widget 속성이 없습니다.")
-        if hasattr(app_instance, "log_message"):
-            app_instance.log_message("❌ tab_widget 속성이 없습니다.", "ERROR")
-        return
-
     """
+    ✅ [수정] 탭 모드와 트리뷰 모드를 모두 지원하도록 수정
     NLK 탭으로 전환하고 제목 검색을 실행합니다.
 
     Args:
-        app_instance: 메인 앱 인스턴스
+        app_instance: 메인 앱 인스턴스 또는 탭 인스턴스
         title_text: 검색할 제목 텍스트
     """
+    print(f"[DEBUG] _search_in_nlk_tab() 호출됨 → '{title_text}'")
+    print(f"[DEBUG] app_instance 타입: {type(app_instance).__name__}")
+
+    # ✅ [핵심 수정] app_instance가 실제 IntegratedSearchApp인지, 아니면 탭 인스턴스인지 확인
+    if hasattr(app_instance, "main_window"):
+        # IntegratedSearchApp 인스턴스
+        main_window = app_instance.main_window
+        print(f"[DEBUG] app_instance.main_window 사용")
+    elif hasattr(app_instance, "app_instance") and hasattr(app_instance.app_instance, "main_window"):
+        # 탭 인스턴스 (app_instance.app_instance.main_window)
+        main_window = app_instance.app_instance.main_window
+        print(f"[DEBUG] app_instance.app_instance.main_window 사용")
+    else:
+        print("[ERROR] ❌ main_window를 찾을 수 없습니다.")
+        return
+
     try:
-        # 1. NLK 탭으로 전환
-        nlk_tab_index = None
-        for i in range(app_instance.tab_widget.count()):
-            tab_name = app_instance.tab_widget.tabText(i)
-            if "NLK" in tab_name:
-                nlk_tab_index = i
-                break
+        # ✅ [핵심 수정] main_window의 switch_to_tab_by_name 메서드 사용
+        main_window.switch_to_tab_by_name("NLK 검색")
 
-        if nlk_tab_index is None:
-            if hasattr(app_instance, "log_message"):
-                app_instance.log_message("⚠️ NLK 탭을 찾을 수 없습니다.", "WARNING")
+        # ✅ [핵심 수정] main_window의 get_tab_by_name 메서드 사용
+        nlk_tab = main_window.get_tab_by_name("NLK 검색")
+
+        if nlk_tab is None:
+            print("[ERROR] ❌ NLK 탭을 찾을 수 없습니다.")
             return
-
-        app_instance.tab_widget.setCurrentIndex(nlk_tab_index)
-
-        # 2. NLK 탭 객체 가져오기
-        nlk_tab = app_instance.tab_widget.widget(nlk_tab_index)
 
         # 3. 모든 검색 입력 필드 초기화 (input_widgets 딕셔너리 사용)
         nlk_tab.input_widgets["title"].clear()
@@ -842,32 +845,41 @@ def _search_in_nlk_tab(app_instance, title_text):
         nlk_tab.input_widgets["year"].clear()
 
         # DDC 입력창이 있으면 초기화
-        if hasattr(nlk_tab, "ddc_input"):
+        if hasattr(nlk_tab, 'ddc_input'):
             nlk_tab.ddc_input.clear()
 
         # 4. 제목 입력 필드에 텍스트 설정
         nlk_tab.input_widgets["title"].setText(title_text)
         print(f"[DEBUG] 제목 입력 완료: '{title_text}' → input_widgets['title'] 사용")
 
-        # 5. ✅ [중요] 타이밍 이슈 해결: GUI 이벤트 처리를 위해 약간의 지연 추가
-        from PySide6.QtCore import QTimer
+        # 5. 제목 체크박스만 활성화 (다른 체크박스는 비활성화)
+        nlk_tab.title_check.setChecked(True)
+        nlk_tab.author_check.setChecked(False)
+        nlk_tab.isbn_check.setChecked(False)
+        nlk_tab.year_check.setChecked(False)
 
+        if hasattr(nlk_tab, 'ddc_check'):
+            nlk_tab.ddc_check.setChecked(False)
+
+        # 6. ✅ [중요] 타이밍 이슈 해결: GUI 이벤트 처리를 위해 약간의 지연 추가
+        from PySide6.QtCore import QTimer
         print(f"[DEBUG] 검색 실행 준비 완료 → 200ms 후 검색 시작")
         QTimer.singleShot(200, nlk_tab.start_search)
 
+        # ✅ [수정] log_message도 올바른 app_instance에서 호출
+        real_app = None
         if hasattr(app_instance, "log_message"):
-            app_instance.log_message(
-                f"✅ NLK 탭에서 '{title_text}' 제목 검색을 시작합니다.", "INFO"
-            )
+            real_app = app_instance
+        elif hasattr(app_instance, "app_instance") and hasattr(app_instance.app_instance, "log_message"):
+            real_app = app_instance.app_instance
+
+        if real_app:
+            real_app.log_message(f"✅ NLK 탭에서 '{title_text}' 제목 검색을 시작합니다.", "INFO")
 
     except Exception as e:
-        if hasattr(app_instance, "log_message"):
-            app_instance.log_message(f"❌ NLK 탭 검색 실행 실패: {e}", "ERROR")
         print(f"[ERROR] _search_in_nlk_tab 예외 발생: {e}")
         import traceback
-
         traceback.print_exc()
-
 
 def setup_widget_context_menu(widget, app_instance):
     """✅ [모델/뷰 전용] 위젯에 컨텍스트 메뉴 자동 설정 - QTableWidget 완전 폐기"""
@@ -1696,7 +1708,6 @@ def show_cell_detail_dialog(cell_value, column_name, app_instance):
 
         # ✅ 컨텍스트 메뉴는 viewport에 걸어야 함 (QTextBrowser는 스크롤 영역이 따로 있음)
         from qt_context_menus import show_textbrowser_context_menu
-
         text_browser.viewport().setContextMenuPolicy(Qt.CustomContextMenu)
         text_browser.viewport().customContextMenuRequested.connect(
             # pos는 이미 viewport 좌표 → 빌더로 그대로 전달

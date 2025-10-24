@@ -1,80 +1,43 @@
 """
 search_query_manager.py를 3개 파일로 분할하는 스크립트
 """
-
 import sys
 import re
 
 # UTF-8 출력 설정
-sys.stdout.reconfigure(encoding="utf-8")
+sys.stdout.reconfigure(encoding='utf-8')
 
 # 메서드 분류
 DEWEY_METHODS = [
-    "_cache_ddc_description",
-    "_search_by_ddc_ranking_logic",
-    "_search_by_ddc_with_fallback",
-    "_search_ddc_by_sql_fts",
-    "_search_ddc_from_cache",
-    "_search_ddc_with_fallback_hierarchy",
-    "get_all_ddc_labels_bulk",
-    "get_ddc_description_cached",
-    "get_ddc_labels",
-    "get_dewey_by_notation",
-    "get_dewey_cache_entry",
-    "get_dewey_from_cache",
-    "get_multiple_ddcs_descriptions",
-    "save_dewey_to_cache",
-    "search_ddc_by_keyword",
-    "search_ddc_by_multiple_keywords",
+    '_cache_ddc_description', '_search_by_ddc_ranking_logic', '_search_by_ddc_with_fallback',
+    '_search_ddc_by_sql_fts', '_search_ddc_from_cache', '_search_ddc_with_fallback_hierarchy',
+    'get_all_ddc_labels_bulk', 'get_ddc_description_cached', 'get_ddc_labels',
+    'get_dewey_by_notation', 'get_dewey_cache_entry', 'get_dewey_from_cache',
+    'get_multiple_ddcs_descriptions', 'save_dewey_to_cache', 'search_ddc_by_keyword',
+    'search_ddc_by_multiple_keywords'
 ]
 
 KSH_METHODS = [
-    "_format_korean_search_results",
-    "_format_ksh_column_optimized",
-    "_format_ksh_display",
-    "_format_ksh_labeled_to_markup",
-    "_get_broader_for_concept",
-    "_get_narrower_for_concept",
-    "_get_related_for_concept",
-    "_get_synonyms_for_concept",
-    "_search_by_korean_subject",
-    "_search_by_ksh_code",
-    "get_concept_relations",
-    "get_ksh_entries",
-    "get_ksh_entries_batch",
-    "get_ksh_entries_batch_exact",
-    "get_ksh_entries_exact_match",
-    "search_integrated_ksh",
-    "search_integrated_ksh_with_relations",
-    "search_ksh_by_language",
+    '_format_korean_search_results', '_format_ksh_column_optimized', '_format_ksh_display',
+    '_format_ksh_labeled_to_markup', '_get_broader_for_concept', '_get_narrower_for_concept',
+    '_get_related_for_concept', '_get_synonyms_for_concept', '_search_by_korean_subject',
+    '_search_by_ksh_code', 'get_concept_relations', 'get_ksh_entries',
+    'get_ksh_entries_batch', 'get_ksh_entries_batch_exact', 'get_ksh_entries_exact_match',
+    'search_integrated_ksh', 'search_integrated_ksh_with_relations', 'search_ksh_by_language'
 ]
 
 COMMON_METHODS = [
-    "__init__",
-    "_extract_and_save_keywords",
-    "_get_best_matched_term",
-    "_get_broader_batch",
-    "_get_clean_subject_for_sorting",
-    "_get_narrower_batch",
-    "_get_pref_label",
-    "_get_related_batch",
-    "_get_synonyms_batch",
-    "_process_parentheses_for_equal_terms",
-    "_save_keywords_separately",
-    "_singularize_search_term",
-    "_sort_by_year_and_identifier",
-    "_strip_namespace",
-    "dedup_lang_variants",
-    "get_bibliographic_by_subject_name",
-    "get_bibliographic_by_title",
-    "preprocess_search_term",
-    "search_bibliographic_by_subject_optimized",
+    '__init__', '_extract_and_save_keywords', '_get_best_matched_term', '_get_broader_batch',
+    '_get_clean_subject_for_sorting', '_get_narrower_batch', '_get_pref_label',
+    '_get_related_batch', '_get_synonyms_batch', '_process_parentheses_for_equal_terms',
+    '_save_keywords_separately', '_singularize_search_term', '_sort_by_year_and_identifier',
+    '_strip_namespace', 'dedup_lang_variants', 'get_bibliographic_by_subject_name',
+    'get_bibliographic_by_title', 'preprocess_search_term', 'search_bibliographic_by_subject_optimized'
 ]
-
 
 def extract_methods(content):
     """파일에서 메서드들을 추출"""
-    lines = content.split("\n")
+    lines = content.split('\n')
     methods = {}
     current_method = None
     method_start = 0
@@ -82,14 +45,14 @@ def extract_methods(content):
 
     for i, line in enumerate(lines):
         # 메서드 정의 시작
-        method_match = re.match(r"    def ([a-zA-Z_][a-zA-Z0-9_]*)\(", line)
+        method_match = re.match(r'    def ([a-zA-Z_][a-zA-Z0-9_]*)\(', line)
 
         if method_match:
             # 이전 메서드 저장
             if current_method:
                 methods[current_method] = {
-                    "start": method_start,
-                    "lines": method_lines.copy(),
+                    'start': method_start,
+                    'lines': method_lines.copy()
                 }
 
             # 새 메서드 시작
@@ -98,11 +61,11 @@ def extract_methods(content):
             method_lines = [line]
         elif current_method:
             # 클래스 종료 또는 다음 메서드 전까지
-            if line and not line.startswith(" "):
+            if line and not line.startswith(' '):
                 # 들여쓰기 없는 줄 = 클래스 끝
                 methods[current_method] = {
-                    "start": method_start,
-                    "lines": method_lines.copy(),
+                    'start': method_start,
+                    'lines': method_lines.copy()
                 }
                 current_method = None
                 method_lines = []
@@ -111,21 +74,23 @@ def extract_methods(content):
 
     # 마지막 메서드 저장
     if current_method:
-        methods[current_method] = {"start": method_start, "lines": method_lines.copy()}
+        methods[current_method] = {
+            'start': method_start,
+            'lines': method_lines.copy()
+        }
 
     return methods
 
-
 # 원본 파일 읽기
-with open(r"c:\Python\search_query_manager.py", "r", encoding="utf-8") as f:
+with open(r'c:\Python\search_query_manager.py', 'r', encoding='utf-8') as f:
     original_content = f.read()
 
-lines = original_content.split("\n")
+lines = original_content.split('\n')
 
 # 헤더 추출 (클래스 정의 전까지)
 class_start_idx = None
 for i, line in enumerate(lines):
-    if line.startswith("class SearchQueryManager"):
+    if line.startswith('class SearchQueryManager'):
         class_start_idx = i
         break
 
@@ -133,7 +98,7 @@ if class_start_idx is None:
     print("❌ 클래스 정의를 찾을 수 없습니다!")
     exit(1)
 
-header = "\n".join(lines[:class_start_idx])
+header = '\n'.join(lines[:class_start_idx])
 
 # 메서드들 추출
 methods = extract_methods(original_content)
@@ -144,9 +109,7 @@ print(f"   - KSH: {len([m for m in methods if m in KSH_METHODS])}개")
 print(f"   - Common: {len([m for m in methods if m in COMMON_METHODS])}개")
 
 # 1. search_common_manager.py 생성
-common_content = (
-    header
-    + '''
+common_content = header + '''
 
 class SearchCommonManager:
     """
@@ -157,13 +120,12 @@ class SearchCommonManager:
     - 유틸리티 메서드
     """
 '''
-)
 
 for method_name in COMMON_METHODS:
     if method_name in methods:
-        common_content += "\n" + "\n".join(methods[method_name]["lines"]) + "\n"
+        common_content += '\n' + '\n'.join(methods[method_name]['lines']) + '\n'
 
-with open(r"c:\Python\search_common_manager.py", "w", encoding="utf-8") as f:
+with open(r'c:\Python\search_common_manager.py', 'w', encoding='utf-8') as f:
     f.write(common_content)
 
 print(f"✅ search_common_manager.py 생성 완료 ({len(common_content.split(chr(10)))}줄)")
@@ -194,9 +156,9 @@ class SearchDeweyManager(SearchCommonManager):
 
 for method_name in DEWEY_METHODS:
     if method_name in methods:
-        dewey_content += "\n" + "\n".join(methods[method_name]["lines"]) + "\n"
+        dewey_content += '\n' + '\n'.join(methods[method_name]['lines']) + '\n'
 
-with open(r"c:\Python\search_dewey_manager.py", "w", encoding="utf-8") as f:
+with open(r'c:\Python\search_dewey_manager.py', 'w', encoding='utf-8') as f:
     f.write(dewey_content)
 
 print(f"✅ search_dewey_manager.py 생성 완료 ({len(dewey_content.split(chr(10)))}줄)")
@@ -228,9 +190,9 @@ class SearchKshManager(SearchCommonManager):
 
 for method_name in KSH_METHODS:
     if method_name in methods:
-        ksh_content += "\n" + "\n".join(methods[method_name]["lines"]) + "\n"
+        ksh_content += '\n' + '\n'.join(methods[method_name]['lines']) + '\n'
 
-with open(r"c:\Python\search_ksh_manager.py", "w", encoding="utf-8") as f:
+with open(r'c:\Python\search_ksh_manager.py', 'w', encoding='utf-8') as f:
     f.write(ksh_content)
 
 print(f"✅ search_ksh_manager.py 생성 완료 ({len(ksh_content.split(chr(10)))}줄)")
