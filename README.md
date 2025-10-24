@@ -60,7 +60,7 @@ python main_app.py
 dewey_cache.db	DDC 계층 구조 및 라벨 캐시
 kdc_ddc_mapping.db	KDC ↔ DDC 매핑 테이블
 glossary.db	용어집 및 다국어 번역 캐시
-concepts.db	KSH 개념 인덱싱 및 의미 유사도 계산
+nlk_concepts.sqlite  KSH 개념 인덱싱 및 의미 유사도 계산
 🔬 연구적 활용
 
 이 앱은 다음과 같은 연구/교육 목적에 활용될 수 있습니다.
