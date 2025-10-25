@@ -1,14 +1,23 @@
 # -*- coding: utf-8 -*-
 # 파일명: qt_tree_menu_navigation.py
-# 버전: v1.0.2
+# 버전: v1.0.3
 # 설명: QTreeWidget 기반 사이드바 네비게이션
 # 생성일: 2025-10-02
 #
 # 변경 이력:
-# v1.0.2 (2025-10-02)
+# v1.0.3 (2025-10-25)
+# - [추가] 마우스 호버 시 그룹 메뉴 자동 펼치기 기능 (on_tree_item_hovered)
+# - [추가] setMouseTracking(True) 및 itemEntered 시그널 연결
+# - [추가] 싱글 클릭으로 그룹 펼치기/접기 동작
+# - [추가] 분류/AI 그룹에 "Gemini DDC 분류" 탭 추가
+# - [수정] 탭 이름을 qt_Tab_configs.py와 정확히 일치시킴
+#
+# v1.0.2 (2025-10-24)
 # - [수정] UI 상수(ui_constants.py)를 사용하도록 배경색 변경
 # - [수정] BACKGROUND_PRIMARY, BACKGROUND_SECONDARY, ACCENT_BLUE 적용
 # - [수정] 트리메뉴 영역, 트리위젯, 콘텐츠 영역 모두 일관된 색상 테마 적용
+# - [수정] 호버 및 선택 항목 색상을 ACCENT_BLUE로 통일
+# - [수정] 텍스트 색상을 TEXT_DEFAULT 및 TEXT_BUTTON으로 변경
 #
 # v1.0.1 (2025-10-02)
 # - [수정] tab_groups의 탭 이름을 qt_Tab_configs.py의 tab_name과 정확히 일치하도록 수정

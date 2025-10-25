@@ -87,6 +87,30 @@
 
 각 `qt_TabView_*.py` 파일은 `qt_base_tab.py`를 상속받아 특정 도메인의 검색 기능을 구현한 구체적인 UI 컴포넌트입니다. 모든 탭은 비동기 검색, 테이블 뷰, 공통 컨텍스트 메뉴 등 `qt_base_tab`이 제공하는 표준화된 기능을 공유합니다.
 
+### 📌 전체 탭 이름 목록 (qt_Tab_configs.py 기준)
+
+**⚠️ 중요**: 트리메뉴나 탭 관련 코드를 수정할 때는 반드시 `qt_Tab_configs.py`에 정의된 정확한 `tab_name`을 사용해야 합니다.
+
+| 탭 이름 (tab_name) | 파일명 | 그룹 | 설명 |
+|-------------------|--------|------|------|
+| **MARC 추출** | `qt_TabView_MARC_Extractor.py` | 검색 | MARC 데이터 추출 |
+| **NLK 검색** | `qt_TabView_NLK.py` | 검색 | 국립중앙도서관 LOD 검색 |
+| **NDL + CiNii 검색** | `qt_TabView_NDL.py` | 검색 | 일본 국립국회도서관 |
+| **Western 검색** | `qt_TabView_Western.py` | 검색 | 서양권 통합 검색 |
+| **Global 통합검색** | `qt_TabView_Global.py` | 검색 | 글로벌 통합 검색 |
+| **납본 ID 검색** | `qt_TabView_LegalDeposit.py` | 검색 | 납본자료 검색 |
+| **저자전거 검색** | `qt_TabView_KACAuthorities.py` | 저작물/저자 | KAC 저자전거 |
+| **상세 저작물 정보** | `qt_TabView_ISNI_Detailed.py` | 저작물/저자 | ISNI 상세 정보 |
+| **간략 저작물 정보** | `qt_TabView_BriefWorks.py` | 저작물/저자 | 간략 서지 정보 |
+| **KSH Hybrid** | `qt_TabView_KSH_Lite.py` | 주제어 | KSH 하이브리드 검색 |
+| **KSH Local** | `qt_TabView_KSH_Local.py` | 주제어 | KSH 로컬 DB 검색 |
+| **Dewey 분류 검색** | `qt_TabView_Dewey.py` | 분류/AI | DDC 분류 검색 |
+| **Gemini DDC 분류** | `qt_TabView_Gemini.py` | 분류/AI | Gemini AI 기반 분류 |
+| **AI 피드** | `qt_TabView_AIFeed.py` | 분류/AI | AI 메타데이터 피드 |
+| **MARC 로직 편집** | `qt_TabView_MARC_Editor.py` | 편집 | MARC 편집기 |
+| **🐍 Python** | `qt_TabView_Python.py` | 도구 | 내장 Python 콘솔 |
+| **설정** | `qt_TabView_Settings.py` | 설정 | 앱 설정 관리 |
+
 ### 4.1. 핵심 검색 탭
 
 - **`qt_TabView_KSH_Local.py` (KSH 로컬 검색)**
