@@ -1,0 +1,208 @@
+0. 탭바 하단 여백
+    QTabBar::tab {{
+        background: {U.WIDGET_BG_DEFAULT};
+        color: {U.TEXT_BUTTON};
+        padding: 5px 15px;         /* 탭바 높이 조절 5px */
+        border: 0px solid {U.ACCENT_BLUE};
+        margin-bottom: 2px;
+    }}
+
+
+
+1. 탭 내부 영역 (모든 탭 공통)
+
+이 설정들은 qt_base_tab.py 파일에서 관리하며, 여기에 수정하면 모든 탭에 일괄적으로 적용됩니다.
+
+A. 입력창과 결과 테이블 사이의 간격
+
+    파일: qt_base_tab.py
+
+    클래스/메서드: BaseSearchTab.setup_ui
+
+    코드:
+    Python
+
+    def setup_ui(self):
+        main_layout = QVBoxLayout(self)
+        # 🔽 1. 위젯 사이의 전체적인 간격
+        main_layout.setSpacing(0)
+
+    설명: setSpacing() 값은 입력 영역, 프로그레스바, 결과 테이블 등 주요 위젯 사이의 수직 간격을 일괄 조절합니다. 0으로 설정하면 간격이 최소화됩니다.
+
+    def create_input_section(self, parent_layout):
+        """UI의 '입력 섹션'을 조립하는 메인 메서드"""
+        self.input_container = QFrame()
+        self.input_layout = QGridLayout(self.input_container)
+        self.input_layout.setContentsMargins(
+            6, 6, 0, -2  # ✅ 하단 여백을 음수로 설정하여 간격 축소
+        )  # 좌상우하 검색어 필드 아래 여백
+
+
+📐 간격 조절 포인트
+1. 입력 섹션 하단 여백 (qt_base_tab.py:497)
+setContentsMargins(6, 6, 0, -3)  # 하단 -3px (음수로 위로 당김)
+더 줄이려면: -5 또는 -8
+원래대로: 0
+2. 프로그레스바 상하 여백 (qt_base_tab.py:471)
+setContentsMargins(6, 2, 6, 2)  # 상하 2px
+더 줄이려면: (6, 0, 6, 0)
+원래: (6, 4, 6, 5)
+3. 메인 레이아웃 간격 (이미 0)
+main_layout.setSpacing(0)  # 이미 최소
+앱 재시작 후 확인해보세요! 입력창과 테이블 사이 간격이 줄어들 겁니다! 😊
+
+B. 프로그레스바의 상/하 여백
+
+    파일: qt_base_tab.py
+
+    클래스/메서드: BaseSearchTab.setup_ui
+
+    코드:
+    Python
+
+    # ... setup_ui 내부 ...
+        progress_layout = QHBoxLayout()
+        # 🔽 2. 프로그레스바 위(top), 아래(bottom) 여백
+        # setContentsMargins(left, top, right, bottom)
+        progress_layout.setContentsMargins(6, 0, 5, 0)
+
+    설명: setContentsMargins의 두 번째(상단), 네 번째(하단) 값을 조절하여 프로그레스바 위아래의 미세한 간격을 제어할 수 있습니다.
+
+C. 결과 테이블과 Find 영역 사이의 간격
+
+    파일: qt_base_tab.py
+
+    클래스/메서드: BaseSearchTab.setup_ui
+
+    코드:
+    Python
+
+    # ... setup_ui 내부 ...
+        self.create_results_section(main_layout)
+        # 🔽 3. 테이블과 Find 영역 사이에 추가된 고정 간격
+        main_layout.addSpacing(5)
+        self.create_find_section(main_layout)
+
+    설명: addSpacing() 값은 결과 테이블과 Find 영역 사이에 추가된 고정 크기의 빈 공간입니다. 이 값을 조절하여 간격을 제어합니다.
+
+2. 메인 윈도우 영역 (전체 구조)
+
+이 설정들은 qt_main_app.py 파일에서 관리하며, 프로그램 전체의 큰 틀에 영향을 줍니다.
+
+D. 탭 위젯과 하단 패널(로그/상세정보) 사이의 간격
+
+    파일: qt_main_app.py
+
+    클래스/메서드: MainApplicationWindow.setup_ui
+
+    설명: 이 간격은 QSplitter에 의해 관리되므로 사용자가 마우스로 직접 조절할 수 있습니다. 코드에서는 고정된 픽셀 값이 아닌, 초기 화면 분할 비율을 설정합니다.
+
+    코드:
+    Python
+
+    # ... setup_ui 내부 ...
+        # 스플리터 초기 크기 비율 설정
+        # 🔽 4. (탭 영역 크기) : (하단 패널 크기) 초기 비율
+        main_splitter.setSizes([700, 300])
+
+
+        # [핵심 수정 2] Find-하단패널 간격 조절 및 그룹박스 제목 스타일 정의 (수직 정렬 효과)
+        groupbox_style = """
+            QGroupBox {
+                margin-top: 0px; margin-left: 0px;
+            }
+            QGroupBox::title {
+                top: 3px;
+                padding-left: 8px;
+                padding-right: 2px;
+                margin-left: 0px;
+            }
+        """
+
+E. 하단 패널의 제목과 내용 사이의 간격
+
+    파일: qt_main_app.py
+
+    클래스/메서드: MainApplicationWindow.setup_ui
+
+    코드:
+    Python
+
+    # ... setup_ui 내부 ...
+        # 왼쪽: 로그 섹션
+        self.log_group = QGroupBox("시스템 로그")
+        log_layout = QVBoxLayout(self.log_group)
+        # 🔽 5. "시스템 로그" 제목과 텍스트 박스 사이의 간격
+        # setContentsMargins(left, top, right, bottom)
+        log_layout.setContentsMargins(5, 20, 5, 5)
+
+        # 오른쪽: 상세 정보 섹션
+        self.detail_group = QGroupBox("선택 행 상세 정보")
+        detail_layout = QVBoxLayout(self.detail_group)
+        # 🔽 6. "선택 행 상세 정보" 제목과 텍스트 박스 사이의 간격
+        detail_layout.setContentsMargins(5, 20, 5, 5)
+
+    설명: 각 QGroupBox 내부 레이아웃의 setContentsMargins 두 번째 인자(top)가 제목과 내용 사이의 간격을 결정합니다.
+
+F. 하단 패널과 프로그램 창 최하단 사이의 간격
+
+    파일: qt_main_app.py
+
+    클래스/메서드: MainApplicationWindow.setup_ui
+
+    코드:
+    Python
+
+# ... setup_ui 내부 ...
+    self.bottom_container = QWidget()
+    bottom_layout = QHBoxLayout(self.bottom_container)
+    # 🔽 7. 하단 패널의 맨 아래쪽 여백
+    # setContentsMargins(left, top, right, bottom)
+    bottom_layout.setContentsMargins(6, 10, 6, 15)
+
+설명: bottom_layout의 setContentsMargins 네 번째 인자(bottom)가 하단 패널과 프로그램 창의 경계 사이 간격을 결정합니다.
+
+
+
+먼저 padding: 6px, 6px, 6px, 6px;는 올바르지 않은 문법이며, 쉼표(,) 대신 **띄어쓰기(     )**를 사용해야 합니다. (padding: 6px 6px 6px 6px;)
+
+padding과 margin 속성의 순서는 CSS 규칙과 동일하며, 상단(Top)에서 시작하여 시계 방향으로 적용됩니다.
+
+    값이 4개일 때: padding: top right bottom left;
+
+        padding: 10px 5px 15px 3px; -> 상: 10, 우: 5, 하: 15, 좌: 3
+
+    값이 2개일 때: padding: top/bottom left/right;
+
+        padding: 10px 5px; -> 상/하: 10, 좌/우: 5
+
+    값이 1개일 때: padding: all;
+
+        padding: 10px; -> 상하좌우 모두 10
+
+따라서 padding: 6px 6px 6px 6px;는 모든 방향에 6px의 여백을 주는 것이며, padding: 6px;와 동일한 의미입니다.
+
+
+
+    def _create_standard_inputs(self):
+        """(공통) 기본 입력창 (제목, 저자, ISBN) 생성"""
+
+        # [핵심] 모든 위젯의 행(row) 번호를 0으로 통일하여 한 줄에 배치
+        self.title_check = QCheckBox("제목:")
+        self.title_check.setChecked(True)
+        self.input_widgets["title"] = SelectAllLineEdit()
+        self.input_widgets["title"].setFixedHeight(24)  # ✅ 높이 조절
+        self.input_layout.addWidget(self.title_check, 0, 0)
+        self.input_layout.addWidget(self.input_widgets["title"], 0, 1)
+
+        self.author_check = QCheckBox("저자:")
+        self.author_check.setChecked(True)
+        self.input_widgets["author"] = SelectAllLineEdit()
+        self.input_widgets["author"].setFixedHeight(24)  # ✅ 높이 조절
+        self.input_layout.addWidget(self.author_check, 0, 2)
+        self.input_layout.addWidget(self.input_widgets["author"], 0, 3)
+
+        self.isbn_check = QCheckBox("ISBN:")
+        self.isbn_check.setChecked(True)
+        self.input_widgets["isbn"] = SelectAllLineEdit()
+        self.input_widgets["isbn"].setFixedHeight(24)  # ✅ 높이 조절
