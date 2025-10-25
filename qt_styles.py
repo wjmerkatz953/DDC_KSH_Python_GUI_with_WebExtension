@@ -8,6 +8,7 @@ qt_styles.py - Qt 스타일시트 정의
 - 테마 전환을 위해 함수로 변경
 """
 
+
 def get_app_stylesheet():
     """현재 테마에 맞는 스타일시트를 반환합니다."""
     from ui_constants import UI_CONSTANTS as U
@@ -46,6 +47,7 @@ def get_app_stylesheet():
     }}
     QTabBar::tab:hover {{
         background: {U.ACCENT_BLUE};
+        color: {U.TEXT_BUTTON};
     }}
     QTabBar::tab:selected {{
         background: {U.ACCENT_BLUE};
@@ -78,14 +80,14 @@ def get_app_stylesheet():
     }}
     /* ✅ [추가] 설정탭 섹션 프레임 전용 스타일 */
     QFrame#SettingsSectionFrame {{
-        background-color: {U.INPUT_WIDGET_BG};
+        background-color: {U.BACKGROUND_PRIMARY};
         border: 0.6px solid {U.BORDER_LIGHT};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
     }}
     /* 모든 QGroupBox에 적용될 기본 스타일 */
     QGroupBox {{
         background-color: {U.WIDGET_BG_DEFAULT};
-        border: 0.6px solid {U.BORDER_LIGHT};
+        border: 0.5px solid {U.BORDER_LIGHT};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         margin-top: 0px;
     }}
@@ -104,11 +106,20 @@ def get_app_stylesheet():
     }}
     QGroupBox::title {{
         top: 3px;
-        padding-left: 8px;
+        padding-left: 2px;
         padding-right: 2px;
         margin-left: 0px;
     }}
     QTextEdit {{
+        background-color: {U.BACKGROUND_PRIMARY};
+        border: 0.8px solid {U.BORDER_MEDIUM};
+        border-radius: {U.CORNER_RADIUS_DEFAULT}px;
+        padding: 6px 6px 6px 6px;
+    }}
+
+    /* ✅ [추가] MARC 추출 탭 & Gemini 탭 입력 위젯 전용 스타일 그룹 */
+    /* MARC_Gemini 그룹: MARC 추출 탭과 Gemini 탭의 입력 위젯 배경색을 별도로 조절 */
+    QTextEdit#MARC_Gemini_Input {{
         background-color: {U.INPUT_WIDGET_BG};
         border: 0.8px solid {U.BORDER_MEDIUM};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
@@ -133,6 +144,46 @@ def get_app_stylesheet():
     QCheckBox::indicator:checked {{
         background-color: {U.ACCENT_BLUE};
         border: 1px solid {U.ACCENT_BLUE};
+    }}
+
+    /* ✅ [추가] QRadioButton 커스텀 스타일 - 선택/미선택 상태를 명확히 구분 */
+    QRadioButton {{
+        spacing: 6px;
+        color: {U.TEXT_DEFAULT};
+    }}
+    QRadioButton::indicator {{
+        width: 16px;
+        height: 16px;
+        border-radius: 5px;
+        border: 2px solid {U.TEXT_SUBDUED};
+        background-color: {U.BACKGROUND_PRIMARY};
+    }}
+    QRadioButton::indicator:hover {{
+        border: 2px solid {U.ACCENT_BLUE};
+    }}
+    QRadioButton::indicator:checked {{
+        border: 2px solid {U.ACCENT_BLUE};
+        background-color: {U.ACCENT_BLUE};
+        /* 중앙 점 효과를 위한 radial gradient */
+        background: qradialgradient(
+            cx:0.5, cy:0.5, radius:0.5,
+            fx:0.5, fy:0.5,
+            stop:0 {U.BACKGROUND_PRIMARY},
+            stop:0.4 {U.BACKGROUND_PRIMARY},
+            stop:0.5 {U.ACCENT_BLUE},
+            stop:1 {U.ACCENT_BLUE}
+        );
+    }}
+    QRadioButton::indicator:checked:hover {{
+        border: 2px solid {U.ACCENT_BLUE_HOVER};
+        background: qradialgradient(
+            cx:0.5, cy:0.5, radius:0.5,
+            fx:0.5, fy:0.5,
+            stop:0 {U.BACKGROUND_PRIMARY},
+            stop:0.4 {U.BACKGROUND_PRIMARY},
+            stop:0.5 {U.ACCENT_BLUE_HOVER},
+            stop:1 {U.ACCENT_BLUE_HOVER}
+        );
     }}
     QPushButton {{
         background-color: {U.ACCENT_BLUE};
@@ -226,6 +277,11 @@ def get_app_stylesheet():
         background-color: {U.BACKGROUND_PRIMARY};
     }}
 
+    QTableView::item:hover {{
+        background-color: {U.ACCENT_BLUE};
+        color: {U.TEXT_BUTTON};
+    }}
+
     QTableView::item:selected {{
         background-color: {U.HIGHLIGHT_SELECTED};
         color: {U.TEXT_BUTTON};
@@ -251,7 +307,7 @@ def get_app_stylesheet():
     }}
     /* ✅ [추가] 테이블 뷰 좌측 상단 코너 위젯 스타일 */
     QTableView QTableCornerButton::section {{
-        background-color: {U.WIDGET_BG_DEFAULT}; /* 👈 이 부분의 색상을 수정하면 됩니다. */
+        background-color: {U.CORNER_STONE}; /* 👈 이 부분의 색상을 수정하면 됩니다. */
         border: none;
     }}
     /* 스크롤바 스타일 */
@@ -374,14 +430,14 @@ def get_app_stylesheet():
     QTableView QLineEdit {{
         padding: 2px 4px;
         border: 1px solid {U.ACCENT_BLUE};
-        background-color: {U.WIDGET_BG_DEFAULT};
+        background-color: {U.INPUT_WIDGET_BG};
         color: {U.TEXT_DEFAULT};
     }}
 
 
     /* ✅ [추가] DDC 탭 전용 버튼/입력필드 스타일 */
     QLineEdit#DeweyEntry {{
-        background-color: {U.WIDGET_BG_DEFAULT};
+        background-color: {U.INPUT_WIDGET_BG};
         color: {U.TEXT_DEFAULT};
         border: 0.4px solid {U.ACCENT_BLUE};
         padding: 4px;
@@ -469,7 +525,7 @@ def get_app_stylesheet():
 
     /* ✅ QComboBox 스타일 - 확실한 방법 */
     QComboBox {{
-        background-color: {U.WIDGET_BG_DEFAULT};
+        background-color: {U.INPUT_WIDGET_BG};
         border: 0.6px solid {U.BORDER_LIGHT};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         padding: 6px 20px 6px 6px;  /* 우측에 화살표 공간 */
@@ -483,7 +539,7 @@ def get_app_stylesheet():
 
     /* 드롭다운 리스트 */
     QComboBox QAbstractItemView {{
-        background-color: {U.WIDGET_BG_DEFAULT};
+        background-color: {U.INPUT_WIDGET_BG};
         border: 1px solid {U.HIGHLIGHT_SELECTED};
         selection-background-color: {U.HIGHLIGHT_SELECTED};
         selection-color: {U.TEXT_BUTTON};
@@ -500,6 +556,7 @@ def get_app_stylesheet():
         color: {U.TEXT_BUTTON};
     }}
 """
+
 
 # 하위 호환성을 위한 변수 (모듈 import 시 자동 생성)
 APP_STYLESHEET = get_app_stylesheet()

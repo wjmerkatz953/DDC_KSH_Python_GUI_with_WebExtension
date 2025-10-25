@@ -178,10 +178,27 @@ class QtGeminiTab(BaseSearchTab):
         input_bar_layout.setSpacing(4)  # ✅ 버튼 간격 설정
 
         self.input_edit = QTextEdit()
+        # ✅ [추가] MARC_Gemini 그룹 스타일 적용을 위한 objectName 설정
+        self.input_edit.setObjectName("MARC_Gemini_Input")
         self.input_edit.setPlaceholderText("텍스트를 여기에 붙여넣으세요...")
         self.input_edit.setMaximumHeight(60)  # ✅ 한 줄 스타일을 위한 높이 제한
         self.input_edit.setFont(QFont("Consolas", 9))
-        # ✅ 전역 스타일 사용 (테마 전환 대응) - 하드코딩 제거
+        # ✅ [핵심 수정] 트리메뉴 모드에서도 정확한 배경색 적용을 위해 인라인 스타일 명시
+        from ui_constants import get_color
+
+        self.input_edit.setStyleSheet(
+            f"""
+            QTextEdit#MARC_Gemini_Input {{
+                background-color: {get_color('INPUT_WIDGET_BG')};
+                border: 0.8px solid {get_color('BORDER_MEDIUM')};
+                border-radius: {U.CORNER_RADIUS_DEFAULT}px;
+                padding: 6px;
+            }}
+            QTextEdit#MARC_Gemini_Input:focus {{
+                border: 1px solid {get_color('HIGHLIGHT_SELECTED')};
+            }}
+        """
+        )
         input_bar_layout.addWidget(self.input_edit)
 
         # ✅ 표준 버튼 및 전용 버튼 생성
@@ -203,7 +220,7 @@ class QtGeminiTab(BaseSearchTab):
         self.main_splitter = QSplitter(Qt.Vertical)
 
         self.intermediate_group = QGroupBox(
-            "🔍 계층적 검색 결과 (DB에서 추출된 DDC 후보군)"
+            " 계층적 검색 결과 (DB에서 추출된 DDC 후보군)"
         )
         # ❌ self.intermediate_group.setVisible(False) 제거
         inter_layout = QVBoxLayout(self.intermediate_group)
@@ -248,7 +265,7 @@ class QtGeminiTab(BaseSearchTab):
         if self.main_splitter.count() > 1:
             final_results_group = self.main_splitter.widget(1)
             if isinstance(final_results_group, QGroupBox):
-                final_results_group.setTitle("📊 DDC 추천 결과")
+                final_results_group.setTitle(" DDC 추천 결과")
                 # ✅ 최종 결과 그룹박스의 레이아웃에 상단 여백 추가
                 if final_results_group.layout():
                     final_results_group.layout().setContentsMargins(6, 20, 6, 6)
@@ -559,15 +576,23 @@ class QtGeminiTab(BaseSearchTab):
             self.app_instance.main_window.detail_display.setHtml(final_html)
 
     # ✅ [수정] 다른 탭으로부터 데이터를 수신하는 단일 메서드
-    def receive_data(self, title=None, author=None, isbn=None, year=None, switch_priority=False, **kwargs):
+    def receive_data(
+        self,
+        title=None,
+        author=None,
+        isbn=None,
+        year=None,
+        switch_priority=False,
+        **kwargs,
+    ):
         """
         AI 피드 탭 등 다른 탭에서 전송된 데이터를 수신합니다.
 
         Gemini 탭은 기본 파라미터는 무시하고, kwargs에서 text와 start_search_now를 추출합니다.
         """
         # kwargs에서 Gemini 전용 파라미터 추출
-        text = kwargs.get('text', None)
-        start_search_now = kwargs.get('start_search_now', False)
+        text = kwargs.get("text", None)
+        start_search_now = kwargs.get("start_search_now", False)
 
         if text and hasattr(self, "input_edit"):
             # 1. 메인 윈도우의 탭을 Gemini 탭으로 전환

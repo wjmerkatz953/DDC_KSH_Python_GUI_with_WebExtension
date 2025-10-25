@@ -102,7 +102,7 @@ class QtTreeMenuNavigation(QWidget):
         tree_frame.setStyleSheet(f"""
             QFrame {{
                 background-color: {U.BACKGROUND_PRIMARY};
-                border-right: 1px solid #3d3d3d;
+                border-right: 1px solid {U.BORDER_LIGHT};
             }}
         """)
         tree_frame.setMinimumWidth(200)

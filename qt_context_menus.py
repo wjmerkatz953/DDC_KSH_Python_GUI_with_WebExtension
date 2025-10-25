@@ -707,21 +707,23 @@ def show_qtextedit_context_menu(widget, pos, app_instance):
 
 
 def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance=None):
+    from ui_constants import UI_CONSTANTS as U
+
     print("[DEBUG] 📋 show_textbrowser_context_menu() 호출됨")
     print(f"[DEBUG] viewport_pos: {viewport_pos}")
 
     menu = QMenu(tb.viewport())  # ✅ viewport 기준으로 메뉴 생성
 
-    # ✅ 스타일 강제 지정 (다크 테마에서도 메뉴 항목이 보이도록)
+    # ✅ 스타일 강제 지정 (테마에 맞게 메뉴 항목이 보이도록)
     menu.setStyleSheet(
-        """
-        QMenu::item {
-            color: white;
+        f"""
+        QMenu::item {{
+            color: {U.TEXT_DEFAULT};
             padding: 6px 12px;
-        }
-        QMenu::item:disabled {
-            color: #888;
-        }
+        }}
+        QMenu::item:disabled {{
+            color: {U.TEXT_SUBDUED};
+        }}
     """
     )
 

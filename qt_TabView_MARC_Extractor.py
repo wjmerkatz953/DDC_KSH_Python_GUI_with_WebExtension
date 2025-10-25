@@ -210,6 +210,8 @@ class QtMARCExtractorTab(QWidget):
         input_bar_layout.setContentsMargins(0, 4, 0, 2)
 
         self.marc_input_text = QTextEdit()
+        # ✅ [추가] MARC_Gemini 그룹 스타일 적용을 위한 objectName 설정
+        self.marc_input_text.setObjectName("MARC_Gemini_Input")
         # ✅ [추가] 붙여넣기 시 서식(색상 등)을 무시하고 일반 텍스트로만 받도록 설정합니다.
         self.marc_input_text.setAcceptRichText(False)
         self.marc_input_text.setPlaceholderText(
@@ -217,7 +219,22 @@ class QtMARCExtractorTab(QWidget):
         )
         self.marc_input_text.setMaximumHeight(input_height)
         self.marc_input_text.setFont(QFont("Consolas", 9))
-        # 전역 스타일 사용 (테마 전환 대응)
+        # ✅ [핵심 수정] 트리메뉴 모드에서도 정확한 배경색 적용을 위해 인라인 스타일 명시
+        from ui_constants import get_color
+
+        self.marc_input_text.setStyleSheet(
+            f"""
+            QTextEdit#MARC_Gemini_Input {{
+                background-color: {get_color('INPUT_WIDGET_BG')};
+                border: 0.8px solid {get_color('BORDER_MEDIUM')};
+                border-radius: {U.CORNER_RADIUS_DEFAULT}px;
+                padding: 6px;
+            }}
+            QTextEdit#MARC_Gemini_Input:focus {{
+                border: 1px solid {get_color('HIGHLIGHT_SELECTED')};
+            }}
+        """
+        )
 
         self.extract_button = QPushButton("MARC 추출")
         self.clear_input_button = QPushButton("입력 지우기")
@@ -243,11 +260,12 @@ class QtMARCExtractorTab(QWidget):
         self.f_fields_table.setMinimumHeight(230)
 
         # ✅ [핵심 추가] 테이블 헤더 색상을 다른 탭과 통일 (WIDGET_BG_DEFAULT 사용)
-        self.f_fields_table.horizontalHeader().setStyleSheet(f"""
+        self.f_fields_table.horizontalHeader().setStyleSheet(
+            f"""
             QHeaderView::section {{
                 background-color: {U.WIDGET_BG_DEFAULT};
                 color: {U.TEXT_BUTTON};
-                padding: 0px 3px 0px 3px;
+                padding: 0px 0px 0px 0px;
                 border: none;
                 font-weight: bold;
                 text-align: center;
@@ -256,7 +274,8 @@ class QtMARCExtractorTab(QWidget):
                 background-color: {U.ACCENT_BLUE};
                 color: {U.TEXT_BUTTON};
             }}
-        """)
+        """
+        )
 
         self.f_fields_table.horizontalHeader().setSectionResizeMode(
             2, QHeaderView.Stretch

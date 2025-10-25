@@ -203,25 +203,25 @@ class QtDeweySearchTab(BaseSearchTab):
         self.dewey_classify_cancel_button.setFixedWidth(50)
         self.dewey_classify_cancel_button.setEnabled(False)
         # ✅ qt_styles.py 파일에서 버튼 스타일 정의 중 DeweyButton
-        self.dewey_nav_back_button = QPushButton("◀ Prv")
+        self.dewey_nav_back_button = QPushButton("Prev")
         self.dewey_nav_back_button.setObjectName("DeweyButton")  # ✅ 오브젝트 이름 추가
         self.dewey_nav_back_button.setFixedHeight(32)
         self.dewey_nav_back_button.setFixedWidth(50)
 
-        self.dewey_nav_forward_button = QPushButton("Nxt ▶")
+        self.dewey_nav_forward_button = QPushButton("Next")
         self.dewey_nav_forward_button.setObjectName(
             "DeweyButton"
         )  # ✅ 오브젝트 이름 추가
         self.dewey_nav_forward_button.setFixedHeight(32)
         self.dewey_nav_forward_button.setFixedWidth(50)
 
-        self.expand_all_button = QPushButton("▼ Open")
+        self.expand_all_button = QPushButton("▼Open")
         self.expand_all_button.setObjectName("DeweyButton")  # ✅ 오브젝트 이름 추가
         self.expand_all_button.setToolTip("현재 로드된 모든 항목을 펼칩니다.")
         self.expand_all_button.setFixedHeight(32)
         self.expand_all_button.setFixedWidth(60)
 
-        self.collapse_all_button = QPushButton("▲ Close")
+        self.collapse_all_button = QPushButton("▲Close")
         self.collapse_all_button.setObjectName("DeweyButton")  # ✅ 오브젝트 이름 추가
         self.collapse_all_button.setToolTip("모든 항목을 접습니다.")
         self.collapse_all_button.setFixedHeight(32)
@@ -324,7 +324,8 @@ class QtDeweySearchTab(BaseSearchTab):
         # ✅ 헤더 스타일을 다른 탭과 통일 (WIDGET_BG_DEFAULT 사용)
         tree_header = self.dewey_context_tree.header()
         tree_header.setStretchLastSection(True)
-        tree_header.setStyleSheet(f"""
+        tree_header.setStyleSheet(
+            f"""
             QHeaderView::section {{
                 background-color: {UI_CONSTANTS.WIDGET_BG_DEFAULT};
                 color: {UI_CONSTANTS.TEXT_BUTTON};
@@ -337,7 +338,8 @@ class QtDeweySearchTab(BaseSearchTab):
                 background-color: {UI_CONSTANTS.ACCENT_BLUE};
                 color: {UI_CONSTANTS.TEXT_BUTTON};
             }}
-        """)
+        """
+        )
         self.dewey_context_tree.setHeaderHidden(False)
 
         self.dewey_context_tree.setSelectionMode(
@@ -359,6 +361,7 @@ class QtDeweySearchTab(BaseSearchTab):
 
                     # ✅ UI_CONSTANTS 사용 (테마 대응)
                     from ui_constants import UI_CONSTANTS as U
+
                     arrow_color = QColor(U.TEXT_SUBDUED)
                     painter.setPen(QPen(arrow_color, 2))
 
@@ -369,7 +372,7 @@ class QtDeweySearchTab(BaseSearchTab):
                     if tree_view and tree_view.isExpanded(index):
                         # 열린 노드: 아래쪽 방향 삼각형 ▼
                         points = [
-                            QPoint(arrow_x, arrow_y + 3),      # 아래쪽 꼭짓점
+                            QPoint(arrow_x, arrow_y + 3),  # 아래쪽 꼭짓점
                             QPoint(arrow_x - 6, arrow_y - 3),  # 왼쪽 위
                             QPoint(arrow_x + 6, arrow_y - 3),  # 오른쪽 위
                         ]
@@ -708,15 +711,25 @@ class QtDeweySearchTab(BaseSearchTab):
         """검색 시작 (BaseSearchTab 오버라이드)"""
         qt_dewey_logic.start_search(self)
 
-    def receive_data(self, title=None, author=None, isbn=None, year=None, switch_priority=False, **kwargs):
+    def receive_data(
+        self,
+        title=None,
+        author=None,
+        isbn=None,
+        year=None,
+        switch_priority=False,
+        **kwargs,
+    ):
         """
         다른 탭으로부터 데이터 수신
 
         Dewey 탭은 기본 파라미터 외에 ddc 파라미터를 추가로 수신합니다.
         """
         # kwargs에서 ddc 파라미터 추출 (data_transfer_manager에서 전송됨)
-        ddc = kwargs.get('ddc', None)
-        qt_dewey_logic.receive_data(self, ddc, isbn, author, title, switch_priority=switch_priority, **kwargs)
+        ddc = kwargs.get("ddc", None)
+        qt_dewey_logic.receive_data(
+            self, ddc, isbn, author, title, switch_priority=switch_priority, **kwargs
+        )
 
 
 # ========================================

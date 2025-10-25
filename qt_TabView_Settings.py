@@ -62,6 +62,12 @@ class QtSettingsTab(QWidget):
 
         # 스크롤 가능한 컨텐츠 위젯
         scroll_widget = QWidget()
+        # ✅ 배경색을 BACKGROUND_PRIMARY로 통일
+        from ui_constants import get_color
+
+        scroll_widget.setStyleSheet(
+            f"QWidget {{ background-color: {get_color('BACKGROUND_PRIMARY')}; }}"
+        )
         scroll_layout = QVBoxLayout(scroll_widget)
         scroll_layout.setContentsMargins(5, 6, 5, 6)
         scroll_layout.setSpacing(15)
@@ -109,11 +115,29 @@ class QtSettingsTab(QWidget):
 
     def _create_section_frame(self, parent_layout, title):
         """설정 섹션 프레임을 생성합니다."""
+        from ui_constants import get_color, get_current_theme
+
         # 섹션 프레임
         section_frame = QFrame()
         section_frame.setFrameShape(QFrame.StyledPanel)
         section_frame.setObjectName("SettingsSectionFrame")  # ✅ 객체 이름 지정
-        # 전역 스타일 사용 (테마 전환 대응)
+
+        # ✅ [디버그] 현재 테마와 색상 출력
+        bg_color = get_color("BACKGROUND_PRIMARY")
+        border_color = get_color("BORDER_LIGHT")
+        current_theme = get_current_theme()
+        print(
+            f"[DEBUG 설정탭] 테마: {current_theme}, 배경: {bg_color}, 테두리: {border_color}, 제목: {title}"
+        )
+
+        # ✅ [긴급 수정] 인라인 스타일로 강제 적용 + get_color 사용
+        section_frame.setStyleSheet(
+            f"QFrame#SettingsSectionFrame {{ "
+            f"background-color: {bg_color}; "
+            f"border: 0.6px solid {border_color}; "
+            f"border-radius: 4px; "
+            f"}}"
+        )
 
         section_layout = QVBoxLayout(section_frame)
         section_layout.setContentsMargins(5, 5, 5, 5)
@@ -130,6 +154,20 @@ class QtSettingsTab(QWidget):
         parent_layout.addWidget(section_frame)
 
         return section_frame, section_layout
+
+    def _create_description_label(self, text):
+        """설명 레이블을 생성합니다 (통일된 스타일 적용)."""
+        from ui_constants import get_color
+
+        label = QLabel(text)
+        label.setStyleSheet(
+            f"color: {get_color('TEXT_SUBDUED')}; "
+            f"font-size: 9pt; "
+            f"background-color: transparent; "
+            f"padding: 4px; "
+        )
+        label.setWordWrap(True)
+        return label
 
     def _create_navigation_section(self, parent_layout):
         """네비게이션 스타일 설정 섹션을 생성합니다."""
@@ -152,14 +190,12 @@ class QtSettingsTab(QWidget):
         section_layout.addWidget(self.tree_checkbox)
 
         # 설명 레이블
-        description = QLabel(
+        description = self._create_description_label(
             "• 일반 탭: 상단에 탭 바를 표시하는 전통적인 방식\n"
             "• 트리메뉴: 왼쪽에 계층적 메뉴를 표시하여 효율적인 탭 관리 제공\n"
             '  - 검색 관련 탭들을 "검색" 그룹으로 분류\n'
             '  - 도구 관련 탭들을 "도구" 그룹으로 분류'
         )
-        description.setStyleSheet(f"color: {U.TEXT_SUBDUED}; font-size: 9pt;")
-        description.setWordWrap(True)
         section_layout.addWidget(description)
 
     def _create_ui_style_section(self, parent_layout):
@@ -187,6 +223,24 @@ class QtSettingsTab(QWidget):
 
         # 적용 버튼 추가
         apply_theme_button = QPushButton("적용")
+        apply_theme_button.setStyleSheet(
+            f"""
+            QPushButton {{
+                background-color: {U.BUTTON_PRIMARY};
+                color: {U.TEXT_BUTTON};
+                border: none;
+                border-radius: 4px;
+                padding: 6px 12px;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{
+                background-color: {U.BUTTON_PRIMARY_HOVER};
+            }}
+            QPushButton:pressed {{
+                background-color: {U.BUTTON_PRIMARY_PRESSED};
+            }}
+        """
+        )
         apply_theme_button.clicked.connect(self._apply_theme)
         theme_layout.addWidget(apply_theme_button)
 
@@ -227,6 +281,9 @@ class QtSettingsTab(QWidget):
         automation_frame = QFrame()
         automation_layout = QVBoxLayout(automation_frame)
         automation_layout.setContentsMargins(0, 10, 0, 0)
+
+        # ✅ 섹션 프레임 배경 사용 (투명)
+        automation_frame.setStyleSheet("QFrame { background-color: transparent; }")
 
         automation_title = QLabel("탭별 자동화 설정")
         automation_font = QFont()
@@ -303,8 +360,7 @@ class QtSettingsTab(QWidget):
         )
 
         # 설명 레이블
-        description = QLabel("MARC 추출탭 텍스트 입력창 높이:")
-        description.setStyleSheet(f"color: {U.TEXT_DEFAULT}; font-size: 10pt;")
+        description = self._create_description_label("MARC 추출탭 텍스트 입력창 높이:")
         section_layout.addWidget(description)
 
         # 그리드 레이아웃으로 체크박스 정렬
@@ -340,13 +396,11 @@ class QtSettingsTab(QWidget):
         )
 
         # 안내 메시지
-        info_label = QLabel(
+        info_label = self._create_description_label(
             "• 기본: 간단한 MARC 데이터 입력에 적합\n"
             "• 확장: 긴 MARC 데이터를 보기 편하게 입력\n"
             "• 변경 후 '설정 적용' 버튼을 눌러 저장하세요."
         )
-        info_label.setStyleSheet(f"color: {U.TEXT_SUBDUED}; font-size: 9pt;")
-        info_label.setWordWrap(True)
         section_layout.addWidget(info_label)
 
     def _create_save_restore_section(self, parent_layout):
@@ -504,11 +558,12 @@ class QtSettingsTab(QWidget):
                 self,
                 "테마 변경",
                 f"{selected_theme.capitalize()} 테마가 선택되었습니다.\n\n"
-                "테마를 완전히 적용하려면 앱을 재시작해주세요."
+                "테마를 완전히 적용하려면 앱을 재시작해주세요.",
             )
 
             self.app_instance.log_message(
-                f"✅ {selected_theme} 테마가 선택되었습니다. 재시작 시 적용됩니다.", "INFO"
+                f"✅ {selected_theme} 테마가 선택되었습니다. 재시작 시 적용됩니다.",
+                "INFO",
             )
 
         except Exception as e:

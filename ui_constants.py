@@ -12,16 +12,18 @@ from path_utils import resource_path
 
 class UI_CONSTANTS_DARK:
     """다크 테마 색상 상수"""
+
     BACKGROUND_PRIMARY = "#0e111a"
     BACKGROUND_SECONDARY = "#1b2236"
     BACKGROUND_TERTIARY = "#131722"
     WIDGET_BG_DEFAULT = "#1b2235"
+    CORNER_STONE = "#1b2235"
     INPUT_WIDGET_BG = "#1a1f2e"  # 입력 위젯 전용 배경색
 
-    TEXT_DEFAULT = "#b1b1b1"
+    TEXT_DEFAULT = "#cfcfcf"
     TEXT_SUBDUED = "#ADAAAA"
     TEXT_HIGHLIGHT = "#B1630A"
-    TEXT_BUTTON = "#cacfda"
+    TEXT_BUTTON = "#e0e0e0"
     TEXT_TAB_UNSELECTED = "#b1b1b1"  # 선택 안 된 탭 글씨
 
     ACCENT_BLUE = "#0072b3"  # 주 강조색 (VS Code 파란색)
@@ -51,14 +53,16 @@ class UI_CONSTANTS_DARK:
 
 class UI_CONSTANTS_LIGHT:
     """라이트 테마 색상 상수"""
-    BACKGROUND_PRIMARY = "#e8e8e8"
+
+    BACKGROUND_PRIMARY = "#dbdbdb"
     BACKGROUND_SECONDARY = "#f5f5f5"
     BACKGROUND_TERTIARY = "#efefef"
     WIDGET_BG_DEFAULT = "#f0f0f0"
-    INPUT_WIDGET_BG = "#dcdcdc"  # 입력 위젯 전용 배경색 (e8e8e8보다 살짝 어둡게)
+    INPUT_WIDGET_BG = "#c5c4c4"  # 입력 위젯 전용 배경색 (e8e8e8보다 살짝 어둡게)
+    CORNER_STONE = "#1b2235"
 
     TEXT_DEFAULT = "#2c2c2c"
-    TEXT_SUBDUED = "#505050"  # 설명 문구 색상 (더 어둡게 - 가독성 향상)
+    TEXT_SUBDUED = "#4a4a4a"  # 설명 문구 색상 (더 어둡게 - 가독성 향상)
     TEXT_HIGHLIGHT = "#B1630A"
     TEXT_BUTTON = "#ffffff"  # 버튼 위 흰 글씨 유지
 
@@ -108,8 +112,14 @@ def get_current_theme():
     return _current_theme
 
 
+def get_color(color_name):
+    """현재 테마의 색상 값을 반환합니다."""
+    return getattr(UI_CONSTANTS, color_name)
+
+
 class UI_CONSTANTS_COMMON:
     """테마에 무관한 공통 상수"""
+
     CORNER_RADIUS_DEFAULT = 0
     TREEVIEW_ROW_HEIGHT_DEFAULT = 25
 
@@ -117,7 +127,8 @@ class UI_CONSTANTS_COMMON:
 
     # 하이라이트 색상 (검색/정렬용)
     HIGHLIGHT_COLOR_FIND = "#FFFF00"
-    HIGHLIGHT_SELECTED = "#AD2E00"
+    HIGHLIGHT_SELECTED = "#0072b3"
+    HIGHLIGHT_SELECTED_RED = "#AD2E00"
 
     # 폰트
     FONT_FAMILY = "맑은 고딕"
@@ -148,7 +159,7 @@ class UI_CONSTANTS_COMMON:
 
 # UI_CONSTANTS에 COMMON 속성 추가 (편의성)
 for attr_name in dir(UI_CONSTANTS_COMMON):
-    if not attr_name.startswith('_'):
+    if not attr_name.startswith("_"):
         setattr(UI_CONSTANTS_DARK, attr_name, getattr(UI_CONSTANTS_COMMON, attr_name))
         setattr(UI_CONSTANTS_LIGHT, attr_name, getattr(UI_CONSTANTS_COMMON, attr_name))
 

@@ -200,11 +200,11 @@ class ExcelStyleTableHeaderView(QHeaderView):
 
         # 2. 테두리 그리기
         pen = QPen(QColor(U.BACKGROUND_PRIMARY))
-        pen.setWidth(3)
+        pen.setWidth(0)
         painter.setPen(pen)
         painter.drawLine(rect.topLeft(), rect.bottomLeft())
         pen = QPen(QColor(U.WIDGET_BG_DEFAULT))
-        pen.setWidth(7)
+        pen.setWidth(0)
         painter.setPen(pen)
         painter.drawLine(rect.bottomRight(), rect.bottomLeft())
         # [핵심] 가장 마지막 컬럼이 아닐 경우에만 오른쪽 테두리를 그립니다.
