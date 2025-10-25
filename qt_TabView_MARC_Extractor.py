@@ -217,13 +217,7 @@ class QtMARCExtractorTab(QWidget):
         )
         self.marc_input_text.setMaximumHeight(input_height)
         self.marc_input_text.setFont(QFont("Consolas", 9))
-        self.marc_input_text.setStyleSheet(
-            "QTextEdit { "
-            "border: 0px solid #6495ED; "
-            "background-color: #1a1f2e; "
-            "border-radius: 0px; "
-            "}"
-        )
+        # 전역 스타일 사용 (테마 전환 대응)
 
         self.extract_button = QPushButton("MARC 추출")
         self.clear_input_button = QPushButton("입력 지우기")
@@ -247,6 +241,23 @@ class QtMARCExtractorTab(QWidget):
         self.f_fields_model.setHorizontalHeaderLabels(["필드", "추출내용", "추출결과"])
         self.f_fields_table.setModel(self.f_fields_model)
         self.f_fields_table.setMinimumHeight(230)
+
+        # ✅ [핵심 추가] 테이블 헤더 색상을 다른 탭과 통일 (WIDGET_BG_DEFAULT 사용)
+        self.f_fields_table.horizontalHeader().setStyleSheet(f"""
+            QHeaderView::section {{
+                background-color: {U.WIDGET_BG_DEFAULT};
+                color: {U.TEXT_BUTTON};
+                padding: 0px 3px 0px 3px;
+                border: none;
+                font-weight: bold;
+                text-align: center;
+            }}
+            QHeaderView::section:hover {{
+                background-color: {U.ACCENT_BLUE};
+                color: {U.TEXT_BUTTON};
+            }}
+        """)
+
         self.f_fields_table.horizontalHeader().setSectionResizeMode(
             2, QHeaderView.Stretch
         )

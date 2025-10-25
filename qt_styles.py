@@ -2,33 +2,34 @@
 # -*- coding: utf-8 -*-
 """
 qt_styles.py - Qt 스타일시트 정의
-버전: 2.0.0
+버전: 3.0.0
 생성일: 2025-09-23
+수정일: 2025-10-25
+- 테마 전환을 위해 함수로 변경
 """
 
-from ui_constants import UI_CONSTANTS
+def get_app_stylesheet():
+    """현재 테마에 맞는 스타일시트를 반환합니다."""
+    from ui_constants import UI_CONSTANTS as U
 
-# ✅ [수정] UI_CONSTANTS를 먼저 정의한 후에 사용합니다.
-U = UI_CONSTANTS
-
-APP_STYLESHEET = f"""
+    return f"""
     /* ✅ [추가] 타이틀바를 포함한 전체 창 배경색을 어둡게 설정 */
     QMainWindow {{
         background-color: {U.BACKGROUND_PRIMARY};
     }}
-    /* ✅ [추가] DDC 검색 트리뷰의 화살표 아이콘 색상을 밝게 만듭니다. */
+    /* ✅ [추가] DDC 검색 트리뷰의 화살표 아이콘 색상을 ACCENT_BLUE로 변경 */
     QTreeView::branch:has-children:!has-siblings:closed,
     QTreeView::branch:closed:has-children:has-siblings {{
         border-image: none;
-        /* U.TEXT_DEFAULT 색상을 사용한 SVG 아이콘 */
-        image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><polyline points="4,2 8,5 4,8" stroke="{U.TEXT_DEFAULT}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+        /* ACCENT_BLUE 색상을 사용한 SVG 아이콘 */
+        image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><polyline points="4,2 8,5 4,8" stroke="{U.ACCENT_BLUE}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
     }}
 
     QTreeView::branch:open:has-children:!has-siblings,
     QTreeView::branch:open:has-children:has-siblings  {{
         border-image: none;
-        /* U.TEXT_DEFAULT 색상을 사용한 SVG 아이콘 */
-        image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><polyline points="2,4 5,8 8,4" stroke="{U.TEXT_DEFAULT}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+        /* ACCENT_BLUE 색상을 사용한 SVG 아이콘 */
+        image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><polyline points="2,4 5,8 8,4" stroke="{U.ACCENT_BLUE}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
     }}
 
     /* QTabWidget 스타일 추가 */
@@ -37,8 +38,8 @@ APP_STYLESHEET = f"""
         border-top: none;
     }}
     QTabBar::tab {{
-        background: {U.WIDGET_BG_DEFAULT};
-        color: {U.TEXT_BUTTON};
+        background: {U.BACKGROUND_PRIMARY};
+        color: {U.TEXT_DEFAULT};
         padding: 6px 10px;         /* 탭바 높이 조절 5px */
         border: 0px solid {U.ACCENT_BLUE};
         margin-bottom: 0px;
@@ -63,10 +64,28 @@ APP_STYLESHEET = f"""
         font-family: "{U.FONT_FAMILY}";
         font-size: {U.FONT_SIZE_NORMAL}pt;
     }}
+    QLabel {{
+        color: {U.TEXT_DEFAULT};
+        background-color: transparent;
+    }}
+    QScrollArea {{
+        background-color: {U.BACKGROUND_PRIMARY};
+        border: none;
+    }}
+    QFrame {{
+        background-color: {U.BACKGROUND_PRIMARY};
+        color: {U.TEXT_DEFAULT};
+    }}
+    /* ✅ [추가] 설정탭 섹션 프레임 전용 스타일 */
+    QFrame#SettingsSectionFrame {{
+        background-color: {U.INPUT_WIDGET_BG};
+        border: 0.6px solid {U.BORDER_LIGHT};
+        border-radius: {U.CORNER_RADIUS_DEFAULT}px;
+    }}
     /* 모든 QGroupBox에 적용될 기본 스타일 */
     QGroupBox {{
         background-color: {U.WIDGET_BG_DEFAULT};
-        border: 0.6px solid {"#202e52"};
+        border: 0.6px solid {U.BORDER_LIGHT};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         margin-top: 0px;
     }}
@@ -90,14 +109,14 @@ APP_STYLESHEET = f"""
         margin-left: 0px;
     }}
     QTextEdit {{
-        background-color: {U.BACKGROUND_PRIMARY};     /* Find, Entry 필드 배경색 */
-        border: 0.8px solid {"#324880"};
+        background-color: {U.INPUT_WIDGET_BG};
+        border: 0.8px solid {U.BORDER_MEDIUM};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         padding: 6px 6px 6px 6px;
     }}
     QLineEdit {{
-        background-color: {U.WIDGET_BG_DEFAULT};     /* Find, Entry 필드 배경색 */
-        border: 0.6px solid {"#202e52"};
+        background-color: {U.INPUT_WIDGET_BG};
+        border: 0.6px solid {U.BORDER_LIGHT};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         padding: 6px 6px 6px 6px;
     }}
@@ -132,14 +151,14 @@ APP_STYLESHEET = f"""
     }}
     /* ProgressBar 컨테이너 */
     QProgressBar {{
-        background-color: #121627;
-        border: 0px solid #263241;
+        background-color: {U.WIDGET_BG_DEFAULT};
+        border: 1px solid {U.BORDER_LIGHT};
         border-radius: 5px;
-        color: #316caa;              /* 글자색 */
-        font-weight: bold;           /* 굵게 */
+        color: {U.ACCENT_BLUE};
+        font-weight: bold;
         height: 14px;
         padding: 0px;
-        text-align: center; /* 텍스트 중앙 정렬 추가 */
+        text-align: center;
     }}
     /* 채워지는 바(Chunk) – 그라데이션 + 은은한 글로우 */
     QProgressBar::chunk {{
@@ -150,9 +169,7 @@ APP_STYLESHEET = f"""
             stop:0.5 rgba( 34,205,246,0.95),
             stop:1   rgba( 70,161,255,0.60)
         );
-        /* 테두리 대신 발광 느낌 */
         border: 1px solid rgba(50,180,255,0.35);
-        /* “빛 번짐” 흉내 */
         margin: 1px;
     }}
     QHeaderView::section {{
@@ -170,6 +187,23 @@ APP_STYLESHEET = f"""
     }}
     QTreeWidget::item:selected {{
         background-color: {U.HIGHLIGHT_SELECTED};
+        color: {U.TEXT_BUTTON};
+    }}
+    /* ✅ [추가] QTreeView 스타일 */
+    QTreeView {{
+        background-color: {U.BACKGROUND_PRIMARY};
+        color: {U.TEXT_DEFAULT};
+        border: none;
+    }}
+    QTreeView::item {{
+        color: {U.TEXT_DEFAULT};
+    }}
+    QTreeView::item:selected {{
+        background-color: {U.HIGHLIGHT_SELECTED};
+        color: {U.TEXT_BUTTON};
+    }}
+    QTreeView::item:hover {{
+        background-color: {U.ACCENT_BLUE};
         color: {U.TEXT_BUTTON};
     }}
     /* ✅ [신규 추가] QTableView 스타일 */
@@ -436,7 +470,7 @@ APP_STYLESHEET = f"""
     /* ✅ QComboBox 스타일 - 확실한 방법 */
     QComboBox {{
         background-color: {U.WIDGET_BG_DEFAULT};
-        border: 0.6px solid {"#202e52"};
+        border: 0.6px solid {U.BORDER_LIGHT};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         padding: 6px 20px 6px 6px;  /* 우측에 화살표 공간 */
         min-height: 20px;
@@ -466,3 +500,6 @@ APP_STYLESHEET = f"""
         color: {U.TEXT_BUTTON};
     }}
 """
+
+# 하위 호환성을 위한 변수 (모듈 import 시 자동 생성)
+APP_STYLESHEET = get_app_stylesheet()

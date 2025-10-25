@@ -69,7 +69,7 @@ class QtTreeMenuNavigation(QWidget):
                 "KSH Hybrid",
                 "KSH Local",
             ],
-            "분류/AI": ["Dewey 분류 검색", "AI 피드"],
+            "분류/AI": ["Dewey 분류 검색", "Gemini DDC 분류", "AI 피드"],
             "편집": ["MARC 로직 편집"],
             "도구": ["🐍 Python"],  # ✅ [추가] Python 탭 그룹
             "설정": ["설정"],
@@ -135,7 +135,7 @@ class QtTreeMenuNavigation(QWidget):
                 background-color: {U.BACKGROUND_PRIMARY};
                 border: none;
                 outline: none;
-                color: #cccccc;
+                color: {U.TEXT_DEFAULT};
                 font-size: 10pt;
             }}
             QTreeWidget::item {{
@@ -143,18 +143,23 @@ class QtTreeMenuNavigation(QWidget):
                 border-radius: 4px;
             }}
             QTreeWidget::item:hover {{
-                background-color: {U.BACKGROUND_SECONDARY};
-                color: #ffffff;
+                background-color: {U.ACCENT_BLUE};
+                color: {U.TEXT_BUTTON};
             }}
             QTreeWidget::item:selected {{
                 background-color: {U.ACCENT_BLUE};
-                color: #ffffff;
+                color: {U.TEXT_BUTTON};
             }}
         """)
+
+        # ✅ 호버 시 자동 펼치기를 위한 마우스 트래킹 활성화
+        self.tree.setMouseTracking(True)
 
         # 트리 항목 클릭 이벤트 연결
         self.tree.itemClicked.connect(self.on_tree_item_clicked)
         self.tree.itemDoubleClicked.connect(self.on_tree_item_double_clicked)
+        # ✅ 호버 시 자동 펼치기를 위한 itemEntered 시그널 연결
+        self.tree.itemEntered.connect(self.on_tree_item_hovered)
 
         tree_layout.addWidget(self.tree)
 
@@ -237,6 +242,7 @@ class QtTreeMenuNavigation(QWidget):
             "상세 저작물 정보": "📋",
             "간략 저작물 정보": "🔢",
             "Dewey 분류 검색": "📊",
+            "Gemini DDC 분류": "🤖",
             "AI 피드": "✨",
             "MARC 추출": "⚡",
             "MARC 로직 편집": "✏️",
@@ -247,8 +253,9 @@ class QtTreeMenuNavigation(QWidget):
 
     def on_tree_item_clicked(self, item, column):
         """트리 아이템 클릭 이벤트 처리"""
-        # 그룹 아이템인 경우 (자식이 있으면)
+        # ✅ 그룹 아이템인 경우 (자식이 있으면) 싱글 클릭으로 펼치기/접기
         if item.childCount() > 0:
+            item.setExpanded(not item.isExpanded())
             return
 
         # 리프 노드(탭) 클릭
@@ -258,8 +265,14 @@ class QtTreeMenuNavigation(QWidget):
 
     def on_tree_item_double_clicked(self, item, column):
         """트리 아이템 더블클릭 이벤트 처리 (그룹 펼치기/접기)"""
-        if item.childCount() > 0:
-            item.setExpanded(not item.isExpanded())
+        # ✅ 싱글 클릭으로 이미 처리되므로 더블클릭은 무시
+        pass
+
+    def on_tree_item_hovered(self, item, column):
+        """트리 아이템 호버 이벤트 처리 (자동 펼치기)"""
+        # ✅ 그룹 아이템인 경우 (자식이 있으면) 호버 시 자동 펼치기
+        if item.childCount() > 0 and not item.isExpanded():
+            item.setExpanded(True)
 
     def show_tab(self, tab_name):
         """지정된 탭을 표시합니다."""
@@ -310,6 +323,7 @@ class QtTreeMenuNavigation(QWidget):
         from qt_TabView_MARC_Extractor import QtMARCExtractorTab
         from qt_TabView_MARC_Editor import QtMARCEditorTab
         from qt_TabView_Dewey import QtDeweySearchTab
+        from qt_TabView_Gemini import QtGeminiTab
         from qt_TabView_Settings import QtSettingsTab
         from qt_TabView_Python import QtPythonTab  # ✅ [추가] Python 탭 임포트
 
@@ -329,6 +343,7 @@ class QtTreeMenuNavigation(QWidget):
             "MARC 추출": QtMARCExtractorTab,
             "MARC 로직 편집": QtMARCEditorTab,
             "Dewey 분류 검색": QtDeweySearchTab,
+            "Gemini DDC 분류": QtGeminiTab,
             "🐍 Python": QtPythonTab,  # ✅ [추가] Python 탭 매핑
             "설정": QtSettingsTab,
         }

@@ -202,11 +202,43 @@
 
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-10-25: 트리메뉴 네비게이션 개선 및 Gemini 탭 추가
+- **트리메뉴 호버 자동 펼치기 구현** (`qt_tree_menu_navigation.py`)
+  - 마우스 호버 시 그룹 메뉴가 자동으로 펼쳐지도록 `itemEntered` 시그널 연결
+  - `setMouseTracking(True)` 활성화로 호버 이벤트 감지
+  - 싱글 클릭으로 그룹 펼치기/접기 동작 추가
+- **Gemini DDC 분류 탭 트리메뉴 추가**
+  - 분류/AI 그룹에 "Gemini DDC 분류" 탭 추가
+  - 탭 이름 통일: `qt_Tab_configs.py`의 정확한 탭 이름과 일치시킴
+  - 아이콘 매핑: 🤖 (로봇) 아이콘 할당
+- **수정 파일**: `qt_tree_menu_navigation.py` v1.0.3
+
+### 2025-10-24: Light/Dark 테마 시스템 완성
+- **다크/라이트 테마 전환 시스템 구현** (`ui_constants.py`, `qt_styles.py`)
+  - `UI_CONSTANTS_DARK` 및 `UI_CONSTANTS_LIGHT` 클래스 정의
+  - 테마별 색상 상수: BACKGROUND, TEXT, ACCENT, BORDER 등
+  - 설정 탭에서 테마 선택 및 저장 기능
+- **테마 적용 개선**
+  - 하드코딩된 색상을 UI 상수로 전환 (다수 파일)
+  - Light 테마 가독성 향상: 로그 색상, 컬럼명 색상, 설명 텍스트 색상 조정
+  - INPUT_WIDGET_BG 상수 추가로 입력 위젯 배경색 통일
+- **트리메뉴 스타일 개선**
+  - 호버 및 선택 항목 색상을 ACCENT_BLUE로 통일
+  - 텍스트 색상을 TEXT_DEFAULT 및 TEXT_BUTTON으로 변경
+- **수정 파일**:
+  - `ui_constants.py` v1.0.2
+  - `qt_styles.py` v1.0.2
+  - `qt_TabView_Settings.py` v1.0.2
+  - `qt_TabView_Gemini.py` v1.0.1
+  - `qt_TabView_Dewey.py` v1.0.1
+  - `qt_TabView_MARC_Extractor.py` v1.0.1
+  - `qt_tree_menu_navigation.py` v1.0.2
+  - `qt_main_app.py` v1.0.1
+
 - **2025-10-24**: `Search_KSH_Lite.py`와 `search_ksh_manager.py`가 개선되었습니다. DDC 출현 빈도, 연관 관계 확장 등을 고려한 정교한 랭킹 로직이 추가되었습니다.
 - **2025-10-20**: **대규모 리팩토링**: 기존의 거대했던 `SearchQueryManager`가 `search_common_manager.py`, `search_dewey_manager.py`, `search_ksh_manager.py`로 분리되어 역할과 책임이 명확해졌습니다. 관련 UI 코드들도 새 관리자 구조에 맞게 업데이트되었습니다.
 - **2025-10-19**: `database_manager.py`가 v2.2.0으로 업데이트되면서 FTS5 기반의 가상 테이블과 백그라운드 쓰기 스레드가 도입되었습니다. 이를 통해 Dewey 검색 로직이 커버링 인덱스를 활용하게 되어 성능이 크게 향상되었습니다.
 - **2025-10-18**: `qt_main_app.py`에 모든 탭의 스플리터 상태를 저장/복원하는 기능이 안정화되었고, 앱 종료 시 백그라운드 스레드와 서버가 확실히 종료되도록 코드가 강화되었습니다.
-- **진행 중**: `이전 대화.md`에 기록된 바와 같이, 트리플 클릭으로 인한 텍스트 선택 동작 등 UI의 세부적인 사용성을 개선하는 작업이 계속 진행 중입니다. 성능 테스트 스크립트 또한 새로운 인덱싱 전략을 검증하기 위해 지속적으로 갱신되고 있습니다.
 
 ---
 

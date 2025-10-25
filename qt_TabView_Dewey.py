@@ -321,7 +321,23 @@ class QtDeweySearchTab(BaseSearchTab):
 
         self.dewey_context_model.setHorizontalHeaderLabels(["DDC Hierarchy"])
 
-        self.dewey_context_tree.header().setStretchLastSection(True)
+        # ✅ 헤더 스타일을 다른 탭과 통일 (WIDGET_BG_DEFAULT 사용)
+        tree_header = self.dewey_context_tree.header()
+        tree_header.setStretchLastSection(True)
+        tree_header.setStyleSheet(f"""
+            QHeaderView::section {{
+                background-color: {UI_CONSTANTS.WIDGET_BG_DEFAULT};
+                color: {UI_CONSTANTS.TEXT_BUTTON};
+                padding: 0px 3px 0px 3px;
+                border: none;
+                font-weight: bold;
+                text-align: center;
+            }}
+            QHeaderView::section:hover {{
+                background-color: {UI_CONSTANTS.ACCENT_BLUE};
+                color: {UI_CONSTANTS.TEXT_BUTTON};
+            }}
+        """)
         self.dewey_context_tree.setHeaderHidden(False)
 
         self.dewey_context_tree.setSelectionMode(
@@ -331,23 +347,8 @@ class QtDeweySearchTab(BaseSearchTab):
         self.dewey_context_tree.setItemsExpandable(True)
         self.dewey_context_tree.setRootIsDecorated(True)
 
-        self.dewey_context_tree.setStyleSheet(
-            f"""
-            QTreeView {{
-                background-color: {UI_CONSTANTS.BACKGROUND_PRIMARY};
-                color: {UI_CONSTANTS.TEXT_DEFAULT};
-                border: 0px solid {UI_CONSTANTS.ACCENT_BLUE};
-                outline: none;
-            }}
-            QTreeView::item {{
-                padding: 2px;
-            }}
-            QTreeView::item:selected {{
-                background-color: {UI_CONSTANTS.ACCENT_BLUE};
-                color: white;
-            }}
-        """
-        )
+        # ✅ 전역 스타일 사용 (테마 전환 대응) - inline setStyleSheet 제거
+        # 전역 qt_styles.py의 QTreeView 스타일이 자동으로 적용됨
 
         class BrightArrowDelegate(QStyledItemDelegate):
             def paint(self, painter, option, index):
@@ -356,7 +357,10 @@ class QtDeweySearchTab(BaseSearchTab):
                 if index.model().hasChildren(index):
                     painter.save()
 
-                    painter.setPen(QPen(QColor(170, 170, 170), 2))
+                    # ✅ UI_CONSTANTS 사용 (테마 대응)
+                    from ui_constants import UI_CONSTANTS as U
+                    arrow_color = QColor(U.TEXT_SUBDUED)
+                    painter.setPen(QPen(arrow_color, 2))
 
                     arrow_x = option.rect.left() - 12
                     arrow_y = option.rect.top() + option.rect.height() // 2
@@ -377,7 +381,7 @@ class QtDeweySearchTab(BaseSearchTab):
                             QPoint(arrow_x - 3, arrow_y + 6),
                         ]
 
-                    painter.setBrush(QColor(170, 170, 170))
+                    painter.setBrush(arrow_color)
                     painter.drawPolygon(QPolygon(points))
 
                     painter.restore()

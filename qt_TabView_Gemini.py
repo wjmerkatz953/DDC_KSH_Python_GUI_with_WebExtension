@@ -181,13 +181,7 @@ class QtGeminiTab(BaseSearchTab):
         self.input_edit.setPlaceholderText("텍스트를 여기에 붙여넣으세요...")
         self.input_edit.setMaximumHeight(60)  # ✅ 한 줄 스타일을 위한 높이 제한
         self.input_edit.setFont(QFont("Consolas", 9))
-        self.input_edit.setStyleSheet(
-            "QTextEdit { "
-            "border: 0px solid #6495ED; "
-            "background-color: #1a1f2e; "
-            "border-radius: 0px; "
-            "}"
-        )
+        # ✅ 전역 스타일 사용 (테마 전환 대응) - 하드코딩 제거
         input_bar_layout.addWidget(self.input_edit)
 
         # ✅ 표준 버튼 및 전용 버튼 생성

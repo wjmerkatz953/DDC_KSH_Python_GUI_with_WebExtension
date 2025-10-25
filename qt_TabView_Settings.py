@@ -58,14 +58,7 @@ class QtSettingsTab(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
-        scroll.setStyleSheet(
-            f"""
-            QScrollArea {{
-                background-color: {U.BACKGROUND_PRIMARY};
-                border: none;
-            }}
-        """
-        )
+        # 전역 스타일 사용 (테마 전환 대응)
 
         # 스크롤 가능한 컨텐츠 위젯
         scroll_widget = QWidget()
@@ -119,15 +112,8 @@ class QtSettingsTab(QWidget):
         # 섹션 프레임
         section_frame = QFrame()
         section_frame.setFrameShape(QFrame.StyledPanel)
-        section_frame.setStyleSheet(
-            f"""
-            QFrame {{
-                background-color: {U.BACKGROUND_PRIMARY};
-                border-radius: 0px;
-                border: 0.6px solid {U.WIDGET_BG_DEFAULT};
-            }}
-        """
-        )
+        section_frame.setObjectName("SettingsSectionFrame")  # ✅ 객체 이름 지정
+        # 전역 스타일 사용 (테마 전환 대응)
 
         section_layout = QVBoxLayout(section_frame)
         section_layout.setContentsMargins(5, 5, 5, 5)
@@ -154,20 +140,16 @@ class QtSettingsTab(QWidget):
         # 현재 설정 가져오기
         current_style = self._get_navigation_style()
 
-        # 라디오 버튼 그룹
-        self.nav_button_group = QButtonGroup(self)
+        # ✅ 체크박스로 변경 (일반 설정과 동일한 스타일)
+        self.normal_checkbox = QCheckBox("일반 탭 (상단 탭뷰)")
+        self.normal_checkbox.setChecked(current_style == "tab")
+        self.normal_checkbox.toggled.connect(self._on_normal_nav_toggled)
+        section_layout.addWidget(self.normal_checkbox)
 
-        # 일반 탭 스타일 라디오 버튼
-        self.normal_radio = QRadioButton("일반 탭 (상단 탭뷰)")
-        self.normal_radio.setChecked(current_style == "tab")
-        self.nav_button_group.addButton(self.normal_radio, 0)
-        section_layout.addWidget(self.normal_radio)
-
-        # 트리메뉴 스타일 라디오 버튼
-        self.tree_radio = QRadioButton("트리메뉴 스타일 (왼쪽 사이드바)")
-        self.tree_radio.setChecked(current_style == "tree")
-        self.nav_button_group.addButton(self.tree_radio, 1)
-        section_layout.addWidget(self.tree_radio)
+        self.tree_checkbox = QCheckBox("트리메뉴 스타일 (왼쪽 사이드바)")
+        self.tree_checkbox.setChecked(current_style == "tree")
+        self.tree_checkbox.toggled.connect(self._on_tree_nav_toggled)
+        section_layout.addWidget(self.tree_checkbox)
 
         # 설명 레이블
         description = QLabel(
@@ -176,7 +158,7 @@ class QtSettingsTab(QWidget):
             '  - 검색 관련 탭들을 "검색" 그룹으로 분류\n'
             '  - 도구 관련 탭들을 "도구" 그룹으로 분류'
         )
-        description.setStyleSheet("color: #888888; font-size: 9pt;")
+        description.setStyleSheet(f"color: {U.TEXT_SUBDUED}; font-size: 9pt;")
         description.setWordWrap(True)
         section_layout.addWidget(description)
 
@@ -192,9 +174,22 @@ class QtSettingsTab(QWidget):
         theme_layout.addWidget(theme_label)
 
         self.theme_combo = QComboBox()
-        self.theme_combo.addItems(["Dark (현재)", "Light", "Auto"])
-        self.theme_combo.setCurrentIndex(0)
+        self.theme_combo.addItems(["Dark", "Light"])
+
+        # 현재 저장된 테마 불러오기
+        current_theme = self._get_theme_setting()
+        if current_theme == "light":
+            self.theme_combo.setCurrentIndex(1)
+        else:
+            self.theme_combo.setCurrentIndex(0)
+
         theme_layout.addWidget(self.theme_combo)
+
+        # 적용 버튼 추가
+        apply_theme_button = QPushButton("적용")
+        apply_theme_button.clicked.connect(self._apply_theme)
+        theme_layout.addWidget(apply_theme_button)
+
         theme_layout.addStretch()
 
         section_layout.addLayout(theme_layout)
@@ -309,7 +304,7 @@ class QtSettingsTab(QWidget):
 
         # 설명 레이블
         description = QLabel("MARC 추출탭 텍스트 입력창 높이:")
-        description.setStyleSheet("color: #cccccc; font-size: 10pt;")
+        description.setStyleSheet(f"color: {U.TEXT_DEFAULT}; font-size: 10pt;")
         section_layout.addWidget(description)
 
         # 그리드 레이아웃으로 체크박스 정렬
@@ -350,7 +345,7 @@ class QtSettingsTab(QWidget):
             "• 확장: 긴 MARC 데이터를 보기 편하게 입력\n"
             "• 변경 후 '설정 적용' 버튼을 눌러 저장하세요."
         )
-        info_label.setStyleSheet("color: #888888; font-size: 9pt;")
+        info_label.setStyleSheet(f"color: {U.TEXT_SUBDUED}; font-size: 9pt;")
         info_label.setWordWrap(True)
         section_layout.addWidget(info_label)
 
@@ -358,35 +353,27 @@ class QtSettingsTab(QWidget):
         """저장/복원 버튼 섹션을 생성합니다."""
         # ✅ [수정] 스크롤 밖에 배치하므로 섹션 프레임 없이 직접 버튼 레이아웃 생성
         button_frame = QFrame()
-        button_frame.setStyleSheet(
-            f"""
-            QFrame {{
-                background-color: {U.BACKGROUND_PRIMARY};
-                border-top: 1px solid {U.WIDGET_BG_DEFAULT};
-                padding: 10px;
-            }}
-        """
-        )
+        # 전역 스타일 사용 (테마 전환 대응)
         button_layout = QHBoxLayout(button_frame)
 
         # 설정 적용 버튼
         save_button = QPushButton("🔄 설정 적용")
         save_button.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #1e88e5;
+            f"""
+            QPushButton {{
+                background-color: {U.BUTTON_PRIMARY};
                 color: white;
                 border: none;
                 border-radius: 4px;
                 padding: 8px 16px;
                 font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #1976d2;
-            }
-            QPushButton:pressed {
-                background-color: #1565c0;
-            }
+            }}
+            QPushButton:hover {{
+                background-color: {U.BUTTON_PRIMARY_HOVER};
+            }}
+            QPushButton:pressed {{
+                background-color: {U.BUTTON_PRIMARY_PRESSED};
+            }}
         """
         )
         save_button.clicked.connect(self._save_all_settings)
@@ -395,20 +382,20 @@ class QtSettingsTab(QWidget):
         # 기본값 복원 버튼
         reset_button = QPushButton("🔄 기본값 복원")
         reset_button.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #d32f2f;
+            f"""
+            QPushButton {{
+                background-color: {U.BUTTON_DANGER};
                 color: white;
                 border: none;
                 border-radius: 4px;
                 padding: 8px 16px;
-            }
-            QPushButton:hover {
-                background-color: #c62828;
-            }
-            QPushButton:pressed {
-                background-color: #b71c1c;
-            }
+            }}
+            QPushButton:hover {{
+                background-color: {U.BUTTON_DANGER_HOVER};
+            }}
+            QPushButton:pressed {{
+                background-color: {U.BUTTON_DANGER_PRESSED};
+            }}
         """
         )
         reset_button.clicked.connect(self._reset_to_defaults)
@@ -417,20 +404,20 @@ class QtSettingsTab(QWidget):
         # 재시작 안내 버튼
         restart_button = QPushButton("🔄 앱 재시작 안내")
         restart_button.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #388e3c;
+            f"""
+            QPushButton {{
+                background-color: {U.BUTTON_SUCCESS};
                 color: white;
                 border: none;
                 border-radius: 4px;
                 padding: 8px 16px;
-            }
-            QPushButton:hover {
-                background-color: #2e7d32;
-            }
-            QPushButton:pressed {
-                background-color: #1b5e20;
-            }
+            }}
+            QPushButton:hover {{
+                background-color: {U.BUTTON_SUCCESS_HOVER};
+            }}
+            QPushButton:pressed {{
+                background-color: {U.BUTTON_SUCCESS_PRESSED};
+            }}
         """
         )
         restart_button.clicked.connect(self._show_restart_dialog)
@@ -485,6 +472,69 @@ class QtSettingsTab(QWidget):
             return int(value) if value else 60
         return 60
 
+    def _get_theme_setting(self):
+        """현재 테마 설정을 가져옵니다."""
+        if hasattr(self.app_instance, "db_manager") and self.app_instance.db_manager:
+            value = self.app_instance.db_manager.get_setting("ui_theme")
+            # 기본값은 dark
+            if value and "light" in value.lower():
+                return "light"
+            return "dark"
+        return "dark"
+
+    def _apply_theme(self):
+        """테마를 적용합니다 (재시작 필요)."""
+        try:
+            from ui_constants import set_theme
+            from qt_styles import get_app_stylesheet
+
+            # 선택된 테마 가져오기
+            selected_theme = self.theme_combo.currentText().lower()
+
+            # ui_constants의 테마 변경
+            set_theme(selected_theme)
+
+            # DB에 저장 (재시작 전에 저장)
+            self.app_instance.db_manager.set_setting(
+                "ui_theme", selected_theme, "UI 테마 설정"
+            )
+
+            # ✅ [핵심 수정] 앱 재시작 안내
+            QMessageBox.information(
+                self,
+                "테마 변경",
+                f"{selected_theme.capitalize()} 테마가 선택되었습니다.\n\n"
+                "테마를 완전히 적용하려면 앱을 재시작해주세요."
+            )
+
+            self.app_instance.log_message(
+                f"✅ {selected_theme} 테마가 선택되었습니다. 재시작 시 적용됩니다.", "INFO"
+            )
+
+        except Exception as e:
+            QMessageBox.critical(
+                self, "오류", f"테마 적용 중 오류가 발생했습니다:\n{str(e)}"
+            )
+            self.app_instance.log_message(f"❌ 테마 적용 실패: {e}", "ERROR")
+
+    def _on_normal_nav_toggled(self, checked):
+        """일반 탭 체크박스가 토글될 때 호출됩니다."""
+        if checked:
+            # 일반 탭이 체크되면 트리메뉴를 해제
+            self.tree_checkbox.setChecked(False)
+        elif not self.tree_checkbox.isChecked():
+            # 둘 다 해제되면 일반 탭을 다시 체크
+            self.normal_checkbox.setChecked(True)
+
+    def _on_tree_nav_toggled(self, checked):
+        """트리메뉴 체크박스가 토글될 때 호출됩니다."""
+        if checked:
+            # 트리메뉴가 체크되면 일반 탭을 해제
+            self.normal_checkbox.setChecked(False)
+        elif not self.normal_checkbox.isChecked():
+            # 둘 다 해제되면 트리메뉴를 다시 체크
+            self.tree_checkbox.setChecked(True)
+
     def _on_marc_height_default_toggled(self, checked):
         """기본 높이 체크박스가 토글될 때 호출됩니다."""
         if checked:
@@ -516,7 +566,7 @@ class QtSettingsTab(QWidget):
 
         try:
             # 네비게이션 스타일 저장
-            nav_style = "tree" if self.tree_radio.isChecked() else "tab"
+            nav_style = "tree" if self.tree_checkbox.isChecked() else "tab"
             self.app_instance.db_manager.set_setting(
                 "navigation_style", nav_style, "네비게이션 스타일 설정"
             )

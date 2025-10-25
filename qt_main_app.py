@@ -357,8 +357,8 @@ class IntegratedSearchApp:
         app.setApplicationName("통합 서지검색 시스템")
         app.setApplicationVersion("2.0.0")
 
-        # 다크 테마 설정
-        self.set_dark_theme(app)
+        # 저장된 테마 불러오기 및 적용
+        self.load_and_apply_theme(app)
 
         # ✅ 스플래시 스크린 생성 및 표시
         # PyInstaller exe 환경에서도 작동하도록 경로 처리
@@ -427,11 +427,25 @@ class IntegratedSearchApp:
         # 애플리케이션 실행
         sys.exit(app.exec())
 
-    def set_dark_theme(self, app):
-        """다크 테마 설정"""
-        from qt_styles import APP_STYLESHEET
+    def load_and_apply_theme(self, app):
+        """저장된 테마를 불러와서 적용합니다"""
+        from ui_constants import set_theme
+        from qt_styles import get_app_stylesheet
 
-        app.setStyleSheet(APP_STYLESHEET)
+        # DB에서 저장된 테마 설정 불러오기
+        saved_theme = "dark"  # 기본값
+        if self.db_manager:
+            theme_setting = self.db_manager.get_setting("ui_theme")
+            if theme_setting and "light" in theme_setting.lower():
+                saved_theme = "light"
+
+        # ui_constants의 테마 설정
+        set_theme(saved_theme)
+
+        # 새 스타일시트 생성 및 적용
+        app.setStyleSheet(get_app_stylesheet())
+
+        self.logger.info(f"✅ {saved_theme.capitalize()} 테마 적용됨")
 
     # ✅ [추가] 각 탭에서 메인 창의 상태 표시줄을 제어하기 위한 중계 함수
     def set_status_message(self, message, level="INFO"):
@@ -838,9 +852,15 @@ class MainApplicationWindow(QMainWindow):
 
         U = UI_CONSTANTS  # UI 상수 가져오기
 
-        # 색상 설정
-        color_map = {"ERROR": "#D84040", "WARNING": "#ff7300", "INFO": "#4EC9B0"}
-        color = color_map.get(level, "#b1b1b1")
+        # ✅ 색상 설정 - 테마별로 다른 색상 사용
+        if U.BACKGROUND_PRIMARY == "#0e111a":  # Dark theme
+            color_map = {"ERROR": "#D84040", "WARNING": "#ff7300", "INFO": "#4EC9B0", "DEBUG": "#888888"}
+            timestamp_color = "#888888"
+        else:  # Light theme
+            color_map = {"ERROR": "#C41E3A", "WARNING": "#D97706", "INFO": "#0369A1", "DEBUG": "#6B7280"}
+            timestamp_color = "#6B7280"
+
+        color = color_map.get(level, U.TEXT_SUBDUED)
 
         # ✅ [수정] 올바른 Qt DateTime 사용
         from PySide6.QtCore import QDateTime
@@ -861,7 +881,7 @@ class MainApplicationWindow(QMainWindow):
             linked_message,
         )
 
-        html_message = f'<span style="color: #888;">[{timestamp}]</span> <span style="color: {color};">[{level}]</span> {linked_message}'
+        html_message = f'<span style="color: {timestamp_color};">[{timestamp}]</span> <span style="color: {color};">[{level}]</span> {linked_message}'
 
         self.log_display.append(html_message)
 
