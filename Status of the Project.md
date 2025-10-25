@@ -212,6 +212,166 @@
 
 ---
 
+6.1. dewey_cache.db (DDC API 캐시 및 통계)
+
+이 데이터베이스는 WorldCat DDC API 응답을 캐싱하고 관련 통계를 수집하는 데 특화되어 있습니다. 총 10개의 테이블 과 3개의 인덱스 , 3개의 트리거 로 구성됩니다.
+
+주요 테이블:
+
+    dewey_cache
+
+    목적: DDC API의 raw_json 응답을 캐싱하는 핵심 테이블입니다.
+
+스키마: iri (PRIMARY KEY), ddc_code, raw_json (NOT NULL), last_updated, hit_count, file_size
+
+인덱스: ddc_code 와 last_updated 컬럼에 별도 인덱스가 생성되어 조회 성능을 향상시킵니다.
+
+ddc_keyword 및 ddc_keyword_fts
+
+    목적: DDC 관련 키워드를 저장하고 FTS5(Full-Text Search)를 통해 빠른 검색을 지원합니다.
+
+ddc_keyword: iri, ddc, keyword, term_type 등을 저장합니다.
+
+ddc_keyword_fts: ddc_keyword 테이블을 기반으로 fts5 가상 테이블이 생성됩니다.
+
+트리거: ddc_keyword_ad (AFTER DELETE), ddc_keyword_ai (AFTER INSERT), ddc_keyword_au (AFTER UPDATE) 트리거가 ddc_keyword 테이블의 데이터 변경 시 ddc_keyword_fts를 자동으로 동기화합니다.
+
+dewey_stats
+
+    목적: 캐시 및 API 사용에 대한 일별 통계를 저장합니다.
+
+스키마: stat_date (PRIMARY KEY), total_entries, cache_hits, api_calls, db_size_mb
+
+search_history
+
+    목적: 사용자의 DDC 검색 이력을 기록합니다.
+
+스키마: id (INTEGER PRIMARY KEY AUTOINCREMENT), ddc_code (NOT NULL), searched_at
+
+인덱스: searched_at (DESC)에 인덱스가 있어 최근 검색 내역을 빠르게 조회할 수 있습니다.
+
+6.2. nlk_concepts.sqlite (국립중앙도서관 KSH 개념 DB)
+
+이 데이터베이스는 국립중앙도서관(NLK)의 KSH 개념, 속성, 관계 및 분류 매핑(DDC, KDC) 정보를 저장하는 핵심 지식 베이스입니다. 총 11개의 테이블 , 24개의 인덱스 , 3개의 트리거 로 구성되어 있으며, 매우 정교한 읽기/검색 최적화가 이루어져 있습니다.
+
+주요 테이블:
+
+    concepts
+
+    목적: 모든 개념(Concept)의 유일한 식별자(concept_id)와 타입(type)을 저장하는 중앙 엔티티 테이블입니다.
+
+스키마: concept_id (PRIMARY KEY), type
+
+literal_props 및 literal_props_fts
+
+    목적: 개념의 문자열 속성(예: 표제어, 정의)을 저장하고 FTS5를 통해 검색합니다.
+
+    literal_props: concept_id (FOREIGN KEY), prop (속성명), value (원본 값), value_normalized (검색용 정규화 값)를 저장합니다.
+
+literal_props_fts: value_normalized 컬럼을 대상으로 하는 fts5 가상 테이블입니다.
+
+트리거: literal_props_ad, literal_props_ai, literal_props_au 트리거가 literal_props 변경 시 literal_props_fts를 자동으로 동기화합니다.
+
+uri_props
+
+    목적: 개념과 다른 개념(URI) 간의 관계(예: 상위어, 하위어, 연관어)를 저장합니다.
+
+    스키마: concept_id (FOREIGN KEY), prop (관계명), target (대상 URI)
+
+매핑 테이블 (Classification & Category)
+
+    ddc_mapping: concept_id와 ddc_classification (DDC 분류)을 매핑합니다.
+
+kdc_mapping: concept_id와 kdc_like_classification (KDC 분류)을 매핑합니다.
+
+category_mapping: concept_id와 main_category (메인 카테고리)를 매핑합니다.
+
+인덱스 최적화:
+
+총 24개의 인덱스 가 존재하며, 이는 매우 특정한 조회 패턴에 대해 고도로 최적화되어 있음을 시사합니다.
+
+    FTS 최적화: idx_literal_props_covering 인덱스 는 FTS 검색 후 원본 테이블(literal_props)을 다시 조회할 필요 없이 value_normalized, concept_id, prop, value를 모두 가져올 수 있게 설계된 **커버링 인덱스(Covering Index)**로, 검색 성능을 극대화합니다.
+
+주요 조회 경로: literal_props 테이블의 (concept_id, prop) , (prop, value_normalized) , value_normalized 등 핵심 조회 컬럼 조합에 대해 복합 인덱스가 촘촘하게 생성되어 있습니다.
+
+관계 조회: uri_props 테이블 역시 (concept_id, prop) , (prop, target) , target 등 다양한 관계 탐색 경로에 최적화된 인덱스를 갖추고 있습니다.
+
+실제 DB 테이블 내의 데이터 예시
+(value_normalized는 공백이 제거되어 있음)
+concept_id	        prop     value	              value_normalized
+nlk:KSH1997000001	  label	   대립 개념[對立槪念]    대립개념[對立槪念]
+
+
+6.3. kdc_ddc_mapping.db (KDC-DDC 매핑 및 검색)
+
+이 데이터베이스는 KDC(한국십진분류법)와 DDC(듀이십진분류법) 간의 매핑 데이터를 저장하며, KSH(주제명)와 연계하여 매우 강력한 검색 기능을 제공하도록 고도로 최적화되어 있습니다. 총 9개의 테이블, 28개의 인덱스, 3개의 트리거로 구성됩니다.
+
+주요 테이블:
+
+    mapping_data
+
+        목적: KDC, DDC, KSH, 서지 정보(표제, 출판연도) 등 모든 핵심 매핑 데이터를 저장하는 메인 테이블입니다.
+
+스키마: id, identifier, kdc, ddc, ksh, kdc_edition, ddc_edition, publication_year, title, data_type, source_file, ksh_labeled, ksh_korean.
+
+mapping_data_fts
+
+    목적: mapping_data 테이블의 데이터를 FTS5(Full-Text Search)로 빠르게 검색하기 위한 가상 테이블입니다.
+
+특징: ksh_korean (KSH 한글 용어) 필드를 중심으로 색인하며, identifier는 색인에서 제외(UNINDEXED)됩니다.
+
+settings 및 translations
+
+    목적: 각각 데이터베이스 관련 설정(Key-Value) 및 용어 번역 정보 를 저장하는 유틸리티 테이블입니다.
+
+인덱스 최적화 (28개):
+
+이 데이터베이스는 28개의 인덱스를 통해 특정 검색 경로에 대해 극단적으로 최적화되어 있습니다.
+
+    기본 인덱스: idx_kdc, idx_ddc, idx_ksh, idx_ksh_korean 등 단일 컬럼 인덱스를 통해 각 분류 체계 및 주제명으로의 빠른 조회를 지원합니다.
+
+복합 인덱스: idx_kdc_ksh_korean , idx_ddc_ksh_korean_year , idx_ksh_korean_ddc_year 등 사용자의 주된 검색 시나리오(예: KSH 한글 용어와 DDC, 출판연도를 함께 조회)에 최적화된 다중 컬럼 인덱스가 다수 존재합니다.
+
+커버링 인덱스 (Covering Index):
+
+    idx_mapping_data_korean_search_cover 인덱스는 ksh_korean, ddc, publication_year (DESC), identifier, title, ksh, ksh_labeled 필드를 모두 포함합니다.
+
+        이는 ksh_korean으로 검색 시, 원본 mapping_data 테이블을 다시 읽지 않고도 필요한 대부분의 정보를 인덱스만으로 반환할 수 있게 하여 검색 성능을 극대화합니다.
+
+트리거 (3개):
+
+    mapping_data_fts_delete, mapping_data_fts_insert, mapping_data_fts_update 트리거가 존재합니다.
+
+이 트리거들은 mapping_data 테이블에 데이터가 추가, 수정, 삭제될 때마다 mapping_data_fts 가상 테이블의 내용을 자동으로 동기화하는 역할을 합니다.
+
+6.4. glossary.db (UI 설정 및 용어집)
+
+이 데이터베이스는 프로젝트 문서의 qt_layout_settings_manager.py (이전 문서 내용 참조) 및 qt_main_app.py (이전 문서 내용 참조)와 연관되어, 애플리케이션의 설정과 UI 상태(창 크기, 스플리터 위치 등)를 저장하는 데 사용됩니다. 총 4개의 테이블, 0개의 인덱스, 0개의 뷰, 0개의 트리거로 구성된 비교적 단순한 구조입니다.
+
+주요 테이블:
+
+    settings
+
+        목적: 애플리케이션의 주요 설정을 저장하는 핵심 Key-Value 테이블입니다. qt_layout_settings_manager가 이 테이블을 사용하여 UI 레이아웃 상태를 저장할 가능성이 높습니다.
+
+        스키마: key (PRIMARY KEY), value (NOT NULL), description, created_at, updated_at.
+
+glossary
+
+    목적: 용어집 또는 번역 데이터를 저장합니다.
+
+    스키마: id (PK AUTOINCREMENT), original_term (UNIQUE NOT NULL), translated_term (NOT NULL), created_at.
+
+translations
+
+    목적: glossary 테이블과 유사하게 용어 번역을 저장하는 또 다른 테이블입니다.
+
+    스키마: original_term (PRIMARY KEY), translated_term (NOT NULL).
+
+인덱스 및 트리거:
+
+    사용자가 생성한 별도의 인덱스나 트리거는 존재하지 않습니다. 테이블의 PRIMARY KEY 및 UNIQUE 제약 조건에 의해 생성되는 기본 인덱스만 사용됩니다.
+
 ## 7. 주요 관계 및 데이터 흐름 (Key Relationships & Data Flow)
 
 **일반적인 검색 흐름 (예: Dewey 탭)**
