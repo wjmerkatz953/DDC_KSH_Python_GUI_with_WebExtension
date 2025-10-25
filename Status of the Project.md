@@ -226,7 +226,36 @@
 
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
-### 2025-10-25: 트리메뉴 네비게이션 개선 및 Gemini 탭 추가
+### 2025-10-25 (세션 2): UI 일관성 개선 및 테마 호환성 강화
+- **MARC_Gemini 입력 위젯 그룹 스타일 추가** (`qt_styles.py`, `qt_TabView_MARC_Extractor.py`, `qt_TabView_Gemini.py`)
+  - MARC 추출 탭과 Gemini 탭의 입력 위젯에 `MARC_Gemini_Input` objectName 지정
+  - `QTextEdit#MARC_Gemini_Input` 전용 스타일 그룹 생성
+  - 두 탭의 입력 위젯 배경색을 한 곳에서 조절 가능하도록 통합
+  - 트리메뉴 모드에서도 정확한 배경색 적용을 위해 `get_color()` 함수 사용한 인라인 스타일 추가
+
+- **라디오 버튼 스타일 개선** (`qt_styles.py`)
+  - QRadioButton 커스텀 스타일 추가로 선택/미선택 상태 명확히 구분
+  - radial gradient 사용하여 선택 시 중앙 점 효과 구현
+  - Light Theme에서도 선명하게 보이도록 테두리 및 색상 조정
+  - 호버 상태에서 파란색 테두리로 인터랙션 피드백 제공
+
+- **설정 탭 "적용" 버튼 텍스트 색상 수정** (`qt_TabView_Settings.py`)
+  - 하드코딩된 `color: white`를 `TEXT_BUTTON` UI 상수로 변경
+  - 테마 전환 시에도 일관된 버튼 텍스트 색상 유지
+
+- **트리메뉴 테두리 색상 수정** (`qt_tree_menu_navigation.py`)
+  - 하드코딩된 `#3d3d3d`를 `BORDER_LIGHT` UI 상수로 변경
+  - 트리메뉴 모드와 탭 모드 간 외관 일관성 확보
+  - Light/Dark 테마 모두에서 적절한 테두리 색상 표시
+
+- **수정 파일**:
+  - `qt_styles.py` v3.0.1
+  - `qt_TabView_MARC_Extractor.py` v2.1.1
+  - `qt_TabView_Gemini.py` v2.2.1
+  - `qt_TabView_Settings.py` v1.0.2
+  - `qt_tree_menu_navigation.py` v1.0.4
+
+### 2025-10-25 (세션 1): 트리메뉴 네비게이션 개선 및 Gemini 탭 추가
 - **트리메뉴 호버 자동 펼치기 구현** (`qt_tree_menu_navigation.py`)
   - 마우스 호버 시 그룹 메뉴가 자동으로 펼쳐지도록 `itemEntered` 시그널 연결
   - `setMouseTracking(True)` 활성화로 호버 이벤트 감지
