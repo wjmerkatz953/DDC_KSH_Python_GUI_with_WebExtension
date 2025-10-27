@@ -1,8 +1,9 @@
 ﻿# -*- coding: utf-8 -*-
 # 파일명: qt_widget_events.py
 # 설명: Qt 위젯 이벤트 관련 유틸리티 함수들 (QTableWidget 30% 교체)
-# 버전: 2.1.0 - QTableWidget 지원 추가
+# 버전: 2.1.1 - Dark/Light 테마 전환 대응
 # 생성일: 2025-09-24
+# 수정일: 2025-10-27 - paintSection 메서드의 모든 색상을 UI_CONSTANTS로 동적 로드하여 테마 전환 대응
 
 import json
 from PySide6.QtWidgets import (
@@ -24,7 +25,8 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QRect, QPoint, QTimer
 from PySide6.QtGui import QAction, QPainter, QPen, QFont, QColor
 from qt_utils import apply_dark_title_bar, enable_modal_close_on_outside_click
-from ui_constants import U
+
+# ✅ U는 제거 - paintSection에서 UI_CONSTANTS를 매번 import하여 테마 전환 대응
 
 
 class CustomTextFilterDialog(QDialog):
@@ -190,16 +192,19 @@ class ExcelStyleTableHeaderView(QHeaderView):
         mouse_pos = self.mapFromGlobal(self.cursor().pos())
         is_hovered = rect.contains(mouse_pos)
 
+        # ✅ 테마 전환 대응: UI_CONSTANTS를 매번 다시 가져와서 현재 테마 색상 적용
+        from ui_constants import UI_CONSTANTS
+
         # 1. 배경 그리기
         if is_hovered:
-            painter.fillRect(rect, QColor(U.ACCENT_BLUE))
+            painter.fillRect(rect, QColor(UI_CONSTANTS.ACCENT_BLUE))
         else:
             painter.fillRect(
-                rect, QColor(U.WIDGET_BG_DEFAULT)
+                rect, QColor(UI_CONSTANTS.QHEADER_BG)
             )  # 테이블뷰 컬럼 헤더 배경색상
 
         # 2. 테두리 그리기
-        pen = QPen(QColor(U.QHEADER_BORDER))
+        pen = QPen(QColor(UI_CONSTANTS.QHEADER_BORDER))
         pen.setWidth(0.5)
         painter.setPen(pen)
         # 왼쪽 경계선
@@ -212,8 +217,10 @@ class ExcelStyleTableHeaderView(QHeaderView):
         if header_text is None:
             header_text = ""
 
-        painter.setPen(QColor(U.TEXT_BUTTON) if not is_hovered else Qt.white)
-        painter.setFont(QFont(U.FONT_FAMILY, U.FONT_SIZE_NORMAL, QFont.Bold))
+        painter.setPen(QColor(UI_CONSTANTS.TEXT_BUTTON) if not is_hovered else Qt.white)
+        painter.setFont(
+            QFont(UI_CONSTANTS.FONT_FAMILY, UI_CONSTANTS.FONT_SIZE_NORMAL, QFont.Bold)
+        )
 
         # 4. 5구역 아이콘 및 텍스트 위치 계산 (공간 절약형 중앙 정렬 로직)
 
@@ -284,10 +291,14 @@ class ExcelStyleTableHeaderView(QHeaderView):
                 sort_ascending = self.sort_ascending
 
             # [핵심 해결 2] 아이콘 폰트 설정 유지 (기울임 방지)
-            icon_font = QFont(U.FONT_FAMILY, U.FONT_SIZE_NORMAL)
+            icon_font = QFont(UI_CONSTANTS.FONT_FAMILY, UI_CONSTANTS.FONT_SIZE_NORMAL)
             icon_font.setItalic(False)
 
-            sort_color = QColor(U.ACCENT_GREEN) if is_hovered else QColor(U.ACCENT_BLUE)
+            sort_color = (
+                QColor(UI_CONSTANTS.ACCENT_GREEN)
+                if is_hovered
+                else QColor(UI_CONSTANTS.ACCENT_BLUE)
+            )
             painter.setPen(sort_color)
             painter.setFont(icon_font)
 
@@ -306,15 +317,17 @@ class ExcelStyleTableHeaderView(QHeaderView):
             painter.drawText(sort_icon_rect, Qt.AlignCenter, sort_symbol)
 
         # 6. 헤더 텍스트 그리기 (아이콘 영역 이후)
-        painter.setPen(QColor(U.TEXT_BUTTON) if not is_hovered else Qt.white)
-        painter.setFont(QFont(U.FONT_FAMILY, U.FONT_SIZE_NORMAL, QFont.Bold))
+        painter.setPen(QColor(UI_CONSTANTS.TEXT_BUTTON) if not is_hovered else Qt.white)
+        painter.setFont(
+            QFont(UI_CONSTANTS.FONT_FAMILY, UI_CONSTANTS.FONT_SIZE_NORMAL, QFont.Bold)
+        )
 
         # [핵심] 텍스트는 자신의 영역(text_rect)에서 좌측 정렬되어 아이콘 옆에 붙습니다.
         painter.drawText(text_rect, Qt.AlignLeft | Qt.AlignVCenter, header_text)
 
         # 7. 필터 라인 그리기
         if logicalIndex in self.column_filters and self.column_filters[logicalIndex]:
-            pen = QPen(QColor(U.ACCENT_RED))
+            pen = QPen(QColor(UI_CONSTANTS.ACCENT_RED))
             pen.setWidth(4)
             painter.setPen(pen)
             # 상단에 라인을 그립니다.

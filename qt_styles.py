@@ -43,7 +43,7 @@ def get_app_stylesheet():
         border-top: none;
     }}
     QTabBar::tab {{
-        background: {U.BACKGROUND_PRIMARY};
+        background: {U.BACKGROUND_SECONDARY};
         color: {U.TEXT_DEFAULT};
         padding: 6px 10px;         /* 탭바 높이 조절 5px */
         border: 0px solid {U.ACCENT_BLUE};
@@ -125,7 +125,7 @@ def get_app_stylesheet():
         margin-left: 0px;
     }}
     QTextEdit {{
-        background-color: {U.BACKGROUND_PRIMARY};
+        background-color: {U.BACKGROUND_SECONDARY};
         border: 0.8px solid {U.BORDER_MEDIUM};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         padding: 6px 6px 6px 6px;
@@ -530,7 +530,7 @@ def get_app_stylesheet():
         border: 1px solid {U.BORDER_COLOR};
     }}
     QTextEdit#DeweyDetailText {{
-        background-color: {U.BACKGROUND_PRIMARY};
+        background-color: {U.BACKGROUND_SECONDARY};
         color: {U.TEXT_DEFAULT};
         border: 0px solid {U.ACCENT_BLUE}; /* 테두리 제거 */
         padding: 5px; /* 약간의 내부 패딩 */

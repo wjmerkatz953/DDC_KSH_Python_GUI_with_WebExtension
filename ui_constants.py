@@ -15,11 +15,13 @@ class UI_CONSTANTS_DARK:
     """다크 테마 색상 상수"""
 
     BACKGROUND_PRIMARY = "#0e111a"
-    BACKGROUND_SECONDARY = "#1b2236"
+    BACKGROUND_SECONDARY = "#11151D"
     BACKGROUND_TERTIARY = "#131722"
     WIDGET_BG_DEFAULT = "#1b2235"
     CORNER_STONE = "#1b2235"
     INPUT_WIDGET_BG = "#1a1f2e"  # 입력 위젯 전용 배경색
+    QHEADER_BG = "#1b2235"
+    QHEADER_BORDER = "#0e111a"
 
     TEXT_DEFAULT = "#bebebe"
     TEXT_SUBDUED = "#ADAAAA"
@@ -73,11 +75,13 @@ class UI_CONSTANTS_LIGHT:
     """라이트 테마 색상 상수"""
 
     BACKGROUND_PRIMARY = "#dbdbdb"
-    BACKGROUND_SECONDARY = "#f5f5f5"
+    BACKGROUND_SECONDARY = "#e2e2e2"
     BACKGROUND_TERTIARY = "#efefef"
+    QHEADER_BG = "#1b2235"
     WIDGET_BG_DEFAULT = "#f0f0f0"
     INPUT_WIDGET_BG = "#cecccc"  # 입력 위젯 전용 배경색 (e8e8e8보다 살짝 어둡게)
     CORNER_STONE = "#1b2235"
+    QHEADER_BORDER = "#38373B"
 
     TEXT_DEFAULT = "#2c2c2c"
     TEXT_SUBDUED = "#4a4a4a"  # 설명 문구 색상 (더 어둡게 - 가독성 향상)
@@ -157,7 +161,6 @@ class UI_CONSTANTS_COMMON:
 
     CORNER_RADIUS_DEFAULT = 0
     TREEVIEW_ROW_HEIGHT_DEFAULT = 25
-    QHEADER_BORDER = "#38373B"
     QTABLE_BORDER = "#316caa"
 
     # 하이라이트 색상 (검색/정렬용)

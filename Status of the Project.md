@@ -444,9 +444,17 @@ translations
   - `refresh_theme()` 메서드 추가로 테마 전환 시 viewport 강제 업데이트
   - Western 탭의 모든 출처 색상(LC, Harvard, MIT 등)도 Global에서 사용
 
+- **테이블 헤더뷰 테마 대응** (`qt_widget_events.py` v2.1.1, `qt_base_tab.py`)
+  - ExcelStyleTableHeaderView의 paintSection 메서드에서 모든 색상을 동적으로 로드하도록 수정
+  - 배경색 (ACCENT_BLUE, WIDGET_BG_DEFAULT), 테두리색 (QHEADER_BORDER), 텍스트색 (TEXT_BUTTON), 정렬 아이콘색 (ACCENT_GREEN, ACCENT_BLUE), 필터 라인색 (ACCENT_RED) 모두 UI_CONSTANTS에서 동적으로 가져옴
+  - `from ui_constants import UI_CONSTANTS` 패턴으로 매 렌더링마다 최신 테마 색상 적용
+  - 모든 BaseSearchTab 상속 탭에서 수평 스크롤바 항상 표시 (`setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)`)
+
 - **수정 파일**:
   - `qt_api_settings.py` v1.1.2 (테마 대응 + X 버튼 수정)
   - `qt_styles.py` v3.0.3 (label_type="subdued" 스타일 추가)
+  - `qt_widget_events.py` v2.1.1 (paintSection 테마 대응)
+  - `qt_base_tab.py` (수평 스크롤바 항상 표시)
   - `qt_TabView_MARC_Extractor.py` v2.1.2
   - `qt_TabView_Dewey.py` v4.3.1
   - `qt_TabView_NLK.py` v1.0.5
