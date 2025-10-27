@@ -1,36 +1,49 @@
 # 파일명: qt_TabView_Western.py
 # -*- coding: utf-8 -*-
 # 설명: Western 통합 검색 UI 탭 (BaseSearchTab 상속)
+# 버전: v1.0.1
+# 수정일: 2025-10-27 - 델리게이트 테마 대응, Google Books API 설정 기능 추가
 
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPalette
-from PySide6.QtWidgets import QStyledItemDelegate, QCheckBox
+from PySide6.QtWidgets import QStyledItemDelegate, QCheckBox, QPushButton, QLabel
 from qt_base_tab import BaseSearchTab, SelectAllLineEdit
 from ui_constants import U
 
 
 class WesternSourceColorDelegate(QStyledItemDelegate):
-    """출처별로 행의 텍스트 색상을 다르게 표시하는 델리게이트"""
+    """✅ 출처별로 행의 텍스트 색상을 다르게 표시하는 델리게이트 (테마 대응)"""
 
     def __init__(self, parent=None, app_instance=None):
         super().__init__(parent)
-        self.app_instance = app_instance  # ← 추가
-        self.color_map = {
-            "LC": QColor("#C7DA72"),
-            "Harvard": QColor("#99A1E6"),
-            "MIT": QColor("#8FB474"),
-            "Princeton": QColor("#E08A44"),
-            "UPenn": QColor("#B19CD9"),
-            "Cornell": QColor("#D2B48C"),
-            "DNB": QColor(U.TEXT_DEFAULT),
-            "BNF": QColor(U.ACCENT_BLUE),
-            "BNE": QColor("#FFAE35"),
-            "Google": QColor("#2EDDC0"),
-        }
+        self.app_instance = app_instance
 
     def paint(self, painter, option, index):
+        """✅ [수정] 행의 출처에 따라 텍스트 색상 변경 (테마 대응)"""
+        # ✅ [핵심] 테마 변경 대응: 매번 최신 UI_CONSTANTS 가져오기
+        from ui_constants import UI_CONSTANTS as U_CURRENT
+
+        # 현재 행의 첫 번째 컬럼(출처)에서 값 가져오기
         source = index.siblingAtColumn(0).data(0)
-        if source in self.color_map:
-            option.palette.setColor(QPalette.ColorRole.Text, self.color_map[source])
+
+        # 출처별 색상 매핑 (테마 변경 시마다 최신 UI 상수 사용)
+        color_map = {
+            "LC": QColor(U_CURRENT.SOURCE_LC),
+            "Harvard": QColor(U_CURRENT.SOURCE_HARVARD),
+            "MIT": QColor(U_CURRENT.SOURCE_MIT),
+            "Princeton": QColor(U_CURRENT.SOURCE_PRINCETON),
+            "UPenn": QColor(U_CURRENT.SOURCE_UPENN),
+            "Cornell": QColor(U_CURRENT.SOURCE_CORNELL),
+            "DNB": QColor(U_CURRENT.SOURCE_DNB),
+            "BNF": QColor(U_CURRENT.SOURCE_BNF),
+            "BNE": QColor(U_CURRENT.SOURCE_BNE),
+            "Google": QColor(U_CURRENT.SOURCE_GOOGLE),
+        }
+
+        # 출처에 해당하는 색상이 있으면 사용, 없으면 기본 텍스트 색상
+        text_color = color_map.get(source, QColor(U_CURRENT.TEXT_DEFAULT))
+        option.palette.setColor(QPalette.ColorRole.Text, text_color)
+
         super().paint(painter, option, index)
 
     # -------------------
@@ -67,6 +80,80 @@ class QtWesternSearchTab(BaseSearchTab):
         self.color_delegate = WesternSourceColorDelegate(self.table_view, app_instance)
         # -------------------
         self.table_view.setItemDelegate(self.color_delegate)
+
+        # ✅ [추가] 초기 API 상태 업데이트
+        self._update_api_status()
+
+    # ✅ [추가] API 설정 버튼과 상태 라벨 추가
+    def create_find_section(self, parent_layout):
+        """✅ [오버라이드] 검색창 섹션에 API 설정 버튼 추가"""
+        super().create_find_section(parent_layout)
+
+        # API 설정 버튼 생성
+        self.api_settings_button = QPushButton("⚙️ API 설정")
+        self.api_settings_button.setFixedWidth(100)
+        self.api_settings_button.clicked.connect(self._show_api_settings)
+
+        # API 상태 라벨 생성
+        self.api_status_label = QLabel("")
+        self.api_status_label.setAlignment(Qt.AlignCenter)
+        self.api_status_label.setFixedWidth(150)
+
+        # 마지막에 추가된 bar_container 찾기
+        bar_container = parent_layout.itemAt(parent_layout.count() - 1).widget()
+        if bar_container:
+            for i in range(bar_container.layout().count()):
+                item = bar_container.layout().itemAt(i)
+                if item and item.widget():
+                    find_container = item.widget()
+                    find_layout = find_container.layout()
+                    if find_layout:
+                        # HTML 버튼 다음에 API 버튼들 추가
+                        find_layout.addWidget(self.api_settings_button)
+                        find_layout.addWidget(self.api_status_label)
+
+        # 초기 상태 업데이트
+        self._update_api_status()
+
+    def _show_api_settings(self):
+        """API 설정 모달창을 표시합니다."""
+        import qt_api_settings
+        qt_api_settings.show_api_settings_modal(
+            "Google Books", self.app_instance.db_manager, self.app_instance, parent_window=self
+        )
+
+        # 다이얼로그가 닫힌 후 상태 업데이트
+        self._update_api_status()
+
+    def _update_api_status(self):
+        """API 상태 라벨을 업데이트합니다."""
+        if not hasattr(self, "api_status_label"):
+            return
+
+        try:
+            import qt_api_settings
+            is_configured = qt_api_settings.check_api_configured(
+                "Google Books", self.app_instance.db_manager
+            )
+
+            if is_configured:
+                self.api_status_label.setText("API 상태: ✅ 설정됨")
+                self.api_status_label.setProperty("api_status", "success")
+                self.api_status_label.style().unpolish(self.api_status_label)
+                self.api_status_label.style().polish(self.api_status_label)
+            else:
+                self.api_status_label.setText("API 상태: ❌ 미설정")
+                self.api_status_label.setProperty("api_status", "error")
+                self.api_status_label.style().unpolish(self.api_status_label)
+                self.api_status_label.style().polish(self.api_status_label)
+
+        except Exception as e:
+            self.api_status_label.setText("API 상태: ❌ 오류")
+            self.api_status_label.setProperty("api_status", "error")
+            self.api_status_label.style().unpolish(self.api_status_label)
+            self.api_status_label.style().polish(self.api_status_label)
+            if hasattr(self.app_instance, "log_message"):
+                self.app_instance.log_message(f"❌ API 상태 확인 실패: {e}", "ERROR")
 
     # -------------------
     # ✅ [수정 1] 'Year' 필드 생성을 제거하고, 'DDC' 필드만 추가하도록 변경
@@ -119,3 +206,8 @@ class QtWesternSearchTab(BaseSearchTab):
 
         params["db_manager"] = self.app_instance.db_manager
         return params
+
+    def refresh_theme(self):
+        """✅ [추가] 테마 변경 시 테이블 뷰를 다시 그려서 델리게이트 색상을 업데이트합니다."""
+        if hasattr(self, 'table_view'):
+            self.table_view.viewport().update()

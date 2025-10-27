@@ -355,6 +355,7 @@ class KshHyperlinkDelegate(QStyledItemDelegate):
         # 현재 컬럼이 링크를 가질 수 있는 컬럼인지 확인
         column_headers = index.model().sourceModel().column_headers
         current_col_name = column_headers[index.column()]
+        from ui_constants import UI_CONSTANTS as U_CURRENT
 
         if current_col_name in self.link_column_map:
             # 숨겨진 URL 컬럼에서 실제 URL 데이터가 있는지 확인
@@ -364,7 +365,7 @@ class KshHyperlinkDelegate(QStyledItemDelegate):
             url_data = index.model().data(url_index)
 
             if url_data:  # URL이 존재할 때만 파란색으로 표시
-                option.palette.setColor(QPalette.Text, QColor("#8ab4f8"))
+                option.palette.setColor(QPalette.Text, QColor(U_CURRENT.SOURCE_UPENN),)
 
         super().paint(painter, option, index)
 

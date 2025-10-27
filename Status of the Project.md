@@ -81,6 +81,8 @@
 
 - **`qt_dewey_logic.py` / `qt_dewey_workers.py`**: Dewey 탭의 UI 로직과 백그라운드 작업을 분리하여 처리합니다. `qt_dewey_logic`은 메뉴 명령, 트리 확장 등 UI 이벤트를 처리하고, `qt_dewey_workers`는 실제 검색, KSH 연계 등 시간이 오래 걸리는 작업을 스레드에서 수행합니다.
 
+- **`qt_widget_events.py`**: 컬럼 헤더 사이의 경계선이 보이지 않는 이유: qt_widget_events.py:202-212의 ExcelStyleTableHeaderView.paintSection() 메서드에서 커스텀 페인팅을 하고 있기 때문입니다. 이 클래스는 Excel 스타일의 헤더뷰로, 자체적으로 배경색, 테두리, 정렬 아이콘, 필터 표시 등을 모두 커스텀 페인팅합니다. 따라서 qt_styles.py에서 QHeaderView::section의 border-left와 border-right를 설정해도 무시됩니다. 이 프로젝트는 ExcelStyleTableHeaderView라는 커스텀 헤더뷰를 사용하여 Excel 스타일의 5구역 클릭(크기 조절, 정렬, 드래그, 필터), 정렬 인디케이터, 필터 아이콘 등을 구현하고 있습니다. 따라서 일반적인 스타일시트가 아닌 paintSection() 메서드 내부에서 직접 그리기 작업을 해야 합니다.
+
 ---
 
 ## 4. 탭 구현 (Tab Implementations)
@@ -386,6 +388,62 @@ translations
 
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-10-27: 테마 대응 개선 및 기능 추가
+- **세로 헤더(행 번호) 스타일 추가** (`qt_styles.py`, `qt_TabView_MARC_Extractor.py`, `qt_TabView_Dewey.py`)
+  - QHeaderView::section:vertical 스타일로 행 번호 중앙 정렬 및 테마별 색상 적용
+  - MARC 추출 탭과 Dewey 탭에 세로 헤더 표시 활성화
+  - `setDefaultAlignment(Qt.AlignCenter)`로 행 번호 중앙 정렬 구현
+
+- **API 상태 표시 테마 대응** (`qt_styles.py`, `qt_TabView_NLK.py`, `qt_TabView_Gemini.py`, `qt_TabView_AIFeed.py`, `qt_dewey_logic.py`)
+  - 하드코딩된 API 상태 색상을 QLabel[api_status] 속성 선택자로 변경
+  - `api_status="success"` → ACCENT_GREEN, `api_status="error"` → ACCENT_RED
+  - 테마 전환 시 자동으로 색상 업데이트되도록 개선
+  - Dewey 탭에 API 상태 라벨 추가
+
+- **NDL 및 Western 탭 델리게이트 테마 대응** (`qt_TabView_NDL.py`, `qt_TabView_Western.py`, `ui_constants.py`, `qt_TabView_Settings.py`)
+  - SourceColorDelegate와 WesternSourceColorDelegate에서 매번 최신 UI_CONSTANTS 가져오기
+  - Western 탭 출처별 색상을 UI 상수로 정의 (Dark/Light 테마별)
+  - `refresh_theme()` 메서드 추가로 테마 전환 시 viewport 강제 업데이트
+  - 설정 탭의 `_apply_theme()`에서 모든 탭의 `refresh_theme()` 호출
+
+- **Western 탭 출처별 색상 상수 추가** (`ui_constants.py`)
+  - Dark Theme: SOURCE_LC (#C7DA72), SOURCE_HARVARD (#99A1E6) 등 기존 색상 유지
+  - Light Theme: 진한 색상으로 가독성 확보 (SOURCE_LC #6B8E23, SOURCE_HARVARD #4A5FC1 등)
+  - SOURCE_DNB, SOURCE_BNF는 TEXT_DEFAULT, ACCENT_BLUE 상수 사용
+
+- **Western 탭 Google Books API 설정 기능 추가** (`qt_TabView_Western.py`)
+  - NLK 탭 구조를 참고하여 API 설정 버튼과 상태 라벨 추가
+  - `create_find_section()` 오버라이드하여 HTML 버튼 옆에 API 관련 위젯 배치
+  - `_show_api_settings()`, `_update_api_status()` 메서드 구현
+  - Qt, QPushButton, QLabel import 추가
+
+- **Cornell 상세 링크에 librarian_view 추가** (`Search_Cornell.py`)
+  - 상세 링크 URL에 `/librarian_view` 경로 추가
+  - 클릭 시 바로 MARC 레코드 뷰 표시되도록 개선
+
+- **Global 탭 델리게이트 테마 대응** (`qt_TabView_Global.py`, `ui_constants.py`)
+  - GlobalSourceColorDelegate에서 매번 최신 UI_CONSTANTS 가져오기
+  - Global 탭 전용 출처별 색상 상수 추가 (Dark/Light 테마별)
+  - Dark Theme: SOURCE_NDL (#FF6B9D), SOURCE_CINII (#87CEEB), SOURCE_NLK (#FFB347)
+  - Light Theme: SOURCE_NDL (#C2185B), SOURCE_CINII (#1976D2), SOURCE_NLK (#F57C00)
+  - `refresh_theme()` 메서드 추가로 테마 전환 시 viewport 강제 업데이트
+  - Western 탭의 모든 출처 색상(LC, Harvard, MIT 등)도 Global에서 사용
+
+- **수정 파일**:
+  - `qt_styles.py` v3.0.2
+  - `qt_TabView_MARC_Extractor.py` v2.1.2
+  - `qt_TabView_Dewey.py` v4.3.1
+  - `qt_TabView_NLK.py` v1.0.5
+  - `qt_TabView_Gemini.py` v2.2.2
+  - `qt_TabView_AIFeed.py` v1.0.2
+  - `qt_TabView_NDL.py` v2.0.1
+  - `qt_TabView_Western.py` v1.0.1
+  - `qt_TabView_Global.py` v1.0.1
+  - `qt_TabView_Settings.py` v1.0.3
+  - `qt_dewey_logic.py` v4.3.1
+  - `ui_constants.py` v3.0.2
+  - `Search_Cornell.py` v2.0.1
+
 ### 2025-10-25 (세션 2): UI 일관성 개선 및 테마 호환성 강화
 - **MARC_Gemini 입력 위젯 그룹 스타일 추가** (`qt_styles.py`, `qt_TabView_MARC_Extractor.py`, `qt_TabView_Gemini.py`)
   - MARC 추출 탭과 Gemini 탭의 입력 위젯에 `MARC_Gemini_Input` objectName 지정
@@ -559,7 +617,6 @@ database_manager.py (DatabaseManager v2.2.0)
 2. 다크 테마 호환성 확인 (`qt_styles.py`)
 3. 커스텀 위젯은 `qt_custom_widgets.py`에 중앙화
 4. 레이아웃 상태 저장 필요 시 `qt_layout_settings_manager.py` 활용
-
 ---
 
 ## 12. 성능 최적화 포인트 (Performance Optimization)

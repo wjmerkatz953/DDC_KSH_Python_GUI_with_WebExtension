@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_MARC_Extractor.py
 # 설명: MARC 추출기 탭 (모든 기능 복구 최종 버전)
-# 버전: v2.1.0
-# 수정일: 2025-10-18
+# 버전: v2.1.2
+# 수정일: 2025-10-27
 #
 # 변경 이력:
+# v2.1.2 (2025-10-27)
+# - [기능 추가] 세로 헤더(행 번호) 표시 및 중앙 정렬 추가
 # v2.1.0 (2025-10-18)
 # - [기능 추가] QSplitter 자동 저장/복구 기능 추가
 #   : v_splitter → self.v_splitter (F 필드 테이블과 하단 뷰 분할)
@@ -44,6 +46,7 @@ from marc_parser import extract_marc_data_to_f_fields, determine_special_call_nu
 from qt_context_menus import setup_widget_context_menu
 from qt_data_transfer_manager import send_marc_data_to_tabs
 from qt_copy_feedback import copy_to_clipboard_with_feedback
+from qt_widget_events import ExcelStyleTableHeaderView
 
 DEFAULT_MARC_LOGIC_CODE = """# -*- coding: utf-8 -*-
 # 이 곳에 MARC 추출 로직을 작성하세요.
@@ -259,34 +262,26 @@ class QtMARCExtractorTab(QWidget):
         self.f_fields_table.setModel(self.f_fields_model)
         self.f_fields_table.setMinimumHeight(230)
 
-        # ✅ [핵심 추가] 테이블 헤더 색상을 다른 탭과 통일 (WIDGET_BG_DEFAULT 사용)
-        self.f_fields_table.horizontalHeader().setStyleSheet(
-            f"""
-            QHeaderView::section {{
-                background-color: {U.WIDGET_BG_DEFAULT};
-                color: {U.TEXT_BUTTON};
-                padding: 0px 0px 0px 0px;
-                border: none;
-                font-weight: bold;
-                text-align: center;
-            }}
-            QHeaderView::section:hover {{
-                background-color: {U.ACCENT_BLUE};
-                color: {U.TEXT_BUTTON};
-            }}
-        """
+        # ✅ [수정] ExcelStyleTableHeaderView 사용으로 다른 탭과 통일
+        f_fields_headers = ["필드", "추출내용", "추출결과"]
+        excel_header = ExcelStyleTableHeaderView(
+            Qt.Horizontal,
+            self.f_fields_table,
+            column_headers=f_fields_headers,
+            callbacks=None,
+            tab_instance=self,
         )
+        self.f_fields_table.setHorizontalHeader(excel_header)
 
-        self.f_fields_table.horizontalHeader().setSectionResizeMode(
-            2, QHeaderView.Stretch
-        )
-        self.f_fields_table.horizontalHeader().setSectionResizeMode(
-            0, QHeaderView.ResizeToContents
-        )
-        self.f_fields_table.horizontalHeader().setSectionResizeMode(
-            1, QHeaderView.ResizeToContents
-        )
+        # 컬럼 크기 조절 모드 설정
+        excel_header.setSectionResizeMode(2, QHeaderView.Stretch)
+        excel_header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        excel_header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.f_fields_table.setEditTriggers(QTableView.NoEditTriggers)
+
+        # ✅ [추가] 세로 헤더(행 번호) 표시 및 정렬 설정
+        self.f_fields_table.verticalHeader().setVisible(True)
+        self.f_fields_table.verticalHeader().setDefaultAlignment(Qt.AlignCenter)
         f_fields_layout.addWidget(self.f_fields_table)
         setup_widget_context_menu(self.f_fields_table, self.app_instance)
 

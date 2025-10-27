@@ -1,6 +1,8 @@
 # 파일명: qt_TabView_AIFeed.py
 # -*- coding: utf-8 -*-
 # 설명: AI 피드 검색 UI 탭 (API 설정 기능 추가)
+# 버전: v1.0.2
+# 수정일: 2025-10-27 - API 상태 표시 테마 대응
 
 from PySide6.QtWidgets import QPushButton, QMessageBox, QLabel  # 👈 [1] QLabel 추가
 from PySide6.QtCore import Qt  # 👈 [1] Qt 추가
@@ -70,13 +72,19 @@ class QtAIFeedSearchTab(BaseSearchTab):
             )
             if is_configured:
                 self.api_status_label.setText("API 상태: ✅ 설정됨")
-                self.api_status_label.setStyleSheet(f"color: {U.ACCENT_GREEN};")
+                self.api_status_label.setProperty("api_status", "success")
+                self.api_status_label.style().unpolish(self.api_status_label)
+                self.api_status_label.style().polish(self.api_status_label)
             else:
                 self.api_status_label.setText("API 상태: ❌ 미설정")
-                self.api_status_label.setStyleSheet(f"color: {U.ACCENT_RED};")
+                self.api_status_label.setProperty("api_status", "error")
+                self.api_status_label.style().unpolish(self.api_status_label)
+                self.api_status_label.style().polish(self.api_status_label)
         except Exception as e:
             self.api_status_label.setText("API 상태: ❌ 오류")
-            self.api_status_label.setStyleSheet(f"color: {U.ACCENT_RED};")
+            self.api_status_label.setProperty("api_status", "error")
+            self.api_status_label.style().unpolish(self.api_status_label)
+            self.api_status_label.style().polish(self.api_status_label)
             if hasattr(self.app_instance, "log_message"):
                 self.app_instance.log_message(f"❌ API 상태 확인 실패: {e}", "ERROR")
 

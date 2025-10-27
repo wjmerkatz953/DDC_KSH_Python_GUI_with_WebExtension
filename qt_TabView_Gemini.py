@@ -1,4 +1,6 @@
 # 파일: qt_TabView_Gemini.py
+# 버전: v2.2.2
+# 수정일: 2025-10-27 - API 상태 표시 테마 대응
 
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_Gemini.py
@@ -329,14 +331,20 @@ class QtGeminiTab(BaseSearchTab):
 
             if is_configured:
                 self.api_status_label.setText("API 상태: ✅ 설정됨")
-                self.api_status_label.setStyleSheet(f"color: {U.ACCENT_GREEN};")
+                self.api_status_label.setProperty("api_status", "success")
+                self.api_status_label.style().unpolish(self.api_status_label)
+                self.api_status_label.style().polish(self.api_status_label)
             else:
                 self.api_status_label.setText("API 상태: ❌ 미설정")
-                self.api_status_label.setStyleSheet(f"color: {U.ACCENT_RED};")
+                self.api_status_label.setProperty("api_status", "error")
+                self.api_status_label.style().unpolish(self.api_status_label)
+                self.api_status_label.style().polish(self.api_status_label)
 
         except Exception as e:
             self.api_status_label.setText("API 상태: ❌ 오류")
-            self.api_status_label.setStyleSheet(f"color: {U.ACCENT_RED};")
+            self.api_status_label.setProperty("api_status", "error")
+            self.api_status_label.style().unpolish(self.api_status_label)
+            self.api_status_label.style().polish(self.api_status_label)
             if hasattr(self.app_instance, "log_message"):
                 self.app_instance.log_message(f"❌ API 상태 확인 실패: {e}", "ERROR")
 

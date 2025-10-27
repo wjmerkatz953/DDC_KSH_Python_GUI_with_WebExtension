@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 ui_constants.py - UI 관련 상수 정의 (Qt 전용)
-버전: 3.0.0
+버전: 3.0.2
 생성일: 2025-09-23
-변경일: 2025-10-25
-- 다크/라이트 테마 지원 추가
+변경일: 2025-10-27
+- Western 탭 출처별 색상 상수 추가 (Dark/Light 테마별)
+- Global 탭 전용 출처별 색상 상수 추가 (SOURCE_NDL, SOURCE_CINII, SOURCE_NLK)
 """
 from path_utils import resource_path
 
@@ -50,6 +51,23 @@ class UI_CONSTANTS_DARK:
     BORDER_LIGHT = "#202e52"  # 하드코딩 제거
     BORDER_MEDIUM = "#324880"  # 하드코딩 제거
 
+    # Western 탭 출처별 색상 (Dark Theme)
+    SOURCE_LC = "#C7DA72"
+    SOURCE_HARVARD = "#99A1E6"
+    SOURCE_MIT = "#8FB474"
+    SOURCE_PRINCETON = "#E08A44"
+    SOURCE_UPENN = "#B19CD9"
+    SOURCE_CORNELL = "#D2B48C"
+    SOURCE_DNB = TEXT_DEFAULT
+    SOURCE_BNF = ACCENT_BLUE
+    SOURCE_BNE = "#FFAE35"
+    SOURCE_GOOGLE = "#2EDDC0"
+
+    # Global 탭 전용 출처별 색상 (Dark Theme)
+    SOURCE_NDL = "#FF6B9D"
+    SOURCE_CINII = "#87CEEB"
+    SOURCE_NLK = "#FFB347"
+
 
 class UI_CONSTANTS_LIGHT:
     """라이트 테마 색상 상수"""
@@ -90,6 +108,23 @@ class UI_CONSTANTS_LIGHT:
     BORDER_LIGHT = "#c0c0c0"
     BORDER_MEDIUM = "#b0b0b0"
 
+    # Western 탭 출처별 색상 (Light Theme - 밝은 배경에 맞는 진한 색상)
+    SOURCE_LC = "#6B8E23"  # 올리브 그린 (진하게)
+    SOURCE_HARVARD = "#4A5FC1"  # 진한 파란색
+    SOURCE_MIT = "#2E7D32"  # 진한 녹색
+    SOURCE_PRINCETON = "#D84315"  # 진한 주황색
+    SOURCE_UPENN = "#7B1FA2"  # 진한 보라색
+    SOURCE_CORNELL = "#8D6E63"  # 진한 갈색
+    SOURCE_DNB = TEXT_DEFAULT
+    SOURCE_BNF = ACCENT_BLUE
+    SOURCE_BNE = "#F57C00"  # 진한 오렌지
+    SOURCE_GOOGLE = "#00897B"  # 진한 청록색
+
+    # Global 탭 전용 출처별 색상 (Light Theme - 밝은 배경에 맞는 진한 색상)
+    SOURCE_NDL = "#C2185B"  # 진한 핑크
+    SOURCE_CINII = "#1976D2"  # 진한 하늘색
+    SOURCE_NLK = "#F57C00"  # 진한 오렌지
+
 
 # 기본 테마는 다크
 _current_theme = "dark"
@@ -122,7 +157,7 @@ class UI_CONSTANTS_COMMON:
 
     CORNER_RADIUS_DEFAULT = 0
     TREEVIEW_ROW_HEIGHT_DEFAULT = 25
-
+    QHEADER_BORDER = "#555555"
     QTABLE_BORDER = "#316caa"
 
     # 하이라이트 색상 (검색/정렬용)
