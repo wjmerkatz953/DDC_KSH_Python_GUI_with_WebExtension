@@ -9,6 +9,8 @@ qt_styles.py - Qt 스타일시트 정의
 - API 상태 라벨 속성 선택자 스타일 추가
 - API 설정 다이얼로그용 label_type="subdued" 스타일 추가
 """
+from PySide6.QtWidgets import QGraphicsDropShadowEffect, QPushButton, QWidget
+from PySide6.QtGui import QColor
 
 
 def get_app_stylesheet():
@@ -248,6 +250,16 @@ def get_app_stylesheet():
         background-color: {U.ACCENT_BLUE};
         color: {U.TEXT_BUTTON};
     }}
+
+    /* ✅ [추가] 세로 헤더(행 번호) 스타일 */
+    QHeaderView::section:vertical {{
+        background-color: {U.BACKGROUND_PRIMARY};
+        color: {U.TEXT_SUBDUED};
+        border: none;
+        padding: 0 5px; /* 좌우 여백을 5px로 설정 */
+        text-align: center; /* 👈 [핵심] 텍스트를 가운데로 정렬합니다. */
+    }}
+
     QTreeWidget::item:selected {{
         background-color: {U.HIGHLIGHT_SELECTED};
         color: {U.TEXT_BUTTON};
@@ -282,6 +294,7 @@ def get_app_stylesheet():
     QTableView::item {{
         padding: 4px;
         border: none;
+        color: {U.TEXT_DEFAULT};
         background-color: {U.BACKGROUND_PRIMARY};
     }}
 
@@ -304,19 +317,13 @@ def get_app_stylesheet():
         color: {U.TEXT_BUTTON};
     }}
 
-    /* ✅ [추가] 세로 헤더(행 번호) 스타일 */
-    QHeaderView::section:vertical {{
-        background-color: {U.BACKGROUND_PRIMARY};
-        color: {U.TEXT_SUBDUED};
-        border: none;
-        padding: 0 5px; /* 좌우 여백을 5px로 설정 */
-        text-align: center; /* 👈 [핵심] 텍스트를 가운데로 정렬합니다. */
-    }}
+
     /* ✅ [추가] 테이블 뷰 좌측 상단 코너 위젯 스타일 */
     QTableView QTableCornerButton::section {{
         background-color: {U.CORNER_STONE}; /* 👈 이 부분의 색상을 수정하면 됩니다. */
         border: none;
     }}
+
     /* 스크롤바 스타일 */
     QScrollBar:vertical {{
         border: none;
@@ -562,6 +569,35 @@ def get_app_stylesheet():
         color: {U.TEXT_BUTTON};
     }}
 """
+
+
+def apply_button_shadows(
+    root: QWidget, *, blur=12, x=0, y=2, alpha_light=80, alpha_dark=120
+):
+    """루트 위젯 하위의 모든 QPushButton에 드롭 섀도 적용"""
+    from ui_constants import UI_CONSTANTS as U
+
+    alpha = alpha_dark if getattr(U, "THEME", "dark") == "dark" else alpha_light
+    color = QColor(0, 0, 0, alpha)
+
+    for btn in root.findChildren(QPushButton):
+        # 기존 효과가 있으면 교체
+        eff = QGraphicsDropShadowEffect()
+        eff.setBlurRadius(blur)
+        eff.setXOffset(x)
+        eff.setYOffset(y)
+        eff.setColor(color)
+        btn.setGraphicsEffect(eff)
+
+
+def apply_shadow_to_button(btn: QPushButton, *, blur=12, x=0, y=2, alpha=100):
+    """개별 버튼에만 섀도 적용"""
+    eff = QGraphicsDropShadowEffect()
+    eff.setBlurRadius(blur)
+    eff.setXOffset(x)
+    eff.setYOffset(y)
+    eff.setColor(QColor(0, 0, 0, alpha))
+    btn.setGraphicsEffect(eff)
 
 
 # 하위 호환성을 위한 변수 (모듈 import 시 자동 생성)

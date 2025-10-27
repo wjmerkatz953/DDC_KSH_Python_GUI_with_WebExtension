@@ -226,7 +226,7 @@ class QtGeminiTab(BaseSearchTab):
         )
         # ❌ self.intermediate_group.setVisible(False) 제거
         inter_layout = QVBoxLayout(self.intermediate_group)
-        inter_layout.setContentsMargins(6, 20, 6, 0)
+        inter_layout.setContentsMargins(0, 20, 0, 0)
         self.inter_table = QTableView()
         self.inter_table.setSortingEnabled(True)  # 정렬 기능 활성화
 
@@ -270,7 +270,7 @@ class QtGeminiTab(BaseSearchTab):
                 final_results_group.setTitle(" DDC 추천 결과")
                 # ✅ 최종 결과 그룹박스의 레이아웃에 상단 여백 추가
                 if final_results_group.layout():
-                    final_results_group.layout().setContentsMargins(6, 20, 6, 6)
+                    final_results_group.layout().setContentsMargins(0, 20, 0, 0)
 
         parent_layout.addWidget(self.main_splitter)
         self.main_splitter.setSizes([400, 200])  # 중간 결과:최종 결과 = 2:1

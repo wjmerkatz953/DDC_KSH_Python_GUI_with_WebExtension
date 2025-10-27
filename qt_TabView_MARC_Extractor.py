@@ -256,6 +256,7 @@ class QtMARCExtractorTab(QWidget):
 
         f_fields_group = QGroupBox()
         f_fields_layout = QVBoxLayout(f_fields_group)
+        f_fields_layout.setContentsMargins(0, 0, 0, 0)
         self.f_fields_table = QTableView()
         self.f_fields_model = QStandardItemModel(10, 3)
         self.f_fields_model.setHorizontalHeaderLabels(["필드", "추출내용", "추출결과"])
@@ -294,7 +295,7 @@ class QtMARCExtractorTab(QWidget):
             "Full MARC (LDR 포함 전체)"
         )  # 기존 splitter -> h_splitter
         left_layout = QVBoxLayout(left_group)
-        left_layout.setContentsMargins(5, 20, 5, 5)
+        left_layout.setContentsMargins(0, 20, 0, 0)
         self.full_marc_left = QTextEdit()
         self.full_marc_left.setReadOnly(True)
         self.full_marc_left.setFont(QFont("Consolas", 9))
@@ -303,7 +304,7 @@ class QtMARCExtractorTab(QWidget):
 
         right_group = QGroupBox("서지 데이터 (020 필드부터)")
         right_layout = QVBoxLayout(right_group)
-        right_layout.setContentsMargins(5, 20, 5, 5)
+        right_layout.setContentsMargins(0, 20, 0, 0)
         self.full_marc_right = QTextEdit()
         self.full_marc_right.setReadOnly(True)
         self.full_marc_right.setFont(QFont("Consolas", 9))

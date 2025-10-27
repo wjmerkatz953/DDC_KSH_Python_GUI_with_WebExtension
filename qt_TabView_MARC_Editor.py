@@ -108,7 +108,7 @@ class QtMARCEditorTab(QWidget):
         # ✅ [기존] 모든 버튼과 프리셋 레이블을 담을 통합 컨트롤 바 (수정 없음)
         unified_controls_frame = QFrame()
         unified_controls_layout = QHBoxLayout(unified_controls_frame)
-        unified_controls_layout.setContentsMargins(0, 0, 0, 0)
+        unified_controls_layout.setContentsMargins(0, 6, 0, 0)
 
         self.run_button = QPushButton("코드 실행")
         self.clear_code_button = QPushButton("코드 지우기")

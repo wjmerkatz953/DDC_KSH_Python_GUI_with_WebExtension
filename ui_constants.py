@@ -21,7 +21,7 @@ class UI_CONSTANTS_DARK:
     CORNER_STONE = "#1b2235"
     INPUT_WIDGET_BG = "#1a1f2e"  # 입력 위젯 전용 배경색
 
-    TEXT_DEFAULT = "#cfcfcf"
+    TEXT_DEFAULT = "#bebebe"
     TEXT_SUBDUED = "#ADAAAA"
     TEXT_HIGHLIGHT = "#B1630A"
     TEXT_BUTTON = "#e0e0e0"
@@ -48,7 +48,7 @@ class UI_CONSTANTS_DARK:
     TEXT_STATUS_COMPLETE = ACCENT_GREEN
 
     BORDER_COLOR = "#555555"
-    BORDER_LIGHT = "#202e52"  # 하드코딩 제거
+    BORDER_LIGHT = "#141c31"  # 하드코딩 제거
     BORDER_MEDIUM = "#324880"  # 하드코딩 제거
 
     # Western 탭 출처별 색상 (Dark Theme)
@@ -105,7 +105,7 @@ class UI_CONSTANTS_LIGHT:
     TEXT_STATUS_COMPLETE = ACCENT_GREEN
 
     BORDER_COLOR = "#d0d0d0"
-    BORDER_LIGHT = "#c0c0c0"
+    BORDER_LIGHT = "#d1d1d1"
     BORDER_MEDIUM = "#b0b0b0"
 
     # Western 탭 출처별 색상 (Light Theme - 밝은 배경에 맞는 진한 색상)
@@ -157,7 +157,7 @@ class UI_CONSTANTS_COMMON:
 
     CORNER_RADIUS_DEFAULT = 0
     TREEVIEW_ROW_HEIGHT_DEFAULT = 25
-    QHEADER_BORDER = "#555555"
+    QHEADER_BORDER = "#403F44"
     QTABLE_BORDER = "#316caa"
 
     # 하이라이트 색상 (검색/정렬용)

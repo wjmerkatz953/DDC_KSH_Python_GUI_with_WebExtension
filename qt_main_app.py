@@ -66,6 +66,7 @@ from PySide6.QtGui import (
     QKeySequence,  # 👈 QKeySequence 추가
     QPixmap,  # ✅ 스플래시 이미지용 추가
 )
+from qt_styles import apply_button_shadows
 
 # UI 상수
 from ui_constants import U
@@ -362,7 +363,7 @@ class IntegratedSearchApp:
 
         # ✅ 스플래시 스크린 생성 및 표시
         # PyInstaller exe 환경에서도 작동하도록 경로 처리
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             # PyInstaller로 패키징된 exe 환경
             base_path = sys._MEIPASS
         else:
@@ -374,7 +375,9 @@ class IntegratedSearchApp:
 
         if splash_pixmap.isNull():
             # 이미지 로드 실패 시 기본 컬러 배경 사용
-            self.logger.warning(f"스플래시 이미지를 찾을 수 없습니다: {splash_image_path}")
+            self.logger.warning(
+                f"스플래시 이미지를 찾을 수 없습니다: {splash_image_path}"
+            )
             splash_pixmap = QPixmap(600, 400)
             splash_pixmap.fill(Qt.GlobalColor.darkBlue)
 
@@ -389,6 +392,7 @@ class IntegratedSearchApp:
 
         # ✅ 스플래시가 충분히 보이도록 실제 대기
         import time
+
         time.sleep(0.5)  # 500ms 대기
         app.processEvents()
 
@@ -511,7 +515,10 @@ class MainApplicationWindow(QMainWindow):
 
         # ✅ [추가] 레이아웃 설정 관리자 초기화 및 설정 복구
         from qt_layout_settings_manager import LayoutSettingsManager
-        self.layout_settings_manager = LayoutSettingsManager(self.app_instance.db_manager)
+
+        self.layout_settings_manager = LayoutSettingsManager(
+            self.app_instance.db_manager
+        )
         # UI가 완전히 준비된 후 설정 복구를 위해 QTimer 사용
         QTimer.singleShot(100, self.restore_layout_settings)
 
@@ -546,7 +553,7 @@ class MainApplicationWindow(QMainWindow):
         self.log_group.setObjectName("BottomPanelGroup")
         # self.log_group.setStyleSheet(groupbox_style)  # <--  스타일 적용 코드 추가
         log_layout = QVBoxLayout(self.log_group)
-        log_layout.setContentsMargins(5, 20, 5, 5)  # ,좌,상,우,하
+        log_layout.setContentsMargins(0, 20, 0, 0)  # ,좌,상,우,하
         self.log_display = QTextBrowser()
         self.log_display.setReadOnly(True)
         self.log_display.setOpenExternalLinks(True)
@@ -561,7 +568,7 @@ class MainApplicationWindow(QMainWindow):
         self.detail_group.setObjectName("BottomPanelGroup")
         # self.detail_group.setStyleSheet(groupbox_style)  # <-- 스타일 적용 코드 추가
         detail_layout = QVBoxLayout(self.detail_group)
-        detail_layout.setContentsMargins(5, 20, 5, 5)
+        detail_layout.setContentsMargins(0, 20, 0, 0)
         self.detail_display = TripleClickLimitedTextBrowser()
         self.detail_display.setReadOnly(True)
         self.detail_display.setOpenExternalLinks(True)
@@ -579,6 +586,7 @@ class MainApplicationWindow(QMainWindow):
 
         # 3. 여백이 적용된 컨테이너를 메인 스플리터 하단에 추가
         self.main_splitter.addWidget(self.bottom_container)
+        apply_button_shadows(self)  # 윈도우 전체 버튼에 섀도 적용
 
         # 스플리터 초기 크기 비율 설정
         self.main_splitter.setSizes([700, 300])  # 탭 영역 : 하단 정보 영역
@@ -592,7 +600,9 @@ class MainApplicationWindow(QMainWindow):
         # 네비게이션 스타일 확인
         nav_style = "tab"  # 기본값
         if self.app_instance.db_manager:
-            nav_style = self.app_instance.db_manager.get_setting("navigation_style") or "tab"
+            nav_style = (
+                self.app_instance.db_manager.get_setting("navigation_style") or "tab"
+            )
 
         if nav_style == "tree":
             # 트리메뉴 네비게이션
@@ -854,10 +864,20 @@ class MainApplicationWindow(QMainWindow):
 
         # ✅ 색상 설정 - 테마별로 다른 색상 사용
         if U.BACKGROUND_PRIMARY == "#0e111a":  # Dark theme
-            color_map = {"ERROR": "#D84040", "WARNING": "#ff7300", "INFO": "#4EC9B0", "DEBUG": "#888888"}
+            color_map = {
+                "ERROR": "#D84040",
+                "WARNING": "#ff7300",
+                "INFO": "#4EC9B0",
+                "DEBUG": "#888888",
+            }
             timestamp_color = "#888888"
         else:  # Light theme
-            color_map = {"ERROR": "#C41E3A", "WARNING": "#D97706", "INFO": "#0369A1", "DEBUG": "#6B7280"}
+            color_map = {
+                "ERROR": "#C41E3A",
+                "WARNING": "#D97706",
+                "INFO": "#0369A1",
+                "DEBUG": "#6B7280",
+            }
             timestamp_color = "#6B7280"
 
         color = color_map.get(level, U.TEXT_SUBDUED)
@@ -921,7 +941,8 @@ class MainApplicationWindow(QMainWindow):
                 if new_tab:
                     self.tree_navigation.tab_widgets[name] = new_tab
                     self.app_instance.log_message(
-                        f"ℹ️ 데이터 전송을 위해 '{name}' 탭을 백그라운드에서 생성했습니다.", "INFO"
+                        f"ℹ️ 데이터 전송을 위해 '{name}' 탭을 백그라운드에서 생성했습니다.",
+                        "INFO",
                     )
                     return new_tab
         return None
@@ -1191,7 +1212,9 @@ class MainApplicationWindow(QMainWindow):
                 )
                 if sizes:
                     self.main_splitter.setSizes(sizes)
-                    self.app_instance.log_message(f"✅ 메인 스플리터 복구: {sizes}", "INFO")
+                    self.app_instance.log_message(
+                        f"✅ 메인 스플리터 복구: {sizes}", "INFO"
+                    )
 
             # 하단 스플리터 설정 복구
             if hasattr(self, "bottom_splitter"):
@@ -1202,7 +1225,9 @@ class MainApplicationWindow(QMainWindow):
                     # QSplitter는 상대 비율로 설정하기 위해 실제 크기를 계산
                     total_width = self.bottom_splitter.width()
                     if total_width > 0:
-                        actual_sizes = [int(total_width * s / sum(sizes)) for s in sizes]
+                        actual_sizes = [
+                            int(total_width * s / sum(sizes)) for s in sizes
+                        ]
                         self.bottom_splitter.setSizes(actual_sizes)
 
             # 각 탭의 QSplitter 설정 복구
@@ -1271,8 +1296,8 @@ class MainApplicationWindow(QMainWindow):
                     "detail_panel": True,
                     "log_panel": True,
                     "menu_bar": True,
-                    "tab_bar": True
-                }
+                    "tab_bar": True,
+                },
             )
 
             if widget_config:
@@ -1378,7 +1403,11 @@ class MainApplicationWindow(QMainWindow):
                 "detail_panel": self.is_detail_visible,
                 "log_panel": self.is_log_visible,
                 "menu_bar": self.menuBar().isVisible(),
-                "tab_bar": self.tab_widget.tabBar().isVisible() if hasattr(self, "tab_widget") else True
+                "tab_bar": (
+                    self.tab_widget.tabBar().isVisible()
+                    if hasattr(self, "tab_widget")
+                    else True
+                ),
             }
 
             self.layout_settings_manager.save_widget_visibility(
