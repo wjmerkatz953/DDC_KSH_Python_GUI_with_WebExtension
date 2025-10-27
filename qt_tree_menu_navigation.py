@@ -120,12 +120,14 @@ class QtTreeMenuNavigation(QWidget):
         # === 왼쪽: 트리메뉴 영역 ===
         tree_frame = QFrame()
         tree_frame.setFrameShape(QFrame.StyledPanel)
-        tree_frame.setStyleSheet(f"""
+        tree_frame.setStyleSheet(
+            f"""
             QFrame {{
-                background-color: {U.BACKGROUND_PRIMARY};
-                border-right: 1px solid {U.BORDER_LIGHT};
+                background-color: {U.WIDGET_BG_DEFAULT};
+                border-right: 0px solid {U.BORDER_LIGHT};
             }}
-        """)
+        """
+        )
         tree_frame.setMinimumWidth(200)
         tree_frame.setMaximumWidth(350)
 
@@ -160,9 +162,10 @@ class QtTreeMenuNavigation(QWidget):
         self.tree.setHeaderHidden(True)
         self.tree.setIndentation(20)
         self.tree.setAnimated(True)
-        self.tree.setStyleSheet(f"""
+        self.tree.setStyleSheet(
+            f"""
             QTreeWidget {{
-                background-color: {U.BACKGROUND_PRIMARY};
+                background-color: {U.BACKGROUND_SECONDARY};
                 border: none;
                 outline: none;
                 color: {U.TEXT_DEFAULT};
@@ -180,7 +183,8 @@ class QtTreeMenuNavigation(QWidget):
                 background-color: {U.ACCENT_BLUE};
                 color: {U.TEXT_BUTTON};
             }}
-        """)
+        """
+        )
 
         # ✅ 호버 시 자동 펼치기를 위한 마우스 트래킹 활성화
         self.tree.setMouseTracking(True)
@@ -195,11 +199,13 @@ class QtTreeMenuNavigation(QWidget):
 
         # === 오른쪽: 콘텐츠 영역 ===
         self.content_frame = QFrame()
-        self.content_frame.setStyleSheet(f"""
+        self.content_frame.setStyleSheet(
+            f"""
             QFrame {{
-                background-color: {U.BACKGROUND_PRIMARY};
+                background-color: {U.BACKGROUND_SECONDARY};
             }}
-        """)
+        """
+        )
         self.content_layout = QVBoxLayout(self.content_frame)
         self.content_layout.setContentsMargins(0, 0, 0, 0)
         self.content_layout.setSpacing(0)
@@ -310,7 +316,9 @@ class QtTreeMenuNavigation(QWidget):
 
     def preload_tabs_and_show_first(self):
         """✅ [추가] 모든 탭을 미리 생성하고 첫 번째 탭을 표시합니다."""
-        self.app_instance.log_message("🔨 트리메뉴 모드: 모든 탭 사전 로딩 시작...", "INFO")
+        self.app_instance.log_message(
+            "🔨 트리메뉴 모드: 모든 탭 사전 로딩 시작...", "INFO"
+        )
 
         # 탭 클래스 import (탭뷰 모드와 동일하게 참조 저장을 위해)
         from qt_TabView_MARC_Extractor import QtMARCExtractorTab
@@ -320,7 +328,9 @@ class QtTreeMenuNavigation(QWidget):
         for group_name, tab_names in self.tab_groups.items():
             for tab_name in tab_names:
                 if tab_name not in self.tab_widgets:
-                    self.app_instance.log_message(f"  🔨 탭 생성 중: '{tab_name}'", "DEBUG")
+                    self.app_instance.log_message(
+                        f"  🔨 탭 생성 중: '{tab_name}'", "DEBUG"
+                    )
                     tab_widget = self.create_tab_widget(tab_name)
                     if tab_widget is None:
                         self.app_instance.log_message(
@@ -350,12 +360,16 @@ class QtTreeMenuNavigation(QWidget):
 
     def show_tab(self, tab_name):
         """✅ [수정] 지정된 탭을 표시합니다. (사전 로딩 모드: 탭뷰와 동일하게 hide/show만 사용)"""
-        self.app_instance.log_message(f"🔍 [DEBUG] show_tab 호출: '{tab_name}'", "DEBUG")
+        self.app_instance.log_message(
+            f"🔍 [DEBUG] show_tab 호출: '{tab_name}'", "DEBUG"
+        )
 
         # 탭 위젯 가져오기
         if tab_name in self.tab_widgets:
             tab_widget = self.tab_widgets[tab_name]
-            self.app_instance.log_message(f"✅ [DEBUG] 기존 탭 전환: '{tab_name}'", "DEBUG")
+            self.app_instance.log_message(
+                f"✅ [DEBUG] 기존 탭 전환: '{tab_name}'", "DEBUG"
+            )
         else:
             # ✅ 사전 로딩 모드에서는 여기에 도달하지 않아야 함
             if self.preload_all_tabs:
@@ -364,7 +378,9 @@ class QtTreeMenuNavigation(QWidget):
                 )
 
             # 탭 위젯 생성 (fallback - 지연 로딩 모드용)
-            self.app_instance.log_message(f"🔨 [DEBUG] 새 탭 생성 시도: '{tab_name}'", "DEBUG")
+            self.app_instance.log_message(
+                f"🔨 [DEBUG] 새 탭 생성 시도: '{tab_name}'", "DEBUG"
+            )
             tab_widget = self.create_tab_widget(tab_name)
             if tab_widget is None:
                 self.app_instance.log_message(
@@ -374,7 +390,9 @@ class QtTreeMenuNavigation(QWidget):
             self.tab_widgets[tab_name] = tab_widget
             # 지연 로딩으로 생성된 탭은 레이아웃에 추가
             self.content_layout.addWidget(tab_widget)
-            self.app_instance.log_message(f"✅ [DEBUG] 탭 생성 성공: '{tab_name}'", "DEBUG")
+            self.app_instance.log_message(
+                f"✅ [DEBUG] 탭 생성 성공: '{tab_name}'", "DEBUG"
+            )
 
         # ✅ [수정] 탭뷰 모드와 동일하게 동작: 레이아웃에서 제거하지 않고 hide/show만 사용
         # 사전 로딩된 모든 탭이 레이아웃에 유지되며, 단순히 보이기/숨기기만 전환
@@ -476,7 +494,8 @@ class QtTreeMenuNavigation(QWidget):
                 import traceback
 
                 self.app_instance.log_message(
-                    f"❌ '{tab_name}' 탭 생성 실패: {e}\n{traceback.format_exc()}", "ERROR"
+                    f"❌ '{tab_name}' 탭 생성 실패: {e}\n{traceback.format_exc()}",
+                    "ERROR",
                 )
                 return None
         else:

@@ -123,15 +123,8 @@ def get_app_stylesheet():
         padding-right: 2px;
         margin-left: 0px;
     }}
-    QTextEdit {{
-        background-color: {U.BACKGROUND_SECONDARY};
-        border: 0.8px solid {U.BORDER_MEDIUM};
-        border-radius: {U.CORNER_RADIUS_DEFAULT}px;
-        padding: 6px 6px 6px 6px;
-    }}
-
-    /* ✅ [추가] MARC 추출 탭 & Gemini 탭 입력 위젯 전용 스타일 그룹 */
-    /* MARC_Gemini 그룹: MARC 추출 탭과 Gemini 탭의 입력 위젯 배경색을 별도로 조절 */
+    /* ✅ [추가] MARC 추출 탭 & Gemini DDC 분류 탭 입력 위젯 전용 스타일 그룹 */
+    /* MARC_Gemini 그룹: "MARC 추출" 탭과 "Gemini DDC 분류"탭의 입력 위젯 배경색을 별도로 조절 */
     QTextEdit#MARC_Gemini_Input {{
         background-color: {U.INPUT_WIDGET_BG};
         border: 0.8px solid {U.BORDER_MEDIUM};
@@ -141,6 +134,13 @@ def get_app_stylesheet():
     QTextEdit#MARC_Gemini_Input:focus {{
         border: 1px solid {U.HIGHLIGHT_SELECTED};
     }}
+    QTextEdit {{
+        background-color: {U.BACKGROUND_SECONDARY};
+        border: 0.8px solid {U.BORDER_MEDIUM};
+        border-radius: {U.CORNER_RADIUS_DEFAULT}px;
+        padding: 6px 6px 6px 6px;
+    }}
+
     QLineEdit {{
         background-color: {U.INPUT_WIDGET_BG};
         border: 0.6px solid {U.BORDER_LIGHT};
