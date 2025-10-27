@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "KSH MARC Inserter",
+  "version": "6.5.6",
+  "description": "KSH 후보를 하단 패널에서 원클릭으로 MARC 650(기본) 필드에 삽입. DDC/KSH 검색 기능 추가. 원서 정관사 처리 기능 추가. 단축키: Ctrl+Shift+Q",
+  "permissions": ["scripting", "activeTab", "contextMenus"],
+  "host_permissions": ["<all_urls>", "http://localhost:5000/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "KSH 패널 토글",
+    "default_popup": ""
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["content.js", "search-addon.js", "article-processor.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "commands": {
+    "toggle_ksh_panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Q"
+      },
+      "description": "KSH 패널 토글"
+    },
+    "toggle_search_panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S"
+      },
+      "description": "검색 패널 토글"
+    }
+  }
+}

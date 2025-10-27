@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 qt_api_settings.py - Qt/PySide6용 API 설정 관련 UI 통합 모듈
-Version: v1.1.0 - CTk 버전과 완전 동기화
+Version: v1.1.2 - X 버튼 닫기 기능 수정
 생성일: 2025-09-29
+수정일: 2025-10-27
+- 하드코딩된 색상을 UI 상수로 변경, 테마 전환 대응
+- X 버튼 클릭 시 다이얼로그가 닫히도록 윈도우 플래그 수정
 
 api_settings_ui.py의 Qt 버전 - PySide6로 완전 포팅
 모든 API 설정 모달창과 상태 관리 UI를 중앙에서 관리합니다.
@@ -196,15 +199,14 @@ def _create_qt_api_settings_dialog(
     dialog.setFixedSize(600, 400)
     # ✅ [수정] 모달이 아닌 모드리스 창으로 변경하여 Alt+Tab 시에도 유지
     dialog.setModal(False)
-    # ✅ [수정] WindowStaysOnTopHint 제거 - 다른 앱 위에 떠있는 것 방지
-    # 대신 부모 창(main_window)에 종속되어 부모와 함께 동작함
-    # 부모 창이 없으면 일반 윈도우처럼 작동
-    if parent is not None:
-        # 부모가 있으면 부모 창의 자식으로 설정 (기존 동작 유지)
-        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowStaysOnTopHint)
-    else:
-        # 부모가 없으면 독립 윈도우로 작동
-        dialog.setWindowFlags(dialog.windowFlags())
+    # ✅ [수정] 윈도우 플래그 설정: 닫기 버튼 포함
+    # Qt.Dialog | Qt.WindowCloseButtonHint | Qt.WindowTitleHint로 닫기 버튼 활성화
+    dialog.setWindowFlags(
+        Qt.Dialog | Qt.WindowCloseButtonHint | Qt.WindowTitleHint
+    )
+
+    # ✅ 닫기 이벤트 처리: X 버튼 클릭 시 다이얼로그 닫기
+    dialog.setAttribute(Qt.WA_DeleteOnClose, False)  # 닫아도 객체 유지
 
     # 메인 레이아웃
     main_layout = QVBoxLayout(dialog)
@@ -214,8 +216,9 @@ def _create_qt_api_settings_dialog(
     # 제목
     title_label = QLabel(f"{tab_name} API 설정")
     title_label.setStyleSheet(
-        f"font-size: {U.FONT_SIZE_LARGE}pt; font-weight: bold; color: {U.TEXT_DEFAULT};"
+        f"font-size: {U.FONT_SIZE_LARGE}pt; font-weight: bold;"
     )
+    # ✅ 색상은 전역 스타일시트에서 상속받도록 함 (테마 대응)
     title_label.setAlignment(Qt.AlignCenter)
     main_layout.addWidget(title_label)
 
@@ -227,7 +230,8 @@ def _create_qt_api_settings_dialog(
 
     # 설명 텍스트
     desc_label = QLabel(desc_text)
-    desc_label.setStyleSheet(f"color: {U.TEXT_SUBDUED};")
+    # ✅ TEXT_SUBDUED 색상을 인라인 스타일로 직접 적용 (속성 선택자 사용)
+    desc_label.setProperty("label_type", "subdued")
     desc_label.setWordWrap(True)
     desc_label.setAlignment(Qt.AlignCenter)
     main_layout.addWidget(desc_label)
@@ -245,6 +249,7 @@ def _create_qt_api_settings_dialog(
         label = QLabel(f"{key_info['label']}:")
         label.setFixedWidth(120)
         label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        # ✅ 테마 대응: 색상은 전역 스타일시트에서 상속
         key_layout.addWidget(label)
 
         # 입력창
@@ -697,13 +702,17 @@ def _delete_api_qt(dialog, key_entries, delete_func, tab_name, status_label, app
 
 
 def _update_qt_status_label(status_label, is_configured):
-    """Qt 상태 라벨 업데이트"""
+    """Qt 상태 라벨 업데이트 - 테마 대응 (속성 선택자 사용)"""
     if is_configured:
         status_label.setText("현재 상태: ✅ 설정됨")
-        status_label.setStyleSheet(f"color: {U.ACCENT_GREEN};")
+        status_label.setProperty("api_status", "success")
     else:
         status_label.setText("현재 상태: ❌ 미설정")
-        status_label.setStyleSheet(f"color: {U.ACCENT_RED};")
+        status_label.setProperty("api_status", "error")
+
+    # ✅ 스타일 재적용 (테마 변경 시 즉시 반영)
+    status_label.style().unpolish(status_label)
+    status_label.style().polish(status_label)
 
 
 def check_api_configured(tab_name, db_manager):

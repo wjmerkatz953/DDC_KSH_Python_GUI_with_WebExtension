@@ -73,6 +73,10 @@
 
 - **`qt_styles.py`**: 다크 테마를 포함한 애플리케이션의 전반적인 스타일시트(QSS)와 색상, 폰트 등 디자인 토큰을 중앙에서 관리합니다.
 
+- **`ui_constants.py`**: UI 색상, 폰트, 패딩 등의 상수를 정의합니다. Light/Dark 테마별 색상 클래스를 제공하며, `set_theme()` 함수로 테마 전환이 가능합니다.
+
+- **`qt_api_settings.py`**: API 설정 다이얼로그를 중앙에서 관리하는 모듈입니다. 네이버, NLK, Google Books, Gemini, Dewey API의 키 설정, 테스트, 저장, 삭제 기능을 제공합니다. 테마 전환에 대응하는 속성 선택자 기반 스타일링을 사용합니다.
+
 - **`view_displays.py`**: 검색 결과의 상세 정보를 보여주는 리치 텍스트 뷰어입니다. `qt_base_tab.py`의 상세 정보 패널에서 사용되어 HTML 형식의 데이터를 시각적으로 렌더링합니다.
 
 - **`qt_layout_settings_manager.py`**: Qt 위젯(스플리터, 창 상태)의 지오메트리를 `glossary.db`에 저장하고 복원하는 로직을 담당합니다.
@@ -389,6 +393,17 @@ translations
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
 ### 2025-10-27: 테마 대응 개선 및 기능 추가
+
+- **API 설정 다이얼로그 테마 대응 및 버그 수정** (`qt_api_settings.py` v1.1.2, `qt_styles.py` v3.0.3)
+  - Light Theme에서 흐릿하게 보이던 레이블 텍스트 색상 문제 해결
+  - 하드코딩된 인라인 스타일을 속성 선택자 기반으로 변경
+  - 제목 레이블: `TEXT_DEFAULT` 색상을 전역 스타일시트에서 상속
+  - 설명 레이블: `QLabel[label_type="subdued"]` 속성 선택자 사용으로 `TEXT_SUBDUED` 색상 적용
+  - 입력 필드 레이블: 전역 스타일시트에서 색상 상속
+  - 상태 레이블: `setProperty("api_status", "success/error")`와 `style().unpolish()/polish()` 패턴 사용
+  - X 버튼 클릭 시 다이얼로그가 닫히지 않던 버그 수정
+  - 윈도우 플래그를 `Qt.Dialog | Qt.WindowCloseButtonHint | Qt.WindowTitleHint`로 명시적 설정
+
 - **세로 헤더(행 번호) 스타일 추가** (`qt_styles.py`, `qt_TabView_MARC_Extractor.py`, `qt_TabView_Dewey.py`)
   - QHeaderView::section:vertical 스타일로 행 번호 중앙 정렬 및 테마별 색상 적용
   - MARC 추출 탭과 Dewey 탭에 세로 헤더 표시 활성화
@@ -430,7 +445,8 @@ translations
   - Western 탭의 모든 출처 색상(LC, Harvard, MIT 등)도 Global에서 사용
 
 - **수정 파일**:
-  - `qt_styles.py` v3.0.2
+  - `qt_api_settings.py` v1.1.2 (테마 대응 + X 버튼 수정)
+  - `qt_styles.py` v3.0.3 (label_type="subdued" 스타일 추가)
   - `qt_TabView_MARC_Extractor.py` v2.1.2
   - `qt_TabView_Dewey.py` v4.3.1
   - `qt_TabView_NLK.py` v1.0.5

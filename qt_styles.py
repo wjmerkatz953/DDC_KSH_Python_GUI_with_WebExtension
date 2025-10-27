@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 qt_styles.py - Qt 스타일시트 정의
-버전: 3.0.2
+버전: 3.0.3
 생성일: 2025-09-23
 수정일: 2025-10-27
 - 세로 헤더 스타일 추가 (행 번호 중앙 정렬)
 - API 상태 라벨 속성 선택자 스타일 추가
+- API 설정 다이얼로그용 label_type="subdued" 스타일 추가
 """
 
 
@@ -77,6 +78,9 @@ def get_app_stylesheet():
     }}
     QLabel[api_status="error"] {{
         color: {U.ACCENT_RED};
+    }}
+    QLabel[label_type="subdued"] {{
+        color: {U.TEXT_SUBDUED};
     }}
     QScrollArea {{
         background-color: {U.BACKGROUND_PRIMARY};
