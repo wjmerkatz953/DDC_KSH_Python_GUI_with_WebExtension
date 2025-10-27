@@ -421,6 +421,14 @@ translations
   - 상세 링크 URL에 `/librarian_view` 경로 추가
   - 클릭 시 바로 MARC 레코드 뷰 표시되도록 개선
 
+- **Global 탭 델리게이트 테마 대응** (`qt_TabView_Global.py`, `ui_constants.py`)
+  - GlobalSourceColorDelegate에서 매번 최신 UI_CONSTANTS 가져오기
+  - Global 탭 전용 출처별 색상 상수 추가 (Dark/Light 테마별)
+  - Dark Theme: SOURCE_NDL (#FF6B9D), SOURCE_CINII (#87CEEB), SOURCE_NLK (#FFB347)
+  - Light Theme: SOURCE_NDL (#C2185B), SOURCE_CINII (#1976D2), SOURCE_NLK (#F57C00)
+  - `refresh_theme()` 메서드 추가로 테마 전환 시 viewport 강제 업데이트
+  - Western 탭의 모든 출처 색상(LC, Harvard, MIT 등)도 Global에서 사용
+
 - **수정 파일**:
   - `qt_styles.py` v3.0.2
   - `qt_TabView_MARC_Extractor.py` v2.1.2
@@ -430,9 +438,10 @@ translations
   - `qt_TabView_AIFeed.py` v1.0.2
   - `qt_TabView_NDL.py` v2.0.1
   - `qt_TabView_Western.py` v1.0.1
+  - `qt_TabView_Global.py` v1.0.1
   - `qt_TabView_Settings.py` v1.0.3
   - `qt_dewey_logic.py` v4.3.1
-  - `ui_constants.py` v3.0.1
+  - `ui_constants.py` v3.0.2
   - `Search_Cornell.py` v2.0.1
 
 ### 2025-10-25 (세션 2): UI 일관성 개선 및 테마 호환성 강화

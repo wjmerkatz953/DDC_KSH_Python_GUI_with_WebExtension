@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 ui_constants.py - UI 관련 상수 정의 (Qt 전용)
-버전: 3.0.1
+버전: 3.0.2
 생성일: 2025-09-23
 변경일: 2025-10-27
 - Western 탭 출처별 색상 상수 추가 (Dark/Light 테마별)
+- Global 탭 전용 출처별 색상 상수 추가 (SOURCE_NDL, SOURCE_CINII, SOURCE_NLK)
 """
 from path_utils import resource_path
 
@@ -62,6 +63,11 @@ class UI_CONSTANTS_DARK:
     SOURCE_BNE = "#FFAE35"
     SOURCE_GOOGLE = "#2EDDC0"
 
+    # Global 탭 전용 출처별 색상 (Dark Theme)
+    SOURCE_NDL = "#FF6B9D"
+    SOURCE_CINII = "#87CEEB"
+    SOURCE_NLK = "#FFB347"
+
 
 class UI_CONSTANTS_LIGHT:
     """라이트 테마 색상 상수"""
@@ -113,6 +119,11 @@ class UI_CONSTANTS_LIGHT:
     SOURCE_BNF = ACCENT_BLUE
     SOURCE_BNE = "#F57C00"  # 진한 오렌지
     SOURCE_GOOGLE = "#00897B"  # 진한 청록색
+
+    # Global 탭 전용 출처별 색상 (Light Theme - 밝은 배경에 맞는 진한 색상)
+    SOURCE_NDL = "#C2185B"  # 진한 핑크
+    SOURCE_CINII = "#1976D2"  # 진한 하늘색
+    SOURCE_NLK = "#F57C00"  # 진한 오렌지
 
 
 # 기본 테마는 다크

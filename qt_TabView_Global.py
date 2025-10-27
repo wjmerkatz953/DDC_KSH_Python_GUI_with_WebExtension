@@ -1,5 +1,6 @@
 # 파일명: qt_TabView_Global.py
 # -*- coding: utf-8 -*-
+# 버전: v1.0.1 (2025-10-27) - 델리게이트 테마 대응 추가, refresh_theme() 메서드 추가
 # 설명: Global 통합 검색 UI 탭 (BaseSearchTab 상속)
 
 from PySide6.QtGui import QColor, QPalette
@@ -9,31 +10,38 @@ from ui_constants import U
 
 
 class GlobalSourceColorDelegate(QStyledItemDelegate):
-    """출처별로 행의 텍스트 색상을 다르게 표시하는 델리게이트"""
+    """✅ [수정] 출처별로 행의 텍스트 색상을 다르게 표시하는 델리게이트 (테마 대응)"""
 
     def __init__(self, parent=None, app_instance=None):
         super().__init__(parent)
-        self.app_instance = app_instance  # ← 추가
-        self.color_map = {
-            "LC": QColor("#C7DA72"),
-            "Harvard": QColor("#99A1E6"),
-            "MIT": QColor("#8FB474"),
-            "Princeton": QColor("#E08A44"),
-            "UPenn": QColor("#B19CD9"),
-            "NDL": QColor("#FF6B9D"),
-            "CiNii": QColor("#87CEEB"),
-            "NLK": QColor("#FFB347"),
-            "Cornell": QColor("#D2B48C"),
-            "DNB": QColor(U.TEXT_DEFAULT),
-            "BNF": QColor(U.ACCENT_BLUE),
-            "BNE": QColor("#FFAE35"),
-            "Google": QColor("#2EDDC0"),
-        }
+        self.app_instance = app_instance
 
     def paint(self, painter, option, index):
+        """✅ [수정] 행의 출처에 따라 텍스트 색상 변경 (테마 대응)"""
+        # ✅ [핵심] 테마 변경 대응: 매번 최신 UI_CONSTANTS 가져오기
+        from ui_constants import UI_CONSTANTS as U_CURRENT
+
         source = index.siblingAtColumn(0).data(0)
-        if source in self.color_map:
-            option.palette.setColor(QPalette.ColorRole.Text, self.color_map[source])
+
+        color_map = {
+            "LC": QColor(U_CURRENT.SOURCE_LC),
+            "Harvard": QColor(U_CURRENT.SOURCE_HARVARD),
+            "MIT": QColor(U_CURRENT.SOURCE_MIT),
+            "Princeton": QColor(U_CURRENT.SOURCE_PRINCETON),
+            "UPenn": QColor(U_CURRENT.SOURCE_UPENN),
+            "Cornell": QColor(U_CURRENT.SOURCE_CORNELL),
+            "DNB": QColor(U_CURRENT.SOURCE_DNB),
+            "BNF": QColor(U_CURRENT.SOURCE_BNF),
+            "BNE": QColor(U_CURRENT.SOURCE_BNE),
+            "Google": QColor(U_CURRENT.SOURCE_GOOGLE),
+            "NDL": QColor(U_CURRENT.SOURCE_NDL),
+            "CiNii": QColor(U_CURRENT.SOURCE_CINII),
+            "NLK": QColor(U_CURRENT.SOURCE_NLK),
+        }
+
+        text_color = color_map.get(source, QColor(U_CURRENT.TEXT_DEFAULT))
+        option.palette.setColor(QPalette.ColorRole.Text, text_color)
+
         super().paint(painter, option, index)
 
     # -------------------
@@ -70,6 +78,11 @@ class QtGlobalSearchTab(BaseSearchTab):
         self.color_delegate = GlobalSourceColorDelegate(self.table_view, app_instance)
         # -------------------
         self.table_view.setItemDelegate(self.color_delegate)
+
+    def refresh_theme(self):
+        """✅ [추가] 테마 변경 시 테이블 뷰를 다시 그려서 델리게이트 색상을 업데이트합니다."""
+        if hasattr(self, 'table_view'):
+            self.table_view.viewport().update()
 
     # ✅ [수정 1] 'Year' 필드 생성을 제거하고, 'DDC' 필드만 추가하도록 변경
     def _create_extra_inputs(self):
