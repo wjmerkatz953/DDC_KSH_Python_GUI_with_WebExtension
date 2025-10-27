@@ -739,7 +739,7 @@ class QtDeweySearchTab(BaseSearchTab):
         Dewey 탭은 기본 파라미터 외에 ddc 파라미터를 추가로 수신합니다.
         """
         # kwargs에서 ddc 파라미터 추출 (data_transfer_manager에서 전송됨)
-        ddc = kwargs.get("ddc", None)
+        ddc = kwargs.pop("ddc", None)  # ✅ [수정] pop으로 제거하면서 추출
         qt_dewey_logic.receive_data(
             self, ddc, isbn, author, title, switch_priority=switch_priority, **kwargs
         )

@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 qt_styles.py - Qt 스타일시트 정의
-버전: 3.0.3
+버전: 3.0.4
 생성일: 2025-09-23
-수정일: 2025-10-27
-- 세로 헤더 스타일 추가 (행 번호 중앙 정렬)
-- API 상태 라벨 속성 선택자 스타일 추가
-- API 설정 다이얼로그용 label_type="subdued" 스타일 추가
+수정일: 2025-10-28
+- MARC_Gemini_Input 위젯에 :focus 스타일 추가
+- 트리메뉴 모드에서 스타일시트가 제대로 적용되도록 개선
 """
 from PySide6.QtWidgets import QGraphicsDropShadowEffect, QPushButton, QWidget
 from PySide6.QtGui import QColor
@@ -101,7 +100,7 @@ def get_app_stylesheet():
     /* 모든 QGroupBox에 적용될 기본 스타일 */
     QGroupBox {{
         background-color: {U.WIDGET_BG_DEFAULT};
-        border: 0.5px solid {U.BORDER_LIGHT};
+        border: 0.0px solid {U.BORDER_LIGHT};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         margin-top: 0px;
     }}
@@ -138,6 +137,9 @@ def get_app_stylesheet():
         border: 0.8px solid {U.BORDER_MEDIUM};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         padding: 6px 6px 6px 6px;
+    }}
+    QTextEdit#MARC_Gemini_Input:focus {{
+        border: 1px solid {U.HIGHLIGHT_SELECTED};
     }}
     QLineEdit {{
         background-color: {U.INPUT_WIDGET_BG};

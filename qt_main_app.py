@@ -922,29 +922,18 @@ class MainApplicationWindow(QMainWindow):
         return None
 
     def get_tab_by_name(self, name):
-        """✅ [수정] 이름으로 탭 위젯 인스턴스를 찾습니다. 트리뷰 모드에서는 필요시 자동 생성합니다."""
+        """✅ [수정] 이름으로 탭 위젯 인스턴스를 찾습니다. (탭 모드 + 트리메뉴 모드 모두 지원)"""
         if self.tab_widget is not None:
-            # 탭 모드: 기존 로직 유지
+            # 탭 모드
             for i in range(self.tab_widget.count()):
                 if self.tab_widget.tabText(i) == name:
                     return self.tab_widget.widget(i)
         elif self.tree_navigation is not None:
-            # 트리뷰 모드: 이미 생성된 탭 찾기
+            # 트리메뉴 모드: 사전 로딩된 탭 찾기
+            # ✅ [수정] 사전 로딩 도입으로 모든 탭이 이미 생성되어 있음
+            # 자동 생성 로직 제거 (불필요)
             if hasattr(self.tree_navigation, "tab_widgets"):
-                existing_tab = self.tree_navigation.tab_widgets.get(name)
-                if existing_tab:
-                    return existing_tab
-
-                # ✅ [핵심 추가] 탭이 아직 생성되지 않았으면 자동 생성
-                # (데이터 전송을 위해 백그라운드에서 탭을 미리 만듦)
-                new_tab = self.tree_navigation.create_tab_widget(name)
-                if new_tab:
-                    self.tree_navigation.tab_widgets[name] = new_tab
-                    self.app_instance.log_message(
-                        f"ℹ️ 데이터 전송을 위해 '{name}' 탭을 백그라운드에서 생성했습니다.",
-                        "INFO",
-                    )
-                    return new_tab
+                return self.tree_navigation.tab_widgets.get(name)
         return None
 
     # 메뉴 액션들
@@ -1193,17 +1182,23 @@ class MainApplicationWindow(QMainWindow):
     def restore_layout_settings(self):
         """
         저장된 레이아웃 설정을 복구합니다. (앱 시작 시 호출)
+        탭 모드와 트리메뉴 모드 모두 지원합니다.
         """
         try:
-            # 탭 이름 리스트 가져오기
+            # ✅ 탭 이름 리스트 가져오기 (탭 모드 또는 트리메뉴 모드)
             tab_names = []
-            if hasattr(self, "tab_widget") and self.tab_widget:
-                for i in range(self.tab_widget.count()):
-                    tab_names.append(self.tab_widget.tabText(i))
+            tabs_dict = {}  # 탭 이름 -> 탭 위젯 매핑
 
-            if not tab_names:
-                self.app_instance.log_message("ℹ️ 복구할 탭이 없습니다.", "WARNING")
-                return
+            if hasattr(self, "tab_widget") and self.tab_widget:
+                # 탭 모드
+                for i in range(self.tab_widget.count()):
+                    tab_name = self.tab_widget.tabText(i)
+                    tab_names.append(tab_name)
+                    tabs_dict[tab_name] = self.tab_widget.widget(i)
+            elif hasattr(self, "tree_menu_navigation") and self.tree_menu_navigation:
+                # 트리메뉴 모드
+                tabs_dict = self.tree_menu_navigation.tab_widgets
+                tab_names = list(tabs_dict.keys())
 
             # 메인 스플리터 설정 복구
             if hasattr(self, "main_splitter"):
@@ -1230,11 +1225,12 @@ class MainApplicationWindow(QMainWindow):
                         ]
                         self.bottom_splitter.setSizes(actual_sizes)
 
-            # 각 탭의 QSplitter 설정 복구
-            if hasattr(self, "tab_widget") and self.tab_widget:
-                for i in range(self.tab_widget.count()):
-                    tab_name = self.tab_widget.tabText(i)
-                    tab = self.tab_widget.widget(i)
+            # ✅ 각 탭의 QSplitter 설정 복구 (탭 모드/트리메뉴 모드 공통)
+            if tab_names:
+                for tab_name in tab_names:
+                    tab = tabs_dict.get(tab_name)
+                    if not tab:
+                        continue
 
                     # Gemini 탭: main_splitter
                     if hasattr(tab, "main_splitter"):
@@ -1288,6 +1284,8 @@ class MainApplicationWindow(QMainWindow):
                         )
                         if sizes:
                             tab.right_content_splitter.setSizes(sizes)
+            else:
+                self.app_instance.log_message("ℹ️ 트리메뉴 모드: 탭 스플리터 설정은 탭 생성 시 개별 복구됩니다.", "INFO")
 
             # 위젯 표시/숨김 설정 복구
             widget_config = self.layout_settings_manager.load_widget_visibility(
@@ -1330,6 +1328,7 @@ class MainApplicationWindow(QMainWindow):
     def save_layout_settings(self):
         """
         현재 레이아웃 설정을 저장합니다. (앱 종료 시 호출)
+        탭 모드와 트리메뉴 모드 모두 지원합니다.
         """
         try:
             # 메인 윈도우 스플리터 크기 저장
@@ -1346,57 +1345,64 @@ class MainApplicationWindow(QMainWindow):
                     "MainWindow", "bottom", sizes
                 )
 
-            # 각 탭의 QSplitter 설정 저장
+            # ✅ 탭 정보 가져오기 (탭 모드 또는 트리메뉴 모드)
+            tabs_dict = {}
             if hasattr(self, "tab_widget") and self.tab_widget:
+                # 탭 모드
                 for i in range(self.tab_widget.count()):
                     tab_name = self.tab_widget.tabText(i)
-                    tab = self.tab_widget.widget(i)
+                    tabs_dict[tab_name] = self.tab_widget.widget(i)
+            elif hasattr(self, "tree_menu_navigation") and self.tree_menu_navigation:
+                # 트리메뉴 모드
+                tabs_dict = self.tree_menu_navigation.tab_widgets
 
-                    # Gemini 탭: main_splitter
-                    if hasattr(tab, "main_splitter"):
-                        sizes = tab.main_splitter.sizes()
-                        self.layout_settings_manager.save_splitter_sizes(
-                            tab_name, "main", sizes
-                        )
+            # ✅ 각 탭의 QSplitter 설정 저장 (탭 모드/트리메뉴 모드 공통)
+            for tab_name, tab in tabs_dict.items():
+                # Gemini 탭: main_splitter
+                if hasattr(tab, "main_splitter"):
+                    sizes = tab.main_splitter.sizes()
+                    self.layout_settings_manager.save_splitter_sizes(
+                        tab_name, "main", sizes
+                    )
 
-                    # KSH_Local 탭: results_splitter
-                    if hasattr(tab, "results_splitter"):
-                        sizes = tab.results_splitter.sizes()
-                        self.layout_settings_manager.save_splitter_sizes(
-                            tab_name, "results", sizes
-                        )
+                # KSH_Local 탭: results_splitter
+                if hasattr(tab, "results_splitter"):
+                    sizes = tab.results_splitter.sizes()
+                    self.layout_settings_manager.save_splitter_sizes(
+                        tab_name, "results", sizes
+                    )
 
-                    # MARC_Extractor 탭: v_splitter, h_splitter
-                    if hasattr(tab, "v_splitter"):
-                        sizes = tab.v_splitter.sizes()
-                        self.layout_settings_manager.save_splitter_sizes(
-                            tab_name, "vertical", sizes
-                        )
+                # MARC_Extractor 탭: v_splitter, h_splitter
+                if hasattr(tab, "v_splitter"):
+                    sizes = tab.v_splitter.sizes()
+                    self.layout_settings_manager.save_splitter_sizes(
+                        tab_name, "vertical", sizes
+                    )
 
-                    if hasattr(tab, "h_splitter"):
-                        sizes = tab.h_splitter.sizes()
-                        self.layout_settings_manager.save_splitter_sizes(
-                            tab_name, "horizontal", sizes
-                        )
+                if hasattr(tab, "h_splitter"):
+                    sizes = tab.h_splitter.sizes()
+                    self.layout_settings_manager.save_splitter_sizes(
+                        tab_name, "horizontal", sizes
+                    )
 
-                    # Dewey 탭: master_splitter, left_content_splitter, right_content_splitter
-                    if hasattr(tab, "master_splitter"):
-                        sizes = tab.master_splitter.sizes()
-                        self.layout_settings_manager.save_splitter_sizes(
-                            tab_name, "master", sizes
-                        )
+                # Dewey 탭: master_splitter, left_content_splitter, right_content_splitter
+                if hasattr(tab, "master_splitter"):
+                    sizes = tab.master_splitter.sizes()
+                    self.layout_settings_manager.save_splitter_sizes(
+                        tab_name, "master", sizes
+                    )
 
-                    if hasattr(tab, "left_content_splitter"):
-                        sizes = tab.left_content_splitter.sizes()
-                        self.layout_settings_manager.save_splitter_sizes(
-                            tab_name, "left_content", sizes
-                        )
+                if hasattr(tab, "left_content_splitter"):
+                    sizes = tab.left_content_splitter.sizes()
+                    self.layout_settings_manager.save_splitter_sizes(
+                        tab_name, "left_content", sizes
+                    )
 
-                    if hasattr(tab, "right_content_splitter"):
-                        sizes = tab.right_content_splitter.sizes()
-                        self.layout_settings_manager.save_splitter_sizes(
-                            tab_name, "right_content", sizes
-                        )
+                if hasattr(tab, "right_content_splitter"):
+                    sizes = tab.right_content_splitter.sizes()
+                    self.layout_settings_manager.save_splitter_sizes(
+                        tab_name, "right_content", sizes
+                    )
 
             # 위젯 표시/숨김 상태 저장
             widget_config = {
@@ -1405,7 +1411,7 @@ class MainApplicationWindow(QMainWindow):
                 "menu_bar": self.menuBar().isVisible(),
                 "tab_bar": (
                     self.tab_widget.tabBar().isVisible()
-                    if hasattr(self, "tab_widget")
+                    if hasattr(self, "tab_widget") and self.tab_widget
                     else True
                 ),
             }

@@ -2,10 +2,14 @@
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_MARC_Extractor.py
 # 설명: MARC 추출기 탭 (모든 기능 복구 최종 버전)
-# 버전: v2.1.2
-# 수정일: 2025-10-27
+# 버전: v2.1.3
+# 수정일: 2025-10-28
 #
 # 변경 이력:
+# v2.1.3 (2025-10-28)
+# - [수정] 인라인 스타일 제거 - 전역 스타일시트만 사용하도록 변경
+# - [효과] 테마 전환 시 자동으로 색상 업데이트, 트리메뉴 모드에서도 올바른 배경색 적용
+#
 # v2.1.2 (2025-10-27)
 # - [기능 추가] 세로 헤더(행 번호) 표시 및 중앙 정렬 추가
 # v2.1.0 (2025-10-18)
@@ -222,22 +226,8 @@ class QtMARCExtractorTab(QWidget):
         )
         self.marc_input_text.setMaximumHeight(input_height)
         self.marc_input_text.setFont(QFont("Consolas", 9))
-        # ✅ [핵심 수정] 트리메뉴 모드에서도 정확한 배경색 적용을 위해 인라인 스타일 명시
-        from ui_constants import get_color
-
-        self.marc_input_text.setStyleSheet(
-            f"""
-            QTextEdit#MARC_Gemini_Input {{
-                background-color: {get_color('INPUT_WIDGET_BG')};
-                border: 0.8px solid {get_color('BORDER_MEDIUM')};
-                border-radius: {U.CORNER_RADIUS_DEFAULT}px;
-                padding: 6px;
-            }}
-            QTextEdit#MARC_Gemini_Input:focus {{
-                border: 1px solid {get_color('HIGHLIGHT_SELECTED')};
-            }}
-        """
-        )
+        # ✅ [수정] 인라인 스타일 제거 - 전역 스타일시트(qt_styles.py)의 QTextEdit#MARC_Gemini_Input 규칙 사용
+        # objectName만 설정하면 전역 스타일시트가 자동으로 적용되며, 테마 전환에도 자동 대응
 
         self.extract_button = QPushButton("MARC 추출")
         self.clear_input_button = QPushButton("입력 지우기")

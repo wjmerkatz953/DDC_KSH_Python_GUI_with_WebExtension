@@ -76,7 +76,8 @@ def extract_marc_data_to_f_fields(raw_marc_text, app_instance):
         "F7_OriginalTitle_WithArticle": "(원서명 추출 실패)",
         "F8_OriginalTitle_WithoutArticle": "(정관사 제거 원서명 추출 실패)",
         "F9_CallNumber": "(청구기호 추출 실패)",
-        "F10_SpecialCallNumber": "" # F10 추가
+        "F10_SpecialCallNumber": "",  # F10 추가
+        "F11_DDC": "",  # ✅ [추가] F11 DDC 번호 (082 필드)
     }
 
     # --- 1. MARC 데이터 재구성 로직 (한 번만 실행) ---

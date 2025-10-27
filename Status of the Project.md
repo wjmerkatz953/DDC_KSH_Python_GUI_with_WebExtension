@@ -392,6 +392,63 @@ translations
 
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-10-28: 트리메뉴와 탭뷰 완전 통일
+
+- **트리메뉴 네비게이션 아키텍처 개선** (`qt_tree_menu_navigation.py` v1.2.0)
+  - 지연 로딩(lazy loading) 제거 - 모든 탭을 초기화 시점에 미리 생성
+  - `preload_tabs_and_show_first()` 메서드 추가 - 17개 모든 탭 사전 로딩
+  - **탭뷰와 완전 동일한 동작**:
+    - 탭 전환 시 레이아웃에서 제거하지 않고 `hide()`/`show()`만 사용
+    - MARC Extractor/Editor 탭을 `app_instance`에 등록 (탭 간 데이터 전송 지원)
+    - 탭 전환 시 자동 포커스 설정 (`set_initial_focus()` 호출)
+  - **효과**: 레이아웃 복원, 데이터 전송, 예외 처리 등 지연 로딩으로 인한 문제 해결
+  - **성능**: 탭 생성 속도가 빠르고 메모리 사용량이 적어 사전 로딩 부담 없음
+  - **일관성**: 탭 모드와 트리메뉴 모드의 동작 방식 완전히 통일
+
+- **스타일시트 적용 문제 해결** (`qt_TabView_MARC_Extractor.py` v2.1.3, `qt_TabView_Gemini.py` v2.2.3, `qt_styles.py` v3.0.4)
+  - 트리메뉴 모드에서 `BACKGROUND_SECONDARY` 색상이 적용되지 않던 문제 해결
+  - **원인**: 인라인 스타일(`setStyleSheet()`)이 탭 생성 시점의 색상으로 고정되어 테마 전환 불가
+  - **해결**: 인라인 스타일 제거, `objectName` 설정만으로 전역 스타일시트 자동 적용
+  - 탭을 레이아웃에 추가한 후 숨김 처리하여 부모의 스타일시트 상속 보장
+  - `:focus` 스타일을 전역 스타일시트에 추가
+  - **효과**: 테마 전환 시 자동으로 색상 업데이트, 코드 간결화
+
+- **배경**:
+  - 이전 트리메뉴 모드는 탭을 클릭할 때마다 생성 (지연 로딩)
+  - 탭 모드는 시작 시 모든 탭 생성 (사전 로딩)
+  - 지연 로딩으로 인한 문제:
+    - 레이아웃 복원 시점에 탭이 존재하지 않아 스플리터 크기 복원 불가
+    - 탭 간 데이터 전송 시 대상 탭이 아직 생성되지 않아 에러 발생
+    - 예외 처리가 복잡해지고 코드 일관성 저하
+  - 사전 로딩 도입 시 이점:
+    - 레이아웃 복원이 즉시 작동 (모든 탭이 이미 존재)
+    - 데이터 전송 로직 단순화 (항상 탭이 존재한다고 가정 가능)
+    - 탭 모드와 동일한 코드 경로 사용으로 버그 감소
+
+- **데이터 전송 로직 간소화** (`qt_main_app.py`)
+  - `get_tab_by_name()` 메서드에서 트리메뉴용 자동 생성 로직 제거
+  - **이전**: 탭이 없으면 `create_tab_widget()`으로 자동 생성
+  - **현재**: 사전 로딩으로 모든 탭이 이미 존재, 단순히 `tab_widgets.get(name)` 호출
+  - **효과**: 코드 간소화, 예외 처리 불필요, 더 빠른 데이터 전송
+
+- **MARC 파서 버그 수정** (`marc_parser.py`, `qt_TabView_Dewey.py`)
+  - 듀이 탭으로 082 필드(DDC 번호) 데이터가 전송되지 않던 버그 수정
+  - **버그 1**: `f_fields` 초기화 딕셔너리에 `F11_DDC` 키가 누락
+    - 해결: 초기화 딕셔너리에 `"F11_DDC": ""` 추가
+  - **버그 2**: `receive_data()` 호출 시 `ddc` 인자 중복 전달 에러
+    - 원인: `kwargs.get("ddc")` 후 `**kwargs`에 여전히 `ddc` 포함
+    - 해결: `kwargs.pop("ddc")` 사용하여 추출과 동시에 제거
+  - **효과**: MARC 추출 시 082 필드가 정상적으로 파싱되어 듀이 탭으로 전송됨
+
+- **수정 파일**:
+  - `qt_tree_menu_navigation.py` v1.2.0
+  - `qt_TabView_MARC_Extractor.py` v2.1.3
+  - `qt_TabView_Gemini.py` v2.2.3
+  - `qt_TabView_Dewey.py` (receive_data 인자 중복 버그 수정)
+  - `qt_styles.py` v3.0.4
+  - `qt_main_app.py` (get_tab_by_name 메서드 간소화)
+  - `marc_parser.py` (F11_DDC 필드 초기화 추가)
+
 ### 2025-10-27: 테마 대응 개선 및 기능 추가
 
 - **API 설정 다이얼로그 테마 대응 및 버그 수정** (`qt_api_settings.py` v1.1.2, `qt_styles.py` v3.0.3)
@@ -450,11 +507,20 @@ translations
   - `from ui_constants import UI_CONSTANTS` 패턴으로 매 렌더링마다 최신 테마 색상 적용
   - 모든 BaseSearchTab 상속 탭에서 수평 스크롤바 항상 표시 (`setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)`)
 
+- **레이아웃 설정 저장/복구 트리메뉴 모드 지원** (`qt_main_app.py`)
+  - `save_layout_settings()`, `restore_layout_settings()` 메서드가 트리메뉴 모드에서 작동하지 않던 버그 수정
+  - 기존: `self.tab_widget`만 체크하여 탭 모드에서만 동작
+  - 수정: `self.tree_menu_navigation.tab_widgets` 딕셔너리를 통해 트리메뉴 모드도 지원
+  - 탭 접근 로직을 통일하여 탭/트리메뉴 모드 모두에서 스플리터 크기 저장/복구 정상 동작
+  - 트리메뉴 모드에서 탭이 지연 로딩되어도 메뉴바/로그/상세정보 패널 표시 상태는 정상 복구됨
+  - `tab_widget.tabBar()` 접근 시 None 체크 추가로 에러 방지
+
 - **수정 파일**:
   - `qt_api_settings.py` v1.1.2 (테마 대응 + X 버튼 수정)
   - `qt_styles.py` v3.0.3 (label_type="subdued" 스타일 추가)
   - `qt_widget_events.py` v2.1.1 (paintSection 테마 대응)
   - `qt_base_tab.py` (수평 스크롤바 항상 표시)
+  - `qt_main_app.py` (레이아웃 저장/복구 트리메뉴 모드 지원)
   - `qt_TabView_MARC_Extractor.py` v2.1.2
   - `qt_TabView_Dewey.py` v4.3.1
   - `qt_TabView_NLK.py` v1.0.5

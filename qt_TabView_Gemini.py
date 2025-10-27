@@ -1,14 +1,14 @@
 # 파일: qt_TabView_Gemini.py
-# 버전: v2.2.2
-# 수정일: 2025-10-27 - API 상태 표시 테마 대응
+# 버전: v2.2.3
+# 수정일: 2025-10-28 - 인라인 스타일 제거, 전역 스타일시트 사용
 
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_Gemini.py
 # 설명: Gemini 기반 계층적 DDC 분류 탭 (BaseSearchTab 상속 최종 버전)
-# 버전: v2.2.0
-# 수정: 2025-10-18 - QSplitter 자동 저장/복구 기능 추가
-#       - splitter 변수를 self.main_splitter로 변경하여 인스턴스 변수화
-#       - 앱 종료 시 스플리터 크기가 자동으로 DB에 저장되고 재시작 시 복구됨
+# 버전: v2.2.3
+# 수정: 2025-10-28 - 인라인 스타일 제거, 전역 스타일시트만 사용
+#       - [효과] 테마 전환 시 자동으로 색상 업데이트, 트리메뉴 모드에서도 올바른 배경색 적용
+# 이전: 2025-10-18 - QSplitter 자동 저장/복구 기능 추가
 # 이전: 2025-10-09 - 입력 영역 UI 표준화 및 중간 결과창 상시 표시
 
 from PySide6.QtCore import Qt, Signal, QThread, Slot, QModelIndex, QTimer
@@ -185,22 +185,8 @@ class QtGeminiTab(BaseSearchTab):
         self.input_edit.setPlaceholderText("텍스트를 여기에 붙여넣으세요...")
         self.input_edit.setMaximumHeight(60)  # ✅ 한 줄 스타일을 위한 높이 제한
         self.input_edit.setFont(QFont("Consolas", 9))
-        # ✅ [핵심 수정] 트리메뉴 모드에서도 정확한 배경색 적용을 위해 인라인 스타일 명시
-        from ui_constants import get_color
-
-        self.input_edit.setStyleSheet(
-            f"""
-            QTextEdit#MARC_Gemini_Input {{
-                background-color: {get_color('INPUT_WIDGET_BG')};
-                border: 0.8px solid {get_color('BORDER_MEDIUM')};
-                border-radius: {U.CORNER_RADIUS_DEFAULT}px;
-                padding: 6px;
-            }}
-            QTextEdit#MARC_Gemini_Input:focus {{
-                border: 1px solid {get_color('HIGHLIGHT_SELECTED')};
-            }}
-        """
-        )
+        # ✅ [수정] 인라인 스타일 제거 - 전역 스타일시트(qt_styles.py)의 QTextEdit#MARC_Gemini_Input 규칙 사용
+        # objectName만 설정하면 전역 스타일시트가 자동으로 적용되며, 테마 전환에도 자동 대응
         input_bar_layout.addWidget(self.input_edit)
 
         # ✅ 표준 버튼 및 전용 버튼 생성

@@ -1,10 +1,28 @@
 # -*- coding: utf-8 -*-
 # 파일명: qt_tree_menu_navigation.py
-# 버전: v1.0.3
+# 버전: v1.2.0
 # 설명: QTreeWidget 기반 사이드바 네비게이션
 # 생성일: 2025-10-02
 #
 # 변경 이력:
+# v1.2.0 (2025-10-28)
+# - [수정] 탭뷰 모드와 완전히 동일하게 동작하도록 개선
+# - [수정] 탭 전환 시 레이아웃에서 제거하지 않고 hide/show만 사용
+# - [추가] MARC Extractor/Editor 탭을 app_instance에 등록 (탭뷰와 동일)
+# - [추가] 탭 전환 시 자동 포커스 설정 (set_initial_focus 호출)
+# - [효과] 탭뷰와 트리메뉴의 동작 완전히 통일
+#
+# v1.1.1 (2025-10-28)
+# - [수정] 스타일시트 적용 개선 - 탭을 레이아웃에 추가한 후 숨김 처리
+# - [효과] 트리메뉴 모드에서도 전역 스타일시트가 올바르게 적용됨
+#
+# v1.1.0 (2025-10-28)
+# - [수정] 지연 로딩(lazy loading) 제거 - 모든 탭을 초기화 시점에 미리 생성
+# - [추가] preload_tabs_and_show_first() 메서드 - 모든 탭 사전 로딩
+# - [수정] show_tab() 메서드 - 사전 로딩된 탭 간 전환만 수행 (생성 로직은 fallback)
+# - [수정] setup_ui() 메서드 - preload_all_tabs 플래그에 따라 사전 로딩 또는 지연 로딩
+# - [효과] 레이아웃 복원, 데이터 전송, 예외 처리 등의 문제 해결
+#
 # v1.0.3 (2025-10-25)
 # - [추가] 마우스 호버 시 그룹 메뉴 자동 펼치기 기능 (on_tree_item_hovered)
 # - [추가] setMouseTracking(True) 및 itemEntered 시그널 연결
@@ -58,6 +76,9 @@ class QtTreeMenuNavigation(QWidget):
         self.tab_configs = tab_configs
         self.current_tab_widget = None
         self.tab_widgets = {}  # 탭 이름 -> 위젯 매핑
+
+        # ✅ [수정] 모든 탭을 미리 생성 (지연 로딩 제거)
+        self.preload_all_tabs = True
 
         # 탭 그룹 정의 (qt_Tab_configs.py의 tab_name과 정확히 일치)
         self.tab_groups = {
@@ -194,8 +215,12 @@ class QtTreeMenuNavigation(QWidget):
         # 트리 채우기
         self.populate_tree()
 
-        # 첫 번째 탭 표시
-        QTimer.singleShot(100, self.show_first_tab)
+        # ✅ [수정] 모든 탭을 미리 생성 (지연 로딩 제거)
+        if self.preload_all_tabs:
+            QTimer.singleShot(100, self.preload_tabs_and_show_first)
+        else:
+            # 첫 번째 탭만 표시 (이전 방식)
+            QTimer.singleShot(100, self.show_first_tab)
 
     def populate_tree(self):
         """트리에 항목들을 추가합니다."""
@@ -283,16 +308,62 @@ class QtTreeMenuNavigation(QWidget):
         if item.childCount() > 0 and not item.isExpanded():
             item.setExpanded(True)
 
+    def preload_tabs_and_show_first(self):
+        """✅ [추가] 모든 탭을 미리 생성하고 첫 번째 탭을 표시합니다."""
+        self.app_instance.log_message("🔨 트리메뉴 모드: 모든 탭 사전 로딩 시작...", "INFO")
+
+        # 탭 클래스 import (탭뷰 모드와 동일하게 참조 저장을 위해)
+        from qt_TabView_MARC_Extractor import QtMARCExtractorTab
+        from qt_TabView_MARC_Editor import QtMARCEditorTab
+
+        # 모든 탭 생성
+        for group_name, tab_names in self.tab_groups.items():
+            for tab_name in tab_names:
+                if tab_name not in self.tab_widgets:
+                    self.app_instance.log_message(f"  🔨 탭 생성 중: '{tab_name}'", "DEBUG")
+                    tab_widget = self.create_tab_widget(tab_name)
+                    if tab_widget is None:
+                        self.app_instance.log_message(
+                            f"  ⚠️ '{tab_name}' 탭 생성 실패 - 건너뜁니다.", "WARNING"
+                        )
+                        continue
+                    self.tab_widgets[tab_name] = tab_widget
+
+                    # ✅ [수정] 스타일시트 적용을 위해 레이아웃에 추가 후 숨김
+                    # 탭을 레이아웃에 추가해야 부모의 스타일시트를 상속받음
+                    self.content_layout.addWidget(tab_widget)
+                    tab_widget.hide()
+
+                    # ✅ [추가] 탭뷰 모드와 동일: 특정 탭을 app_instance에 등록
+                    if isinstance(tab_widget, QtMARCExtractorTab):
+                        self.app_instance.marc_extractor_tab = tab_widget
+                    elif isinstance(tab_widget, QtMARCEditorTab):
+                        self.app_instance.marc_editor_tab = tab_widget
+
+        total_tabs = len(self.tab_widgets)
+        self.app_instance.log_message(
+            f"✅ 트리메뉴 모드: 총 {total_tabs}개 탭 사전 로딩 완료", "INFO"
+        )
+
+        # 첫 번째 탭 표시
+        self.show_first_tab()
+
     def show_tab(self, tab_name):
-        """지정된 탭을 표시합니다."""
+        """✅ [수정] 지정된 탭을 표시합니다. (사전 로딩 모드: 탭뷰와 동일하게 hide/show만 사용)"""
         self.app_instance.log_message(f"🔍 [DEBUG] show_tab 호출: '{tab_name}'", "DEBUG")
 
-        # 이미 생성된 탭인지 확인
+        # 탭 위젯 가져오기
         if tab_name in self.tab_widgets:
             tab_widget = self.tab_widgets[tab_name]
-            self.app_instance.log_message(f"✅ [DEBUG] 기존 탭 재사용: '{tab_name}'", "DEBUG")
+            self.app_instance.log_message(f"✅ [DEBUG] 기존 탭 전환: '{tab_name}'", "DEBUG")
         else:
-            # 탭 위젯 생성
+            # ✅ 사전 로딩 모드에서는 여기에 도달하지 않아야 함
+            if self.preload_all_tabs:
+                self.app_instance.log_message(
+                    f"⚠️ [DEBUG] 사전 로딩 모드인데 탭이 없음: '{tab_name}'", "WARNING"
+                )
+
+            # 탭 위젯 생성 (fallback - 지연 로딩 모드용)
             self.app_instance.log_message(f"🔨 [DEBUG] 새 탭 생성 시도: '{tab_name}'", "DEBUG")
             tab_widget = self.create_tab_widget(tab_name)
             if tab_widget is None:
@@ -301,19 +372,26 @@ class QtTreeMenuNavigation(QWidget):
                 )
                 return
             self.tab_widgets[tab_name] = tab_widget
+            # 지연 로딩으로 생성된 탭은 레이아웃에 추가
+            self.content_layout.addWidget(tab_widget)
             self.app_instance.log_message(f"✅ [DEBUG] 탭 생성 성공: '{tab_name}'", "DEBUG")
+
+        # ✅ [수정] 탭뷰 모드와 동일하게 동작: 레이아웃에서 제거하지 않고 hide/show만 사용
+        # 사전 로딩된 모든 탭이 레이아웃에 유지되며, 단순히 보이기/숨기기만 전환
 
         # 현재 탭 숨기기
         if self.current_tab_widget:
             self.current_tab_widget.hide()
-            self.content_layout.removeWidget(self.current_tab_widget)
 
         # 새 탭 표시
-        self.content_layout.addWidget(tab_widget)
         tab_widget.show()
         self.current_tab_widget = tab_widget
 
         self.app_instance.log_message(f"ℹ️ '{tab_name}' 탭으로 전환되었습니다.", "INFO")
+
+        # ✅ [추가] 탭뷰 모드와 동일: 탭 변경 시 첫 번째 검색창에 자동 포커스
+        if hasattr(tab_widget, "set_initial_focus"):
+            tab_widget.set_initial_focus()
 
     def create_tab_widget(self, tab_name):
         """탭 위젯을 생성합니다."""
