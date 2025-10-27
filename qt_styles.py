@@ -216,8 +216,8 @@ def get_app_stylesheet():
     }}
     /* ProgressBar 컨테이너 */
     QProgressBar {{
-        background-color: {U.WIDGET_BG_DEFAULT};
-        border: 1px solid {U.BORDER_LIGHT};
+        background-color: {U.BACKGROUND_PRIMARY};
+        border: 0.5px solid {U.BORDER_LIGHT};
         border-radius: 5px;
         color: {U.ACCENT_BLUE};
         font-weight: bold;

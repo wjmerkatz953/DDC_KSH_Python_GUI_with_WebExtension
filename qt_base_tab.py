@@ -653,6 +653,9 @@ class BaseSearchTab(QWidget):
         self.table_view.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.table_view.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 
+        # ✅ 수평 스크롤바 항상 표시 (모든 탭 통일)
+        self.table_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+
     def _on_table_item_clicked(self, index: QModelIndex):
         """✅ [모델/뷰 전환] 테이블 항목 클릭 시 컬럼 인덱스 저장"""
         if index.isValid():

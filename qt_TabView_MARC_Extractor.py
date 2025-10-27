@@ -210,7 +210,7 @@ class QtMARCExtractorTab(QWidget):
         input_bar_frame = QFrame()
         input_bar_frame.setMaximumHeight(input_height)
         input_bar_layout = QHBoxLayout(input_bar_frame)
-        input_bar_layout.setContentsMargins(0, 4, 0, 2)
+        input_bar_layout.setContentsMargins(0, 4, 0, 4)
 
         self.marc_input_text = QTextEdit()
         # ✅ [추가] MARC_Gemini 그룹 스타일 적용을 위한 objectName 설정
