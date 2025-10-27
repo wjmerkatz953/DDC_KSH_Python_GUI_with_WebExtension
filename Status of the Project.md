@@ -81,6 +81,8 @@
 
 - **`qt_dewey_logic.py` / `qt_dewey_workers.py`**: Dewey 탭의 UI 로직과 백그라운드 작업을 분리하여 처리합니다. `qt_dewey_logic`은 메뉴 명령, 트리 확장 등 UI 이벤트를 처리하고, `qt_dewey_workers`는 실제 검색, KSH 연계 등 시간이 오래 걸리는 작업을 스레드에서 수행합니다.
 
+- **`qt_widget_events.py`**: 컬럼 헤더 사이의 경계선이 보이지 않는 이유: qt_widget_events.py:202-212의 ExcelStyleTableHeaderView.paintSection() 메서드에서 커스텀 페인팅을 하고 있기 때문입니다. 이 클래스는 Excel 스타일의 헤더뷰로, 자체적으로 배경색, 테두리, 정렬 아이콘, 필터 표시 등을 모두 커스텀 페인팅합니다. 따라서 qt_styles.py에서 QHeaderView::section의 border-left와 border-right를 설정해도 무시됩니다. 이 프로젝트는 ExcelStyleTableHeaderView라는 커스텀 헤더뷰를 사용하여 Excel 스타일의 5구역 클릭(크기 조절, 정렬, 드래그, 필터), 정렬 인디케이터, 필터 아이콘 등을 구현하고 있습니다. 따라서 일반적인 스타일시트가 아닌 paintSection() 메서드 내부에서 직접 그리기 작업을 해야 합니다.
+
 ---
 
 ## 4. 탭 구현 (Tab Implementations)
@@ -559,7 +561,6 @@ database_manager.py (DatabaseManager v2.2.0)
 2. 다크 테마 호환성 확인 (`qt_styles.py`)
 3. 커스텀 위젯은 `qt_custom_widgets.py`에 중앙화
 4. 레이아웃 상태 저장 필요 시 `qt_layout_settings_manager.py` 활용
-
 ---
 
 ## 12. 성능 최적화 포인트 (Performance Optimization)
