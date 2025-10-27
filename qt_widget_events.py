@@ -199,17 +199,13 @@ class ExcelStyleTableHeaderView(QHeaderView):
             )  # 테이블뷰 컬럼 헤더 배경색상
 
         # 2. 테두리 그리기
-        pen = QPen(QColor(U.BACKGROUND_PRIMARY))
-        pen.setWidth(0)
+        pen = QPen(QColor(U.QHEADER_BORDER))
+        pen.setWidth(0.5)
         painter.setPen(pen)
+        # 왼쪽 경계선
         painter.drawLine(rect.topLeft(), rect.bottomLeft())
-        pen = QPen(QColor(U.WIDGET_BG_DEFAULT))
-        pen.setWidth(0)
-        painter.setPen(pen)
-        painter.drawLine(rect.bottomRight(), rect.bottomLeft())
-        # [핵심] 가장 마지막 컬럼이 아닐 경우에만 오른쪽 테두리를 그립니다.
-        # if logicalIndex < self.count() - 1:
-        #    painter.drawLine(rect.topRight(), rect.bottomRight())
+        # 오른쪽 경계선
+        painter.drawLine(rect.topRight(), rect.bottomRight())
 
         # 3. 헤더 텍스트 가져오기
         header_text = self.model().headerData(logicalIndex, Qt.Horizontal)

@@ -1,7 +1,8 @@
 """
-파일명: dewey_logic.py
+파일명: qt_dewey_logic.py
 설명: Dewey 탭의 UI 업데이트, 네비게이션, 검색 로직을 담당
-버전: v1.0.0
+버전: v4.3.1
+수정일: 2025-10-27 - API 상태 라벨 업데이트 로직 추가
 """
 
 import re
@@ -170,27 +171,47 @@ def _update_detail_view(tab, current, previous, proxy_model, table_model):
 
 
 def _show_api_settings(tab):
+    """API 설정 모달창을 표시합니다."""
     qt_api_settings.show_api_settings_modal(
         "Web Dewey",
         tab.app_instance.db_manager,
         tab.app_instance,
         parent_window=tab,
     )
+    # 다이얼로그가 닫힌 후 상태 업데이트
+    _update_api_status(tab)
 
 
 def _update_api_status(tab):
+    """API 상태 라벨을 업데이트합니다."""
+    if not hasattr(tab, "api_status_label"):
+        return
+
     try:
         is_configured = qt_api_settings.check_api_configured(
             "Web Dewey", tab.app_instance.db_manager
         )
+
         if is_configured:
+            tab.api_status_label.setText("API 상태: ✅ 설정됨")
+            tab.api_status_label.setProperty("api_status", "success")
+            tab.api_status_label.style().unpolish(tab.api_status_label)
+            tab.api_status_label.style().polish(tab.api_status_label)
             tab.app_instance.log_message("✅ Web Dewey API가 설정되었습니다.", "INFO")
         else:
+            tab.api_status_label.setText("API 상태: ❌ 미설정")
+            tab.api_status_label.setProperty("api_status", "error")
+            tab.api_status_label.style().unpolish(tab.api_status_label)
+            tab.api_status_label.style().polish(tab.api_status_label)
             tab.app_instance.log_message(
                 "⚠️ Web Dewey API가 설정되지 않았습니다. [API 설정] 버튼을 눌러 설정해주세요.",
                 "WARNING",
             )
     except Exception as e:
+        tab.api_status_label.setText("API 상태: ❌ 오류")
+        tab.api_status_label.setProperty("api_status", "error")
+        tab.api_status_label.style().unpolish(tab.api_status_label)
+        tab.api_status_label.style().polish(tab.api_status_label)
         tab.app_instance.log_message(
             f"❌ Web Dewey API 상태 확인 중 오류 발생: {e}", "ERROR"
         )

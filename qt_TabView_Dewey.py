@@ -1,9 +1,12 @@
 ﻿"""파일명: qt_TabView_Dewey.py
 설명: Dewey 분류 검색 탭 (전체 기능 리팩토링)
-버전: v4.3.0
-수정일: 2025-10-18
+버전: v4.3.1
+수정일: 2025-10-27
 
 변경 이력:
+v4.3.1 (2025-10-27)
+- [기능 추가] 세로 헤더(행 번호) 표시 및 중앙 정렬 추가
+- [기능 추가] API 상태 라벨 추가 (API 설정 버튼 옆)
 v4.3.0 (2025-10-18)
 - [기능 추가] QSplitter 자동 저장/복구 기능 추가
   : master_splitter → self.master_splitter (좌우 패널 분할: DDC 트리 vs KSH 검색)
@@ -283,6 +286,11 @@ class QtDeweySearchTab(BaseSearchTab):
         self.dewey_api_button.setFixedWidth(70)
         self.dewey_api_button.setFixedHeight(32)
 
+        # ✅ [추가] API 상태 라벨 생성
+        self.api_status_label = QLabel("")
+        self.api_status_label.setAlignment(Qt.AlignCenter)
+        self.api_status_label.setFixedWidth(150)
+
         # ✅ [추가] 연동검색 ON/OFF 버튼
         self.dewey_interlock_button = QPushButton("연동검색 ON")
         self.dewey_interlock_button.setObjectName(
@@ -298,6 +306,7 @@ class QtDeweySearchTab(BaseSearchTab):
         layout.addWidget(self.dewey_ksh_cancel_button)
         layout.addWidget(self.dewey_interlock_button)
         layout.addWidget(self.dewey_api_button)
+        layout.addWidget(self.api_status_label)
 
         self.app_instance.dewey_ksh_search_entry = self.dewey_ksh_search_entry
         self.app_instance.dewey_ksh_search_button = self.dewey_ksh_search_button
@@ -450,6 +459,10 @@ class QtDeweySearchTab(BaseSearchTab):
         self.ksh_table.setHorizontalHeader(header)
         header.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         header.setStretchLastSection(False)
+
+        # ✅ [추가] 세로 헤더(행 번호) 표시 및 정렬 설정
+        self.ksh_table.verticalHeader().setVisible(True)
+        self.ksh_table.verticalHeader().setDefaultAlignment(Qt.AlignCenter)
 
         setup_widget_context_menu(self.ksh_table, self.app_instance)
 

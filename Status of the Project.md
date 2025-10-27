@@ -388,6 +388,53 @@ translations
 
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-10-27: 테마 대응 개선 및 기능 추가
+- **세로 헤더(행 번호) 스타일 추가** (`qt_styles.py`, `qt_TabView_MARC_Extractor.py`, `qt_TabView_Dewey.py`)
+  - QHeaderView::section:vertical 스타일로 행 번호 중앙 정렬 및 테마별 색상 적용
+  - MARC 추출 탭과 Dewey 탭에 세로 헤더 표시 활성화
+  - `setDefaultAlignment(Qt.AlignCenter)`로 행 번호 중앙 정렬 구현
+
+- **API 상태 표시 테마 대응** (`qt_styles.py`, `qt_TabView_NLK.py`, `qt_TabView_Gemini.py`, `qt_TabView_AIFeed.py`, `qt_dewey_logic.py`)
+  - 하드코딩된 API 상태 색상을 QLabel[api_status] 속성 선택자로 변경
+  - `api_status="success"` → ACCENT_GREEN, `api_status="error"` → ACCENT_RED
+  - 테마 전환 시 자동으로 색상 업데이트되도록 개선
+  - Dewey 탭에 API 상태 라벨 추가
+
+- **NDL 및 Western 탭 델리게이트 테마 대응** (`qt_TabView_NDL.py`, `qt_TabView_Western.py`, `ui_constants.py`, `qt_TabView_Settings.py`)
+  - SourceColorDelegate와 WesternSourceColorDelegate에서 매번 최신 UI_CONSTANTS 가져오기
+  - Western 탭 출처별 색상을 UI 상수로 정의 (Dark/Light 테마별)
+  - `refresh_theme()` 메서드 추가로 테마 전환 시 viewport 강제 업데이트
+  - 설정 탭의 `_apply_theme()`에서 모든 탭의 `refresh_theme()` 호출
+
+- **Western 탭 출처별 색상 상수 추가** (`ui_constants.py`)
+  - Dark Theme: SOURCE_LC (#C7DA72), SOURCE_HARVARD (#99A1E6) 등 기존 색상 유지
+  - Light Theme: 진한 색상으로 가독성 확보 (SOURCE_LC #6B8E23, SOURCE_HARVARD #4A5FC1 등)
+  - SOURCE_DNB, SOURCE_BNF는 TEXT_DEFAULT, ACCENT_BLUE 상수 사용
+
+- **Western 탭 Google Books API 설정 기능 추가** (`qt_TabView_Western.py`)
+  - NLK 탭 구조를 참고하여 API 설정 버튼과 상태 라벨 추가
+  - `create_find_section()` 오버라이드하여 HTML 버튼 옆에 API 관련 위젯 배치
+  - `_show_api_settings()`, `_update_api_status()` 메서드 구현
+  - Qt, QPushButton, QLabel import 추가
+
+- **Cornell 상세 링크에 librarian_view 추가** (`Search_Cornell.py`)
+  - 상세 링크 URL에 `/librarian_view` 경로 추가
+  - 클릭 시 바로 MARC 레코드 뷰 표시되도록 개선
+
+- **수정 파일**:
+  - `qt_styles.py` v3.0.2
+  - `qt_TabView_MARC_Extractor.py` v2.1.2
+  - `qt_TabView_Dewey.py` v4.3.1
+  - `qt_TabView_NLK.py` v1.0.5
+  - `qt_TabView_Gemini.py` v2.2.2
+  - `qt_TabView_AIFeed.py` v1.0.2
+  - `qt_TabView_NDL.py` v2.0.1
+  - `qt_TabView_Western.py` v1.0.1
+  - `qt_TabView_Settings.py` v1.0.3
+  - `qt_dewey_logic.py` v4.3.1
+  - `ui_constants.py` v3.0.1
+  - `Search_Cornell.py` v2.0.1
+
 ### 2025-10-25 (세션 2): UI 일관성 개선 및 테마 호환성 강화
 - **MARC_Gemini 입력 위젯 그룹 스타일 추가** (`qt_styles.py`, `qt_TabView_MARC_Extractor.py`, `qt_TabView_Gemini.py`)
   - MARC 추출 탭과 Gemini 탭의 입력 위젯에 `MARC_Gemini_Input` objectName 지정

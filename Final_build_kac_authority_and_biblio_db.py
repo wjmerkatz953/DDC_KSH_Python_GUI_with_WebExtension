@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 KAC/KAB Authority & NLK Biblio — Batch JSON → SQLite Builder (PySide6)
+Version: 2.1.0 (2025-10-26)
 
 ▶ 목적
 - NLK 전거 JSON의 **KAC(개인)·KAB(기관)** 레코드에서 `create` 배열을 빠짐없이 추출해
@@ -15,11 +16,22 @@ KAC/KAB Authority & NLK Biblio — Batch JSON → SQLite Builder (PySide6)
 - PRAGMA 튜닝: WAL, NORMAL, cache, temp_store=MEMORY
 - 진행률: 총량 미지 시에도 1,000건마다 진행 로그/라벨 갱신
 
+▶ 변경 이력
+[2025-10-26] v2.1.0
+- biblio 테이블에 author_names, kac_codes 컬럼 추가
+  * 기존: creator, dc:creator, dcterms:creator에 저자명과 KAC 코드가 혼재
+  * 개선: 모든 creator 필드를 취합하여 저자명과 KAC 코드를 별도 컬럼으로 분리 저장
+  * author_names: 실제 저자 이름들 (세미콜론 구분, 정렬됨)
+  * kac_codes: nlk:KAC*/nlk:KAB* 형식의 전거 코드들 (세미콜론 구분, 정렬됨)
+- 양 컬럼에 대한 인덱스 추가로 검색 성능 향상
+- BIBLIO_SCHEMA 및 BIBLIO_SCHEMA_LIGHT 스키마 동기화
+- upsert_biblio 함수에서 light/normal 모드 모두 새 컬럼 지원
+
 실행:
-    python kac_biblio_builder_gui.py
+    python Final_build_kac_authority_and_biblio_db.py
 
 의존:
-    pip install PySide6
+    pip install PySide6 ijson
 """
 from __future__ import annotations
 import fnmatch
@@ -295,6 +307,8 @@ CREATE TABLE IF NOT EXISTS biblio (
     dc_creator TEXT,
     dcterms_creator TEXT,
     title TEXT,
+    author_names TEXT,
+    kac_codes TEXT,
     raw_json TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_biblio_year ON biblio(year);
@@ -302,6 +316,8 @@ CREATE INDEX IF NOT EXISTS idx_biblio_creator ON biblio(creator);
 CREATE INDEX IF NOT EXISTS idx_biblio_dc_creator ON biblio(dc_creator);
 CREATE INDEX IF NOT EXISTS idx_biblio_dcterms_creator ON biblio(dcterms_creator);
 CREATE INDEX IF NOT EXISTS idx_biblio_title ON biblio(title);
+CREATE INDEX IF NOT EXISTS idx_biblio_author_names ON biblio(author_names);
+CREATE INDEX IF NOT EXISTS idx_biblio_kac_codes ON biblio(kac_codes);
 
 CREATE VIRTUAL TABLE IF NOT EXISTS biblio_fts USING fts5(
     nlk_id UNINDEXED,
@@ -316,7 +332,9 @@ CREATE TABLE IF NOT EXISTS biblio (
     creator TEXT,
     dc_creator TEXT,
     dcterms_creator TEXT,
-    title TEXT
+    title TEXT,
+    author_names TEXT,
+    kac_codes TEXT
 );
 """
 
@@ -578,14 +596,16 @@ def upsert_biblio(
     else:
         cur.execute(
             """
-            INSERT INTO biblio (nlk_id, year, creator, dc_creator, dcterms_creator, title, raw_json)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO biblio (nlk_id, year, creator, dc_creator, dcterms_creator, title, author_names, kac_codes, raw_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(nlk_id) DO UPDATE SET
               year=excluded.year,
               creator=excluded.creator,
               dc_creator=excluded.dc_creator,
               dcterms_creator=excluded.dcterms_creator,
               title=excluded.title,
+              author_names=excluded.author_names,
+              kac_codes=excluded.kac_codes,
               raw_json=excluded.raw_json
             """,
             (
@@ -595,6 +615,8 @@ def upsert_biblio(
                 dc_creator_str,
                 dcterms_creator_str,
                 title,
+                final_author_names,
+                final_kac_codes,
                 raw_json_str,
             ),
         )

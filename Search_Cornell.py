@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # 파일명: Search_Cornell.py
-# Version: v2.0.0
-# 수정일시: 2025-09-20 KST
+# Version: v2.0.1
+# 수정일시: 2025-10-27 KST
 # 설명: Cornell University Library API의 내장 MARCXML을 직접 파싱하여 도서 정보를 검색하는 최적화된 모듈.
 #      (Search_UPenn.py 구조를 모방하여 작성)
+# 변경: 상세 링크에 /librarian_view 추가
 
 import requests
 import re
@@ -175,7 +176,7 @@ def _parse_cornell_json_record(record_json, app_instance):
         "연도": "",
         "ISBN": "",
         "상세 링크": (
-            f"https://catalog.library.cornell.edu/catalog/{record_id}"
+            f"https://catalog.library.cornell.edu/catalog/{record_id}/librarian_view"
             if record_id
             else ""
         ),

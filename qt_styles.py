@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 qt_styles.py - Qt 스타일시트 정의
-버전: 3.0.0
+버전: 3.0.2
 생성일: 2025-09-23
-수정일: 2025-10-25
-- 테마 전환을 위해 함수로 변경
+수정일: 2025-10-27
+- 세로 헤더 스타일 추가 (행 번호 중앙 정렬)
+- API 상태 라벨 속성 선택자 스타일 추가
 """
 
 
@@ -69,6 +70,13 @@ def get_app_stylesheet():
     QLabel {{
         color: {U.TEXT_DEFAULT};
         background-color: transparent;
+    }}
+    /* ✅ [추가] API 상태 라벨 스타일 (테마 대응) */
+    QLabel[api_status="success"] {{
+        color: {U.ACCENT_GREEN};
+    }}
+    QLabel[api_status="error"] {{
+        color: {U.ACCENT_RED};
     }}
     QScrollArea {{
         background-color: {U.BACKGROUND_PRIMARY};
@@ -292,11 +300,6 @@ def get_app_stylesheet():
         color: {U.TEXT_BUTTON};
     }}
 
-    /* ✅ [추가] 테이블 뷰 좌측 상단 코너 위젯 스타일 */
-    QTableView QTableCornerButton::section {{
-        background-color: {U.BACKGROUND_PRIMARY};
-        border: 2px solid {U.BACKGROUND_PRIMARY};
-    }}
     /* ✅ [추가] 세로 헤더(행 번호) 스타일 */
     QHeaderView::section:vertical {{
         background-color: {U.BACKGROUND_PRIMARY};
@@ -434,7 +437,6 @@ def get_app_stylesheet():
         color: {U.TEXT_DEFAULT};
     }}
 
-
     /* ✅ [추가] DDC 탭 전용 버튼/입력필드 스타일 */
     QLineEdit#DeweyEntry {{
         background-color: {U.INPUT_WIDGET_BG};
@@ -509,6 +511,7 @@ def get_app_stylesheet():
         border: none;
         width: 0px;
     }}
+
     QComboBox#DeweyCombo QAbstractItemView {{
         background-color: {U.BACKGROUND_SECONDARY};
         color: {U.TEXT_DEFAULT};
@@ -521,7 +524,6 @@ def get_app_stylesheet():
         border: 0px solid {U.ACCENT_BLUE}; /* 테두리 제거 */
         padding: 5px; /* 약간의 내부 패딩 */
     }}
-
 
     /* ✅ QComboBox 스타일 - 확실한 방법 */
     QComboBox {{
