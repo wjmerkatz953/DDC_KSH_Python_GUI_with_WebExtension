@@ -94,7 +94,7 @@ def get_app_stylesheet():
     /* ✅ [추가] 설정탭 섹션 프레임 전용 스타일 */
     QFrame#SettingsSectionFrame {{
         background-color: {U.BACKGROUND_PRIMARY};
-        border: 0.6px solid {U.BORDER_LIGHT};
+        border: 1px solid {U.BORDER_LIGHT};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
     }}
     /* 모든 QGroupBox에 적용될 기본 스타일 */
@@ -102,7 +102,7 @@ def get_app_stylesheet():
         background-color: {U.WIDGET_BG_DEFAULT};
         border: 0.0px solid {U.BORDER_LIGHT};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
-        margin-top: 0px;
+        padding-top: 0px;  /* 이걸 추가하면 위젯 상단에 여백이 생기면서 WIDGET_BG_DEFAULT 색상이 적용됨*/
     }}
     /* ✅ [추가] 이름이 'BottomPanelGroup'인 QGroupBox에만 적용될 특별 스타일 */
     /* 기본 스타일을 덮어씁니다(Override). */
@@ -118,10 +118,10 @@ def get_app_stylesheet():
         border: none;
     }}
     QGroupBox::title {{
-        top: 3px;
+        top: 0px; /* 이 항목의 값을 올리면 title 텍스트가 아래로 내려감 */
         padding-left: 2px;
         padding-right: 2px;
-        margin-left: 0px;
+        margin-bottom: 0px;
     }}
     /* ✅ [추가] MARC 추출 탭 & Gemini DDC 분류 탭 입력 위젯 전용 스타일 그룹 */
     /* MARC_Gemini 그룹: "MARC 추출" 탭과 "Gemini DDC 분류"탭의 입력 위젯 배경색을 별도로 조절 */
@@ -134,9 +134,10 @@ def get_app_stylesheet():
     QTextEdit#MARC_Gemini_Input:focus {{
         border: 1px solid {U.HIGHLIGHT_SELECTED};
     }}
+
     QTextEdit {{
         background-color: {U.BACKGROUND_SECONDARY};
-        border: 0.8px solid {U.BORDER_MEDIUM};
+        border: 0.6px solid {U.BORDER_MEDIUM};
         border-radius: {U.CORNER_RADIUS_DEFAULT}px;
         padding: 6px 6px 6px 6px;
     }}
@@ -238,6 +239,10 @@ def get_app_stylesheet():
         );
         border: 1px solid rgba(50,180,255,0.35);
         margin: 1px;
+    }}
+    /* QHeaderView 자체의 border 제거 */
+    QHeaderView {{
+        border: none;
     }}
     QHeaderView::section {{
         background-color: {U.BACKGROUND_PRIMARY};

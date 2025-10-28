@@ -392,7 +392,74 @@ translations
 
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
-### 2025-10-28: 트리메뉴와 탭뷰 완전 통일
+### 2025-10-28 (세션 2): 트리메뉴 모드 스타일 적용 및 테마 전환 문제 해결
+
+- **⚠️ 중요 패턴: 인라인 스타일과 테마 전환 문제**
+  - **문제 1**: 트리메뉴 모드에서 `QTextEdit#MARC_Gemini_Input` 같은 objectName 기반 전역 스타일시트가 적용되지 않음
+    - **원인**: Qt는 숨겨진 위젯(`hide()` 상태)에 objectName 기반 ID 선택자를 완전히 적용하지 않음
+    - **1차 시도 (실패)**: `style().polish(tab_widget)` 호출 - 효과 없음
+    - **2차 시도 (실패)**: `show()` → `polish()` → `hide()` 트릭 - 여전히 효과 없음
+    - **최종 해결**: **인라인 스타일(`setStyleSheet()`)을 명시적으로 설정**
+
+  - **문제 2**: 인라인 스타일이 **탭 생성 시점의 색상으로 고정**됨
+    - **현상**: Dark Theme일 때 모듈 로드 → Light Theme 설정 → 탭 생성 → 여전히 Dark 색상 표시
+    - **원인**: 모듈 최상단에서 `from ui_constants import U`로 import하면 **모듈 로드 시점의 값으로 고정**
+      ```python
+      # 모듈 최상단 (잘못된 방법)
+      from ui_constants import UI_CONSTANTS as U
+
+      def create_input_section(self):
+          self.input_edit.setStyleSheet(f"background: {U.INPUT_WIDGET_BG}")
+          # ❌ U는 모듈 로드 시점(Dark)의 값으로 고정됨!
+      ```
+    - **해결 1**: 함수 내에서 **지역 import**로 최신 값 가져오기
+      ```python
+      def create_input_section(self):
+          from ui_constants import UI_CONSTANTS as U_CURRENT
+          self.input_edit.setStyleSheet(f"background: {U_CURRENT.INPUT_WIDGET_BG}")
+          # ✅ 함수 호출 시점의 최신 테마 값 적용!
+      ```
+    - **해결 2**: `refresh_theme()` 메서드로 테마 전환 시 스타일 재설정
+      ```python
+      def refresh_theme(self):
+          from ui_constants import UI_CONSTANTS as U
+          self.input_edit.setStyleSheet(f"background: {U.INPUT_WIDGET_BG}")
+      ```
+
+  - **교훈**:
+    1. 전역 스타일시트만으로는 트리메뉴 모드(숨겨진 위젯)에서 불충분
+    2. **인라인 스타일 사용 시 반드시 함수 내에서 UI_CONSTANTS를 import**
+    3. 테마 전환을 지원하려면 `refresh_theme()` 메서드 필수 구현
+    4. 설정 탭에서 모든 탭의 `refresh_theme()` 호출 필수
+
+- **트리메뉴 모드 테마 전환 에러 수정** (`qt_TabView_Settings.py` v1.0.4)
+  - Light/Dark 테마 전환 시 `'NoneType' object has no attribute 'count'` 에러 수정
+  - **원인**: `main_window.tab_widget.count()` 호출 시 트리메뉴 모드에서 `tab_widget`이 `None`
+  - **해결**: 탭 모드와 트리메뉴 모드 구분 처리
+    - 탭 모드: `main_window.tab_widget` 순회
+    - 트리메뉴 모드: `main_window.tree_menu_navigation.tab_widgets` 딕셔너리 순회
+  - 모든 탭의 `refresh_theme()` 메서드 호출하여 인라인 스타일 업데이트
+
+- **MARC 추출 및 Gemini 탭 테마 적용 완전 수정** (`qt_TabView_MARC_Extractor.py` v2.1.6, `qt_TabView_Gemini.py` v2.2.6)
+  - **v2.1.5/v2.2.5**: `refresh_theme()` 메서드 추가 (테마 전환 지원)
+  - **v2.1.6/v2.2.6**: 탭 생성 시점에도 올바른 테마 적용되도록 수정
+    - 문제: 모듈 최상단 import로 인해 Dark 테마 값으로 고정
+    - 해결: 함수 내에서 `from ui_constants import UI_CONSTANTS as U_CURRENT` 지역 import
+  - **효과**:
+    - 앱 시작 시 Light 테마로 설정되어 있어도 정확한 색상 적용
+    - Dark/Light 테마 전환 시에도 즉시 업데이트
+
+- **트리메뉴 네비게이션 스타일 강제 적용** (`qt_tree_menu_navigation.py` v1.2.2)
+  - 사전 로딩 시 `show()` → `polish()` → `hide()` 트릭 시도 (효과 제한적)
+  - 최종적으로는 각 탭의 인라인 스타일 + `refresh_theme()`으로 해결
+
+- **수정 파일**:
+  - `qt_TabView_Settings.py` v1.0.4 (트리메뉴 모드 테마 전환 에러 수정)
+  - `qt_tree_menu_navigation.py` v1.2.2 (스타일 강제 적용 시도)
+  - `qt_TabView_Gemini.py` v2.2.6 (지역 import + refresh_theme)
+  - `qt_TabView_MARC_Extractor.py` v2.1.6 (지역 import + refresh_theme)
+
+### 2025-10-28 (세션 1): 트리메뉴와 탭뷰 완전 통일
 
 - **트리메뉴 네비게이션 아키텍처 개선** (`qt_tree_menu_navigation.py` v1.2.0)
   - 지연 로딩(lazy loading) 제거 - 모든 탭을 초기화 시점에 미리 생성

@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_Settings.py
-# 버전: v1.0.3
+# 버전: v1.0.4
 # 설명: 앱 설정탭 - UI 스타일, 네비게이션 모드 등 설정
 # 생성일: 2025-10-02
 #
 # 변경 이력:
+# v1.0.4 (2025-10-28)
+# - [버그 수정] 트리메뉴 모드에서 테마 전환 시 'NoneType' 에러 수정
+#   : tab_widget이 None인 경우(트리메뉴 모드) tree_menu_navigation.tab_widgets 사용
+#   : refresh_theme() 호출 시 탭/트리메뉴 모드 구분 처리
 # v1.0.3 (2025-10-27)
 # - [기능 추가] 테마 적용 시 모든 탭의 refresh_theme() 호출
 # v1.0.1 (2025-10-02)
@@ -558,10 +562,19 @@ class QtSettingsTab(QWidget):
             # ✅ [추가] 모든 탭의 델리게이트를 다시 그리기
             if hasattr(self.app_instance, 'main_window'):
                 main_window = self.app_instance.main_window
-                for i in range(main_window.tab_widget.count()):
-                    tab = main_window.tab_widget.widget(i)
-                    if hasattr(tab, 'refresh_theme'):
-                        tab.refresh_theme()
+
+                # 탭 모드와 트리메뉴 모드 구분 처리
+                if hasattr(main_window, 'tab_widget') and main_window.tab_widget:
+                    # 탭 모드
+                    for i in range(main_window.tab_widget.count()):
+                        tab = main_window.tab_widget.widget(i)
+                        if hasattr(tab, 'refresh_theme'):
+                            tab.refresh_theme()
+                elif hasattr(main_window, 'tree_menu_navigation') and main_window.tree_menu_navigation:
+                    # 트리메뉴 모드
+                    for tab_name, tab in main_window.tree_menu_navigation.tab_widgets.items():
+                        if hasattr(tab, 'refresh_theme'):
+                            tab.refresh_theme()
 
             # ✅ [핵심 수정] 앱 재시작 안내
             QMessageBox.information(

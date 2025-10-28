@@ -1,13 +1,15 @@
 # 파일: qt_TabView_Gemini.py
-# 버전: v2.2.3
-# 수정일: 2025-10-28 - 인라인 스타일 제거, 전역 스타일시트 사용
+# 버전: v2.2.6
+# 수정일: 2025-10-28 - 탭 생성 시점에도 최신 테마 적용되도록 수정
 
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_Gemini.py
 # 설명: Gemini 기반 계층적 DDC 분류 탭 (BaseSearchTab 상속 최종 버전)
-# 버전: v2.2.3
-# 수정: 2025-10-28 - 인라인 스타일 제거, 전역 스타일시트만 사용
-#       - [효과] 테마 전환 시 자동으로 색상 업데이트, 트리메뉴 모드에서도 올바른 배경색 적용
+# 버전: v2.2.6
+# 수정: 2025-10-28 - create_input_section()에서 UI_CONSTANTS를 지역 import로 수정
+#       - [문제] 모듈 최상단에서 import한 U는 모듈 로드 시점(Dark 테마)의 값으로 고정됨
+#       - [해결] 함수 내에서 `from ui_constants import UI_CONSTANTS as U_CURRENT`로 최신 값 가져옴
+#       - [효과] 앱 시작 시 Light 테마로 로드되어도 정확한 색상 적용됨
 # 이전: 2025-10-18 - QSplitter 자동 저장/복구 기능 추가
 # 이전: 2025-10-09 - 입력 영역 UI 표준화 및 중간 결과창 상시 표시
 
@@ -185,8 +187,23 @@ class QtGeminiTab(BaseSearchTab):
         self.input_edit.setPlaceholderText("텍스트를 여기에 붙여넣으세요...")
         self.input_edit.setMaximumHeight(60)  # ✅ 한 줄 스타일을 위한 높이 제한
         self.input_edit.setFont(QFont("Consolas", 9))
-        # ✅ [수정] 인라인 스타일 제거 - 전역 스타일시트(qt_styles.py)의 QTextEdit#MARC_Gemini_Input 규칙 사용
-        # objectName만 설정하면 전역 스타일시트가 자동으로 적용되며, 테마 전환에도 자동 대응
+        # ✅ [수정] 트리메뉴 모드 호환을 위해 인라인 스타일 추가
+        # 전역 스타일시트(qt_styles.py)는 탭 모드에서 잘 작동하지만,
+        # 트리메뉴 모드에서는 숨겨진 위젯에 objectName 기반 스타일이 즉시 적용되지 않을 수 있음
+        # 인라인 스타일을 명시적으로 설정하여 모든 모드에서 일관된 배경색 보장
+        # ⚠️ 중요: UI_CONSTANTS를 함수 내에서 import하여 최신 테마 값을 가져옴
+        from ui_constants import UI_CONSTANTS as U_CURRENT
+        self.input_edit.setStyleSheet(f"""
+            QTextEdit#MARC_Gemini_Input {{
+                background-color: {U_CURRENT.INPUT_WIDGET_BG};
+                border: 0.8px solid {U_CURRENT.BORDER_MEDIUM};
+                border-radius: {U.CORNER_RADIUS_DEFAULT}px;
+                padding: 6px;
+            }}
+            QTextEdit#MARC_Gemini_Input:focus {{
+                border: 1px solid {U_CURRENT.HIGHLIGHT_SELECTED};
+            }}
+        """)
         input_bar_layout.addWidget(self.input_edit)
 
         # ✅ 표준 버튼 및 전용 버튼 생성
@@ -611,3 +628,20 @@ class QtGeminiTab(BaseSearchTab):
     def closeEvent(self, event):
         self._stop_worker_if_running()
         super().closeEvent(event)
+
+    def refresh_theme(self):
+        """✅ [추가] 테마 전환 시 input_edit의 인라인 스타일을 최신 UI_CONSTANTS로 업데이트합니다."""
+        from ui_constants import UI_CONSTANTS as U
+
+        if hasattr(self, 'input_edit'):
+            self.input_edit.setStyleSheet(f"""
+                QTextEdit#MARC_Gemini_Input {{
+                    background-color: {U.INPUT_WIDGET_BG};
+                    border: 0.8px solid {U.BORDER_MEDIUM};
+                    border-radius: {U.CORNER_RADIUS_DEFAULT}px;
+                    padding: 6px;
+                }}
+                QTextEdit#MARC_Gemini_Input:focus {{
+                    border: 1px solid {U.HIGHLIGHT_SELECTED};
+                }}
+            """)

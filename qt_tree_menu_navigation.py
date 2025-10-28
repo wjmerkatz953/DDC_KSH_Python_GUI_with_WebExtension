@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 # 파일명: qt_tree_menu_navigation.py
-# 버전: v1.2.0
+# 버전: v1.2.2
 # 설명: QTreeWidget 기반 사이드바 네비게이션
 # 생성일: 2025-10-02
 #
 # 변경 이력:
+# v1.2.2 (2025-10-28)
+# - [수정] 스타일 강제 적용 방법 개선: show/hide 트릭 사용
+#   : hide() 전에 show()를 호출하여 Qt 스타일 polish가 완전히 이루어지도록 함
+#   : 단순 polish() 호출보다 더 확실한 스타일 적용 보장
+# v1.2.1 (2025-10-28)
+# - [버그 수정] objectName 기반 스타일(예: QTextEdit#MARC_Gemini_Input)이 트리메뉴 모드에서 적용되지 않던 문제 발견
+#   : polish() 호출로 시도했으나 효과 없음 (v1.2.2에서 show/hide 트릭으로 재시도)
 # v1.2.0 (2025-10-28)
 # - [수정] 탭뷰 모드와 완전히 동일하게 동작하도록 개선
 # - [수정] 탭 전환 시 레이아웃에서 제거하지 않고 hide/show만 사용
@@ -342,6 +349,12 @@ class QtTreeMenuNavigation(QWidget):
                     # ✅ [수정] 스타일시트 적용을 위해 레이아웃에 추가 후 숨김
                     # 탭을 레이아웃에 추가해야 부모의 스타일시트를 상속받음
                     self.content_layout.addWidget(tab_widget)
+
+                    # ✅ [추가] objectName 기반 스타일 강제 적용을 위한 show/hide 트릭
+                    # Qt는 위젯이 show()될 때 스타일을 완전히 적용하므로, 한 번 보여줬다가 숨김
+                    # 이렇게 하면 QTextEdit#MARC_Gemini_Input 같은 ID 선택자가 확실히 적용됨
+                    tab_widget.show()
+                    tab_widget.style().polish(tab_widget)
                     tab_widget.hide()
 
                     # ✅ [추가] 탭뷰 모드와 동일: 특정 탭을 app_instance에 등록
@@ -390,6 +403,8 @@ class QtTreeMenuNavigation(QWidget):
             self.tab_widgets[tab_name] = tab_widget
             # 지연 로딩으로 생성된 탭은 레이아웃에 추가
             self.content_layout.addWidget(tab_widget)
+            # ✅ [추가] 스타일 polish 강제 적용
+            tab_widget.style().polish(tab_widget)
             self.app_instance.log_message(
                 f"✅ [DEBUG] 탭 생성 성공: '{tab_name}'", "DEBUG"
             )

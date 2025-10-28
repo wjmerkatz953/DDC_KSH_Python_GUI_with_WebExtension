@@ -2,13 +2,27 @@
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_MARC_Extractor.py
 # 설명: MARC 추출기 탭 (모든 기능 복구 최종 버전)
-# 버전: v2.1.3
+# 버전: v2.1.6
 # 수정일: 2025-10-28
 #
 # 변경 이력:
+# v2.1.6 (2025-10-28)
+# - [수정] setup_ui()에서 UI_CONSTANTS를 지역 import로 수정
+# - [문제] 모듈 최상단에서 import한 U는 모듈 로드 시점(Dark 테마)의 값으로 고정됨
+# - [해결] 함수 내에서 `from ui_constants import UI_CONSTANTS as U_CURRENT`로 최신 값 가져옴
+# - [효과] 앱 시작 시 Light 테마로 로드되어도 정확한 색상 적용됨
+# v2.1.5 (2025-10-28)
+# - [추가] refresh_theme() 메서드 추가로 테마 전환 시 인라인 스타일 업데이트
+# - [문제] 인라인 스타일이 탭 생성 시점의 색상으로 고정되어 테마 전환 시 업데이트 안 됨
+# - [해결] refresh_theme() 메서드에서 최신 UI_CONSTANTS로 인라인 스타일 재설정
+# - [효과] Dark/Light 테마 전환 시 marc_input_text 배경색이 즉시 업데이트됨
+# v2.1.4 (2025-10-28)
+# - [수정] 트리메뉴 모드 호환을 위해 인라인 스타일 재추가
+# - [문제] 트리메뉴 모드에서 숨겨진 위젯에 objectName 기반 스타일(#MARC_Gemini_Input)이 즉시 적용되지 않음
+# - [해결] setStyleSheet()로 인라인 스타일 명시적 설정
+# - [효과] 탭 모드와 트리메뉴 모드 모두에서 INPUT_WIDGET_BG 색상 정상 적용
 # v2.1.3 (2025-10-28)
-# - [수정] 인라인 스타일 제거 - 전역 스타일시트만 사용하도록 변경
-# - [효과] 테마 전환 시 자동으로 색상 업데이트, 트리메뉴 모드에서도 올바른 배경색 적용
+# - [수정] 인라인 스타일 제거 - 전역 스타일시트만 사용하도록 변경 (트리메뉴 모드 문제로 v2.1.4에서 복원)
 #
 # v2.1.2 (2025-10-27)
 # - [기능 추가] 세로 헤더(행 번호) 표시 및 중앙 정렬 추가
@@ -226,8 +240,23 @@ class QtMARCExtractorTab(QWidget):
         )
         self.marc_input_text.setMaximumHeight(input_height)
         self.marc_input_text.setFont(QFont("Consolas", 9))
-        # ✅ [수정] 인라인 스타일 제거 - 전역 스타일시트(qt_styles.py)의 QTextEdit#MARC_Gemini_Input 규칙 사용
-        # objectName만 설정하면 전역 스타일시트가 자동으로 적용되며, 테마 전환에도 자동 대응
+        # ✅ [수정] 트리메뉴 모드 호환을 위해 인라인 스타일 추가
+        # 전역 스타일시트(qt_styles.py)는 탭 모드에서 잘 작동하지만,
+        # 트리메뉴 모드에서는 숨겨진 위젯에 objectName 기반 스타일이 즉시 적용되지 않을 수 있음
+        # 인라인 스타일을 명시적으로 설정하여 모든 모드에서 일관된 배경색 보장
+        # ⚠️ 중요: UI_CONSTANTS를 함수 내에서 import하여 최신 테마 값을 가져옴
+        from ui_constants import UI_CONSTANTS as U_CURRENT
+        self.marc_input_text.setStyleSheet(f"""
+            QTextEdit#MARC_Gemini_Input {{
+                background-color: {U_CURRENT.INPUT_WIDGET_BG};
+                border: 0.8px solid {U_CURRENT.BORDER_MEDIUM};
+                border-radius: {U.CORNER_RADIUS_DEFAULT}px;
+                padding: 6px;
+            }}
+            QTextEdit#MARC_Gemini_Input:focus {{
+                border: 1px solid {U_CURRENT.HIGHLIGHT_SELECTED};
+            }}
+        """)
 
         self.extract_button = QPushButton("MARC 추출")
         self.clear_input_button = QPushButton("입력 지우기")
@@ -588,3 +617,20 @@ class QtMARCExtractorTab(QWidget):
 
             QTimer.singleShot(0, focus_and_select)
             # -------------------
+
+    def refresh_theme(self):
+        """✅ [추가] 테마 전환 시 marc_input_text의 인라인 스타일을 최신 UI_CONSTANTS로 업데이트합니다."""
+        from ui_constants import UI_CONSTANTS as U
+
+        if hasattr(self, 'marc_input_text'):
+            self.marc_input_text.setStyleSheet(f"""
+                QTextEdit#MARC_Gemini_Input {{
+                    background-color: {U.INPUT_WIDGET_BG};
+                    border: 0.8px solid {U.BORDER_MEDIUM};
+                    border-radius: {U.CORNER_RADIUS_DEFAULT}px;
+                    padding: 6px;
+                }}
+                QTextEdit#MARC_Gemini_Input:focus {{
+                    border: 1px solid {U.HIGHLIGHT_SELECTED};
+                }}
+            """)
