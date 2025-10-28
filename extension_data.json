@@ -1,2470 +1,1395 @@
 [
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "독일(국명)[獨逸]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일군[獨逸軍]▼0KSH2000014185▲",
-        "display": "독일군[獨逸軍]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일법[獨逸法]▼0KSH1998025742▲",
-        "display": "독일법[獨逸法]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일사[獨逸史]▼0KSH1998028549▲",
-        "display": "독일사[獨逸史]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어[獨逸語]▼0KSH1998010143▲",
-        "display": "독일어[獨逸語]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일인[獨逸人]▼0KSH2002039159▲",
-        "display": "독일인[獨逸人]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 시[獨逸詩]▼0KSH2002039023▲",
-        "display": "독일 시[獨逸詩]",
-        "category": "문학",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 가곡[獨逸歌曲]▼0KSH2007000062▲",
-        "display": "독일 가곡[獨逸歌曲]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 강수[獨逸降水]▼0KSH2002039006▲",
-        "display": "독일 강수[獨逸降水]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 건축[獨逸建築]▼0KSH1999020312▲",
-        "display": "독일 건축[獨逸建築]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 경제[獨逸經濟]▼0KSH1998012235▲",
-        "display": "독일 경제[獨逸經濟]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 공채[獨逸公債]▼0KSH2002039011▲",
-        "display": "독일 공채[獨逸公債]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 교회[獨逸敎會]▼0KSH2005009140▲",
-        "display": "독일 교회[獨逸敎會]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 국민[獨逸國民]▼0KSH2000014184▲",
-        "display": "독일 국민[獨逸國民]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 기행[獨逸紀行]▼0KSH2002039014▲",
-        "display": "독일 기행[獨逸紀行]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 동맹[獨逸同盟]▼0KSH2000014187▲",
-        "display": "독일 동맹[獨逸同盟]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 동화[獨逸童話]▼0KSH2002003410▲",
-        "display": "독일 동화[獨逸童話]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 문제[獨逸問題]▼0KSH2000014188▲",
-        "display": "독일 문제[獨逸問題]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 문학[獨逸文學]▼0KSH1999020314▲",
-        "display": "독일 문학[獨逸文學]",
-        "category": "문학",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 문화[獨逸文化]▼0KSH2005010291▲",
-        "display": "독일 문화[獨逸文化]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 미술[獨逸美術]▼0KSH1999020357▲",
-        "display": "독일 미술[獨逸美術]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 민법[獨逸民法]▼0KSH2001003540▲",
-        "display": "독일 민법[獨逸民法]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 민족[獨逸民族]▼0KSH2000014189▲",
-        "display": "독일 민족[獨逸民族]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 방식[獨逸方式]▼0KSH2000014191▲",
-        "display": "독일 방식[獨逸方式]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 법계[獨逸法系]▼0KSH1999001667▲",
-        "display": "독일 법계[獨逸法系]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 분단[獨逸分斷]▼0KSH2000014192▲",
-        "display": "독일 분단[獨逸分斷]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a저먼 아이리스[German iris]▼0KSH2003004386▲",
-        "display": "저먼 아이리스[German iris]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 서간[獨逸書簡]▼0KSH2002039020▲",
-        "display": "독일 서간[獨逸書簡]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 소설[獨逸小說]▼0KSH2002003413▲",
-        "display": "독일 소설[獨逸小說]",
-        "category": "문학",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 수필[獨逸隨筆]▼0KSH2002039021▲",
-        "display": "독일 수필[獨逸隨筆]",
-        "category": "문학",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 시대[獨逸時代]▼0KSH2002039024▲",
-        "display": "독일 시대[獨逸時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 연극[獨逸演劇]▼0KSH1999020317▲",
-        "display": "독일 연극[獨逸演劇]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 연설[獨逸演說]▼0KSH2002039156▲",
-        "display": "독일 연설[獨逸演說]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 영화[獨逸映畵]▼0KSH2018000270▲",
-        "display": "독일 영화[獨逸映畵]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 왕조[獨逸王朝]▼0KSH2002011805▲",
-        "display": "독일 왕조[獨逸王朝]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 외교[獨逸外交]▼0KSH2006000563▲",
-        "display": "독일 외교[獨逸外交]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 요리[獨逸料理]▼0KSH2000000653▲",
-        "display": "독일 요리[獨逸料理]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 웅변[獨逸雄辯]▼0KSH2002039157▲",
-        "display": "독일 웅변[獨逸雄辯]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 유머[獨逸--]▼0KSH2002039158▲",
-        "display": "독일 유머[獨逸--]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 음악[獨逸音樂]▼0KSH1999020319▲",
-        "display": "독일 음악[獨逸音樂]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 일기[獨逸日記]▼0KSH2002039160▲",
-        "display": "독일 일기[獨逸日記]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 전쟁[獨逸戰爭]▼0KSH2002039161▲",
-        "display": "독일 전쟁[獨逸戰爭]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 정당[獨逸政黨]▼0KSH1999020315▲",
-        "display": "독일 정당[獨逸政黨]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 정치[獨逸政治]▼0KSH2006000683▲",
-        "display": "독일 정치[獨逸政治]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 제국[獨逸帝國]▼0KSH2000014196▲",
-        "display": "독일 제국[獨逸帝國]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 조약[獨逸條約]▼0KSH2000014316▲",
-        "display": "독일 조약[獨逸條約]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a고정 주의[固定主義]▼0KSH2005016059▲",
-        "display": "고정 주의[固定主義]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 체조[獨逸體操]▼0KSH1999020320▲",
-        "display": "독일 체조[獨逸體操]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일[獨逸統一]▼0KSH1999020321▲",
-        "display": "독일 통일[獨逸統一]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 풍자[獨逸諷刺]▼0KSH2002039172▲",
-        "display": "독일 풍자[獨逸諷刺]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 헌법[獨逸憲法]▼0KSH1999020322▲",
-        "display": "독일 헌법[獨逸憲法]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 혁명[獨逸革命]▼0KSH2002019380▲",
-        "display": "독일 혁명[獨逸革命]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 희곡[獨逸戱曲]▼0KSH2002039176▲",
-        "display": "독일 희곡[獨逸戱曲]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 가문비[獨逸--]▼0KSH2004012253▲",
-        "display": "독일 가문비[獨逸--]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 관념론[獨逸觀念論]▼0KSH1999020313▲",
-        "display": "독일 관념론[獨逸觀念論]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 교육사[獨逸敎育史]▼0KSH2005009139▲",
-        "display": "독일 교육사[獨逸敎育史]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 기본법[獨逸基本法]▼0KSH2000014186▲",
-        "display": "독일 기본법[獨逸基本法]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 기사단[獨逸騎士團]▼0KSH2002013368▲",
-        "display": "독일 기사단[獨逸騎士團]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 낭만파[獨逸浪漫派]▼0KSH2006006585▲",
-        "display": "독일 낭만파[獨逸浪漫派]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a마르크화[--貨]▼0KSH1998030625▲",
-        "display": "마르크화[--貨]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 문학사[獨逸文學史]▼0KSH2004010097▲",
-        "display": "독일 문학사[獨逸文學史]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 문화원[獨逸文化院]▼0KSH1998028548▲",
-        "display": "독일 문화원[獨逸文化院]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 민법학[獨逸民法學]▼0KSH2005009141▲",
-        "display": "독일 민법학[獨逸民法學]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 사유화[獨逸私有化]▼0KSH2000014193▲",
-        "display": "독일 사유화[獨逸私有化]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 사회학[獨逸社會學]▼0KSH1999020316▲",
-        "display": "독일 사회학[獨逸社會學]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 수필집[獨逸隨筆集]▼0KSH2002039022▲",
-        "display": "독일 수필집[獨逸隨筆集]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 여행기[獨逸旅行記]▼0KSH2002039155▲",
-        "display": "독일 여행기[獨逸旅行記]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 연극제[獨逸演劇祭]▼0KSH2002005340▲",
-        "display": "독일 연극제[獨逸演劇祭]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 연방군[獨逸聯邦軍]▼0KSH2000014615▲",
-        "display": "독일 연방군[獨逸聯邦軍]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 오페라[獨逸--]▼0KSH1999020318▲",
-        "display": "독일 오페라[獨逸--]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 외교사[獨逸外交史]▼0KSH2006000680▲",
-        "display": "독일 외교사[獨逸外交史]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 재군비[獨逸再軍備]▼0KSH2006000682▲",
-        "display": "독일 재군비[獨逸再軍備]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 정치사[獨逸政治史]▼0KSH2006000684▲",
-        "display": "독일 정치사[獨逸政治史]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일기[獨逸統一期]▼0KSH2002039170▲",
-        "display": "독일 통일기[獨逸統一期]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a나치 주의[--主義]▼0KSH1998018908▲",
-        "display": "나치 주의[--主義]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 고어[獨逸語古語]▼0KSH2002039025▲",
-        "display": "독일어 고어[獨逸語古語]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 교육[獨逸語敎育]▼0KSH2002010719▲",
-        "display": "독일어 교육[獨逸語敎育]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 문법[獨逸語文法]▼0KSH2002039026▲",
-        "display": "독일어 문법[獨逸語文法]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 문자[獨逸語文字]▼0KSH2002039027▲",
-        "display": "독일어 문자[獨逸語文字]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 방언[獨逸語方言]▼0KSH2002039028▲",
-        "display": "독일어 방언[獨逸語方言]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 번역[獨逸語飜譯]▼0KSH2019000092▲",
-        "display": "독일어 번역[獨逸語飜譯]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 사전[獨逸語辭典]▼0KSH1998028515▲",
-        "display": "독일어 사전[獨逸語辭典]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 속어[獨逸語俗語]▼0KSH2002039029▲",
-        "display": "독일어 속어[獨逸語俗語]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 어원[獨逸語語源]▼0KSH2002039031▲",
-        "display": "독일어 어원[獨逸語語源]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 어의[獨逸語語義]▼0KSH2002039032▲",
-        "display": "독일어 어의[獨逸語語義]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 어휘[獨逸語語彙]▼0KSH2002039033▲",
-        "display": "독일어 어휘[獨逸語語彙]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 역사[獨逸語歷史]▼0KSH2005009142▲",
-        "display": "독일어 역사[獨逸語歷史]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 음성[獨逸語音聲]▼0KSH2002039150▲",
-        "display": "독일어 음성[獨逸語音聲]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 음운[獨逸語音韻]▼0KSH2002039151▲",
-        "display": "독일어 음운[獨逸語音韻]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 작문[獨逸語作文]▼0KSH2002039152▲",
-        "display": "독일어 작문[獨逸語作文]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 해석[獨逸語解釋]▼0KSH2002039153▲",
-        "display": "독일어 해석[獨逸語解釋]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 회화[獨逸語會話]▼0KSH2002039154▲",
-        "display": "독일어 회화[獨逸語會話]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일형 습곡[獨逸型褶曲]▼0KSH2002002001▲",
-        "display": "독일형 습곡[獨逸型褶曲]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a저먼 셰퍼드[German shepherd]▼0KSH2004019531▲",
-        "display": "저먼 셰퍼드[German shepherd]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 정치사학[獨逸政治史學]▼0KSH2000014619▲",
-        "display": "독일 정치사학[獨逸政治史學]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 교육과[獨逸語敎育科]▼0KSH2004039409▲",
-        "display": "독일어 교육과[獨逸語敎育科]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 발음법[獨逸語發音法]▼0KSH2002024254▲",
-        "display": "독일어 발음법[獨逸語發音法]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 수필집[獨逸語隨筆集]▼0KSH2002039030▲",
-        "display": "독일어 수필집[獨逸語隨筆集]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일형 적도의[獨逸型赤道儀]▼0KSH2002017889▲",
-        "display": "독일형 적도의[獨逸型赤道儀]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 경제 통합[獨逸經濟統合]▼0KSH2000014497▲",
-        "display": "독일 경제 통합[獨逸經濟統合]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 고대 시대[獨逸古代時代]▼0KSH2002039010▲",
-        "display": "독일 고대 시대[獨逸古代時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 공업 규격[獨逸工業規格]▼0KSH2000025096▲",
-        "display": "독일 공업 규격[獨逸工業規格]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 공작 연맹[獨逸工作聯盟]▼0KSH2001022138▲",
-        "display": "독일 공작 연맹[獨逸工作聯盟]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 관세 동맹[獨逸關稅同盟]▼0KSH1998020362▲",
-        "display": "독일 관세 동맹[獨逸關稅同盟]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a프랑크푸르트 국민 의회[--國民議會]▼0KSH2000007674▲",
-        "display": "프랑크푸르트 국민 의회[--國民議會]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 근세 시대[獨逸近世時代]▼0KSH2002039012▲",
-        "display": "독일 근세 시대[獨逸近世時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 기록 문학[獨逸記錄文學]▼0KSH2002039013▲",
-        "display": "독일 기록 문학[獨逸記錄文學]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 낭만 주의[獨逸浪漫主義]▼0KSH2002039016▲",
-        "display": "독일 낭만 주의[獨逸浪漫主義]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 민주 주의[獨逸民主主義]▼0KSH2000014190▲",
-        "display": "독일 민주 주의[獨逸民主主義]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a반기 시대[叛起時代]▼0KSH2002036418▲",
-        "display": "반기 시대[叛起時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 배상 문제[獨逸賠償問題]▼0KSH2002025403▲",
-        "display": "독일 배상 문제[獨逸賠償問題]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 선급 협회[獨逸船級協會]▼0KSH2001011776▲",
-        "display": "독일 선급 협회[獨逸船級協會]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a역사 학파[歷史學派]▼0KSH1998014087▲",
-        "display": "역사 학파[歷史學派]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 연방 의회[獨逸聯邦議會]▼0KSH2000014616▲",
-        "display": "독일 연방 의회[獨逸聯邦議會]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 연방 정부[獨逸聯邦政府]▼0KSH2000014617▲",
-        "display": "독일 연방 정부[獨逸聯邦政府]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 외교 정책[獨逸外交政策]▼0KSH2006000681▲",
-        "display": "독일 외교 정책[獨逸外交政策]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 이데올로기[獨逸--]▼0KSH2006005595▲",
-        "display": "독일 이데올로기[獨逸--]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 정치 사상[獨逸政治思想]▼0KSH2006000685▲",
-        "display": "독일 정치 사상[獨逸政治思想]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 정치 연합[獨逸政治聯合]▼0KSH2000014195▲",
-        "display": "독일 정치 연합[獨逸政治聯合]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 제국 시대[獨逸帝國時代]▼0KSH2002039164▲",
-        "display": "독일 제국 시대[獨逸帝國時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 제국 주의[獨逸帝國主義]▼0KSH2006000687▲",
-        "display": "독일 제국 주의[獨逸帝國主義]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 제정 시대[獨逸帝政時代]▼0KSH2002039165▲",
-        "display": "독일 제정 시대[獨逸帝政時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 조세 제도[獨逸租稅制度]▼0KSH2003002565▲",
-        "display": "독일 조세 제도[獨逸租稅制度]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 중세 시대[獨逸中世時代]▼0KSH2002039167▲",
-        "display": "독일 중세 시대[獨逸中世時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 과정[獨逸統一過程]▼0KSH2000014622▲",
-        "display": "독일 통일 과정[獨逸統一過程]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 모형[獨逸統一模型]▼0KSH2000014623▲",
-        "display": "독일 통일 모형[獨逸統一模型]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 문제[獨逸統一問題]▼0KSH2000014624▲",
-        "display": "독일 통일 문제[獨逸統一問題]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 방식[獨逸統一方式]▼0KSH2000014625▲",
-        "display": "독일 통일 방식[獨逸統一方式]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 방안[獨逸統一方案]▼0KSH2006000688▲",
-        "display": "독일 통일 방안[獨逸統一方案]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 비용[獨逸統一費用]▼0KSH2000014626▲",
-        "display": "독일 통일 비용[獨逸統一費用]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 외교[獨逸統一外交]▼0KSH2006000689▲",
-        "display": "독일 통일 외교[獨逸統一外交]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 원칙[獨逸統一原則]▼0KSH2000014627▲",
-        "display": "독일 통일 원칙[獨逸統一原則]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 전쟁[獨逸統一戰爭]▼0KSH2006000691▲",
-        "display": "독일 통일 전쟁[獨逸統一戰爭]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 정책[獨逸統一政策]▼0KSH2006000692▲",
-        "display": "독일 통일 정책[獨逸統一政策]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 조약[獨逸統一條約]▼0KSH2000014628▲",
-        "display": "독일 통일 조약[獨逸統一條約]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통합 조약[獨逸統合條約]▼0KSH2000014629▲",
-        "display": "독일 통합 조약[獨逸統合條約]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 패권 주의[獨逸覇權主義]▼0KSH2000014631▲",
-        "display": "독일 패권 주의[獨逸覇權主義]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 현대 소설[獨逸現代小說]▼0KSH2005009143▲",
-        "display": "독일 현대 소설[獨逸現代小說]",
-        "category": "문학",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 경제 학설사[獨逸經濟學說史]▼0KSH2002039008▲",
-        "display": "독일 경제 학설사[獨逸經濟學說史]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 계몽기 철학[獨逸啓蒙期哲學]▼0KSH2002039009▲",
-        "display": "독일 계몽기 철학[獨逸啓蒙期哲學]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a대공위 시대[大空位時代]▼0KSH2002022498▲",
-        "display": "대공위 시대[大空位時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a동독(국명)[東獨]▼0KSH2000013904▲",
-        "display": "동독(국명)[東獨]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 사회 제국당[獨逸社會帝國黨]▼0KSH2006000562▲",
-        "display": "독일 사회 제국당[獨逸社會帝國黨]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a30년 전쟁[三十年戰爭]▼0KSH2002019488▲",
-        "display": "30년 전쟁[三十年戰爭]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 신교 연합회[獨逸新敎聯合會]▼0KSH2000014194▲",
-        "display": "독일 신교 연합회[獨逸新敎聯合會]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 정치 사상사[獨逸政治思想史]▼0KSH2006000686▲",
-        "display": "독일 정치 사상사[獨逸政治思想史]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일기 시대[獨逸統一期時代]▼0KSH2002039171▲",
-        "display": "독일 통일기 시대[獨逸統一期時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 프랑스 관계[獨逸佛蘭西關係]▼0KSH2002001702▲",
-        "display": "독일 프랑스 관계[獨逸佛蘭西關係]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 학습 자료[獨逸語學習資料]▼0KSH2005005900▲",
-        "display": "독일어 학습 자료[獨逸語學習資料]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 학원 강사[獨逸語學院講師]▼0KSH2004002652▲",
-        "display": "독일어 학원 강사[獨逸語學院講師]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 제3제국 시대[獨逸第三帝國時代]▼0KSH2002039163▲",
-        "display": "독일 제3제국 시대[獨逸第三帝國時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 연속 간행물[獨逸語連續刊行物]▼0KSH2002039148▲",
-        "display": "독일어 연속 간행물[獨逸語連續刊行物]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 강제 점령 시대[獨逸强制占領時代]▼0KSH2002039007▲",
-        "display": "독일 강제 점령 시대[獨逸强制占領時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 경제 사회 통합[獨逸經濟社會統合]▼0KSH2000014496▲",
-        "display": "독일 경제 사회 통합[獨逸經濟社會統合]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 제2 제국 시대[獨逸第二帝國時代]▼0KSH2002039162▲",
-        "display": "독일 제2 제국 시대[獨逸第二帝國時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 종교 개혁 시대[獨逸宗敎改革時代]▼0KSH2002039166▲",
-        "display": "독일 종교 개혁 시대[獨逸宗敎改革時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 통일 외교 전략[獨逸統一外交戰略]▼0KSH2006000690▲",
-        "display": "독일 통일 외교 전략[獨逸統一外交戰略]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 북독일 연방 시대[獨逸北獨逸聯邦時代]▼0KSH2002039019▲",
-        "display": "독일 북독일 연방 시대[獨逸北獨逸聯邦時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 연방 헌법 재판소[獨逸聯邦憲法裁判所]▼0KSH2000014618▲",
-        "display": "독일 연방 헌법 재판소[獨逸聯邦憲法裁判所]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 콘라드 1세 시대[獨逸--一世時代]▼0KSH2002039169▲",
-        "display": "독일 콘라드 1세 시대[獨逸--一世時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 프러시아흥기 시대[獨逸--興期時代]▼0KSH2002039174▲",
-        "display": "독일 프러시아흥기 시대[獨逸--興期時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 나폴레옹 전쟁 시대[獨逸--戰爭時代]▼0KSH2002039015▲",
-        "display": "독일 나폴레옹 전쟁 시대[獨逸--戰爭時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 룩셈부르크왕가 시대[獨逸--王家時代]▼0KSH2002039017▲",
-        "display": "독일 룩셈부르크왕가 시대[獨逸--王家時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 바이말 공화국 시대[獨逸--共和國時代]▼0KSH2002039018▲",
-        "display": "독일 바이말 공화국 시대[獨逸--共和國時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 카롤링거 제국 시대[獨逸--帝國時代]▼0KSH2002039168▲",
-        "display": "독일 카롤링거 제국 시대[獨逸--帝國時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 프란코니아왕가 시대[獨逸--王家時代]▼0KSH2002039173▲",
-        "display": "독일 프란코니아왕가 시대[獨逸--王家時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일 합스부르크왕가 시대[獨逸--王家時代]▼0KSH2002039175▲",
-        "display": "독일 합스부르크왕가 시대[獨逸--王家時代]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a제1차 세계 대전[第一次世界大戰]▼0KSH1998022622▲",
-        "display": "제1차 세계 대전[第一次世界大戰]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일어 연속 간행물 기사 색인[獨逸語連續刊行物記事索引]▼0KSH2002039149▲",
-        "display": "독일어 연속 간행물 기사 색인[獨逸語連續刊行物記事索引]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a슈체친[Szczecin]▼0KSH2004017719▲",
-        "display": "슈체친[Szczecin]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a본(독일)[Bonn]▼0KSH2004016513▲",
-        "display": "본(독일)[Bonn]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a줄(독일)[Suhl]▼0KSH2004020653▲",
-        "display": "줄(독일)[Suhl]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a킬(독일)[Kiel]▼0KSH2004019440▲",
-        "display": "킬(독일)[Kiel]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a함(독일)[Hamm]▼0KSH2004021767▲",
-        "display": "함(독일)[Hamm]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a게라(독일)[Gera]▼0KSH2004015617▲",
-        "display": "게라(독일)[Gera]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a첼레(독일)[Celle]▼0KSH2004020335▲",
-        "display": "첼레(독일)[Celle]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a교육 제도(독일)[敎育制度]▼0KSH2004002074▲",
-        "display": "교육 제도(독일)[敎育制度]",
-        "category": "",
-        "type": "concept"
-    },
-    {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "320.943",
-        "title": "기억",
-        "type": "biblio"
-    },
-    {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "943",
-        "title": "베를린 시대의 독일공화국",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "생태복원공사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "943",
-        "title": "통일 이후 독일 문화와 사회",
+        "subject": "▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲",
+        "display": "자연 생태 복원 기사[自然生態復原技士]",
+        "ddc": "577",
+        "title": "자연생태복원기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a문화(문명)[文化]▼0KSH1998007809▲; ▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "문화(문명)[文化]",
-        "ddc": "943",
-        "title": "통일 이후 독일의 문화통합 과정",
+        "subject": "▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "생물 생태[生物生態]",
+        "ddc": "577",
+        "title": "2024년 외래생물 전국 서식실태 조사",
         "type": "biblio"
     },
     {
-        "subject": "▼a사회 사정[社會事情]▼0KSH1998011447▲; ▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "사회 사정[社會事情]",
-        "ddc": "943",
-        "title": "기초자료로 본 독일 통일 20년",
+        "subject": "▼a사고(사건)[事故]▼0KSH1998002651▲; ▼a화학[化學]▼0KSH1998010841▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a영향 평가[影響評價]▼0KSH2000034438▲; ▼a생태[生態]▼0KSH2002018405▲",
+        "display": "사고(사건)[事故]",
+        "ddc": "577",
+        "title": "화학사고 후 생태계오염 모니터링 및 생태영향 통합평가 기술개발 최종보고서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 경제[獨逸經濟]▼0KSH1998012235▲; ▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a독일 정치[獨逸政治]▼0KSH2006000683▲",
-        "display": "독일 경제[獨逸經濟]",
-        "ddc": "943.087",
-        "title": "통계로 보는 독일통일 2017",
+        "subject": "▼a서식지[棲息地]▼0KSH1998026926▲; ▼a지리 정보 시스템[地理情報--]▼0KSH1998042092▲; ▼a지표 조사[地表調査]▼0KSH2002018691▲; ▼a야생 생물[野生生物]▼0KSH2002029453▲; ▼a분포 특성[分布特性]▼0KSH2002037001▲",
+        "display": "서식지[棲息地]",
+        "ddc": "577",
+        "title": "GIS를 이용한 야생생물종분포 분석 연구 (1차년도)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a통일(국토)[統一]▼0KSH1999012676▲; ▼a한국(국명)[韓國]▼0KSH2000010145▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "320.9519",
-        "title": "비무장지대를 넘는 길",
+        "subject": "▼a환경 보호[環境保護]▼0KSH1998018568▲; ▼a자원 보호[資源保護]▼0KSH2000002644▲; ▼a토지 자원[土地資源]▼0KSH2000020964▲; ▼a생태 환경[生態環境]▼0KSH2002040350▲",
+        "display": "환경 보호[環境保護]",
+        "ddc": "577",
+        "title": "버려진 섬들",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "306.0943",
-        "title": "문화로 읽는 영화의 즐거움",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a기후 변화 대응[氣候變化對應]▼0KSH2005001156▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "환경유전자(eDNA)를 활용한 기후·생물다양성 변화 연구(2023)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "306.0943",
-        "title": "독일인,어떻게 살(았)지?",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a탄소 중립[炭素中立]▼0KSH2022000022▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "생태계 부분 탄소 저장량 및 거동 산정 현황 분석 연구('22)",
         "type": "biblio"
     },
     {
-        "subject": "▼a시민 사회[市民社會]▼0KSH1998022364▲; ▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "시민 사회[市民社會]",
-        "ddc": "306.0943",
-        "title": "독일사회를 인터뷰하다",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a기후 변화 대응[氣候變化對應]▼0KSH2005001156▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "기후변화 대응 기반마련 국가 생물다양성 평가('22)",
         "type": "biblio"
     },
     {
-        "subject": "▼a교육학[敎育學]▼0KSH1998004910▲; ▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "교육학[敎育學]",
-        "ddc": "370.943",
-        "title": "독일교육학의 이해",
+        "subject": "▼a지도(자료)[地圖]▼0KSH1998008062▲; ▼a환경 조사[環境調査]▼0KSH1998011849▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a환경 개발 규제[環境開發規制]▼0KSH2005017699▲",
+        "display": "지도(자료)[地圖]",
+        "ddc": "577",
+        "title": "생태·자연도 현지조사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a인물[人物]▼0KSH2001004755▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "324.2092",
-        "title": "히틀러의 뜻대로",
+        "subject": "▼a실태 조사[實態調査]▼0KSH2001020570▲; ▼a외래종[外來種]▼0KSH2004024416▲; ▼a생태계 교란 야생 생물[生態系攪亂野生生物]▼0KSH2018000033▲; ▼a외래 생물[外來生物]▼0KSH2019000239▲",
+        "display": "실태 조사[實態調査]",
+        "ddc": "577",
+        "title": "2021년 외래생물 전국 서식실태 조사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a인물[人物]▼0KSH2001004755▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "324.2092",
-        "title": "히틀러의 뜻대로",
+        "subject": "▼a모니터링[monitoring]▼0KSH2000016969▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a시민 참여[市民參與]▼0KSH2002037963▲; ▼a생태계 보호[生態系保護]▼0KSH2002040348▲",
+        "display": "모니터링[monitoring]",
+        "ddc": "577",
+        "title": "시민참여 「한국 생물다양성 관측 네트워크(K-BON)」 운영",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a출생률[出生率]▼0KSH1998034090▲; ▼a인구 정책[人口政策]▼0KSH1998039161▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "304.6",
-        "title": "가족정책과 출산율",
+        "subject": "▼a지표종[指標種]▼0KSH1998035703▲; ▼a생활 환경[生活環境]▼0KSH1999006811▲; ▼a기후 변화[氣候變化]▼0KSH2000011818▲; ▼a지표 생물[指標生物]▼0KSH2002019266▲",
+        "display": "지표종[指標種]",
+        "ddc": "577",
+        "title": "우리 주변 생활 속 기후변화 생물지표종",
         "type": "biblio"
     },
     {
-        "subject": "▼a민족 주의[民族主義]▼0KSH1998019042▲; ▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a역사 주의[歷史主義]▼0KSH2000015278▲",
-        "display": "민족 주의[民族主義]",
-        "ddc": "102",
-        "title": "民族主義",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(2018년도 NCS기반 국가기술자격 실기시험 평가방법 개발) 자연생태복원분야",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a사회 보장법(법률)[社會保障法]▼0KSH1999002410▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "361.943",
-        "title": "獨逸社會保障法論",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a인간 생태학[人間生態學]▼0KSH1998036581▲; ▼a군집 생태학[群集生態學]▼0KSH1999013809▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "생태학",
         "type": "biblio"
     },
     {
-        "subject": "▼a광고[廣告]▼0KSH1998001149▲; ▼a독일(국명)[獨逸]▼0KSH1998025580▲",
-        "display": "광고[廣告]",
-        "ddc": "659.10943",
-        "title": "독일의 광고와 언어",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a환경 문제[環境問題]▼0KSH1998043534▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "경관환경생태학",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a노인 복지법(법률)[老人福祉法]▼0KSH1999000020▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "344.0326",
-        "title": "독일의 노인복지법제연구",
+        "subject": "▼a환경 정책[環境政策]▼0KSH1998042284▲; ▼a지속 가능한 개발[持續可能--開發]▼0KSH2002021189▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "환경 정책[環境政策]",
+        "ddc": "577",
+        "title": "자연 기여율 및 모형을 활용한 생태계서비스 평가 개선방안",
         "type": "biblio"
     },
     {
-        "subject": "▼a축구[蹴球]▼0KSH1998008281▲; ▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a월드컵[World Cup]▼0KSH2002029806▲",
-        "display": "축구[蹴球]",
-        "ddc": "796.334668",
-        "title": "독일월드컵 100배 즐기기",
+        "subject": "▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a생물 자원[生物資源]▼0KSH2002018176▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲",
+        "display": "생태계 조사[生態系調査]",
+        "ddc": "577",
+        "title": "무주군의 생물다양성",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a가족 정책[家族政策]▼0KSH1999000089▲; ▼a가족 사회화[家族社會化]▼0KSH2005017502▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "306.85",
-        "title": "독일의 가족 및 가족내 사회화과정 연구",
+        "subject": "▼a환경[環境]▼0KSH1998011419▲; ▼a수필집[隨筆集]▼0KSH1998038039▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "환경[環境]",
+        "ddc": "577",
+        "title": "모래 군(郡)의 열두 달",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a민담[民譚]▼0KSH2000030086▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "398.20431",
-        "title": "그림형제 독일민담",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 환경[自然環境]▼0KSH1998039514▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "동네에서 자연을 관찰하는 9가지 방법",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a산업 경제[産業經濟]▼0KSH2002002949▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "338",
-        "title": "경제의 디지털화와 노동의 미래",
+        "subject": "▼a공생(생물)[共生]▼0KSH1998016785▲; ▼a자연 보호[自然保護]▼0KSH1998026910▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "공생(생물)[共生]",
+        "ddc": "577",
+        "title": "지구를 살리는 생태 감수성 수업",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일(국명)[獨逸]▼0KSH1998025580▲; ▼a수기(글)[手記]▼0KSH2001003491▲",
-        "display": "독일(국명)[獨逸]",
-        "ddc": "895.785",
-        "title": "무작정 독일",
+        "subject": "▼a환경 교육[環境敎育]▼0KSH1998020289▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲; ▼a생태 교육[生態敎育]▼0KSH2006003636▲",
+        "display": "환경 교육[環境敎育]",
+        "ddc": "577",
+        "title": "생태·자연도 해설서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "哲學의 本質",
+        "subject": "▼a환경 조사[環境調査]▼0KSH1998011849▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 환경[自然環境]▼0KSH1998039514▲",
+        "display": "환경 조사[環境調査]",
+        "ddc": "577",
+        "title": "자연환경종합 GIS-DB 구축",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말하였다",
+        "subject": "▼a환경 조사[環境調査]▼0KSH1998011849▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a환경 개발 규제[環境開發規制]▼0KSH2005017699▲",
+        "display": "환경 조사[環境調査]",
+        "ddc": "577",
+        "title": "생태·자연도 현지조사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "現代의 精神的危機",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a데이터 분석[--分析]▼0KSH1998028364▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "생태학적 데이터 분석을 위한 R",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(쇼펜하우엘의) 回想錄",
+        "subject": "▼a수도권[首都圈]▼0KSH1998035719▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a생태계 교란 야생 생물[生態系攪亂野生生物]▼0KSH2018000033▲",
+        "display": "수도권[首都圈]",
+        "ddc": "577",
+        "title": "수도권 내 생태계교란 생물 분포현황 조사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "原子彈과 人類의 未來",
+        "subject": "▼a생태[生態]▼0KSH2002018405▲; ▼a생태 환경[生態環境]▼0KSH2002040350▲; ▼a공생 사회[共生社會]▼0KSH2006002463▲",
+        "display": "생태[生態]",
+        "ddc": "577",
+        "title": "생태",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a칸트 철학[--哲學]▼0KSH2000027758▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "人生論",
+        "subject": "▼a데이터 분석[--分析]▼0KSH1998028364▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲",
+        "display": "데이터 분석[--分析]",
+        "ddc": "577",
+        "title": "생태학적 데이터 분석을 위한 R",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "悲劇論",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a생물권[生物圈]▼0KSH2000028983▲; ▼a가이아 이론[--理論]▼0KSH2002020061▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "가이아",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(續)孤獨을 運命처럼",
+        "subject": "▼a환경[環境]▼0KSH1998011419▲; ▼a수필집[隨筆集]▼0KSH1998038039▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "환경[環境]",
+        "ddc": "577",
+        "title": "모래 군(郡)의 열두 달",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "人生論",
+        "subject": "▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a생태·경관 보전 지역[生態景觀保全地域]▼0KSH2019000153▲",
+        "display": "생태계 조사[生態系調査]",
+        "ddc": "577",
+        "title": "서울특별시 생태·경관보전지역 확대를 위한 생물다양성 조사 및 생태계 보전방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a법리학[法理學]▼0KSH2000015631▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "獨逸國民에게 告함",
+        "subject": "▼a환경 조사[環境調査]▼0KSH1998011849▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 환경[自然環境]▼0KSH1998039514▲",
+        "display": "환경 조사[環境調査]",
+        "ddc": "577",
+        "title": "자연환경종합 GIS-DB 구축",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a독일 국민[獨逸國民]▼0KSH2000014184▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "獨逸國民에게 告함",
+        "subject": "▼a정보 관리(경영)[情報管理]▼0KSH1998010915▲; ▼a생물 자원[生物資源]▼0KSH2002018176▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲",
+        "display": "정보 관리(경영)[情報管理]",
+        "ddc": "577",
+        "title": "생물다양성 디지털 정보 구축 및 관리 (2022년)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "휴머니즘論",
+        "subject": "▼a환경 영향 평가[環境影響評價]▼0KSH1998016748▲; ▼a자연 생태계[自然生態系]▼0KSH2000020865▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "환경 영향 평가[環境影響評價]",
+        "ddc": "577",
+        "title": "지역의 생태가치 평가 및 인식 증진방안 연구('22)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "네 運命을 사랑하라",
+        "subject": "▼a비무장 지대[非武裝地帶]▼0KSH1998001151▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "비무장 지대[非武裝地帶]",
+        "ddc": "577",
+        "title": "핵심 생태자산과 생태계서비스 가치 평가 및 보전방안 연구('22)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "哲學的 思考의 小學校",
+        "subject": "▼a환경 교육[環境敎育]▼0KSH1998020289▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲; ▼a생태 교육[生態敎育]▼0KSH2006003636▲",
+        "display": "환경 교육[環境敎育]",
+        "ddc": "577",
+        "title": "생태·자연도 해설서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "原子彈과 人類의 未來",
+        "subject": "▼a생태계 파괴[生態系破壞]▼0KSH1998036166▲; ▼a생태계 교란 야생 생물[生態系攪亂野生生物]▼0KSH2018000033▲; ▼a외래 생물[外來生物]▼0KSH2019000239▲",
+        "display": "생태계 파괴[生態系破壞]",
+        "ddc": "577",
+        "title": "한국의 생태계교란 외래생물",
         "type": "biblio"
     },
     {
-        "subject": "▼a자연 과학[自然科學]▼0KSH1998010840▲; ▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a문화 과학[文化科學]▼0KSH2000016747▲",
-        "display": "자연 과학[自然科學]",
-        "ddc": "193",
-        "title": "文化科學과 自然科學",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 생태계[自然生態系]▼0KSH2000020865▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "생태계서비스 평가 및 활용방안 마련(4차)",
         "type": "biblio"
     },
     {
-        "subject": "▼a자연 과학[自然科學]▼0KSH1998010840▲; ▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a문화 과학[文化科學]▼0KSH2000016747▲",
-        "display": "자연 과학[自然科學]",
-        "ddc": "193",
-        "title": "文化科學과 自然科學",
+        "subject": "▼a생물 자원[生物資源]▼0KSH2002018176▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a해외 자원[海外資源]▼0KSH2002028232▲",
+        "display": "생물 자원[生物資源]",
+        "ddc": "577",
+        "title": "『해외생물자원 확보-미국 (1차년도)』 최종보고서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "文化科學과 自然科學",
+        "subject": "▼a생물 자원[生物資源]▼0KSH2002018176▲; ▼a생물종[生物種]▼0KSH2002018404▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "생물 자원[生物資源]",
+        "ddc": "577",
+        "title": "산과 들에서 전해지는 강원 생물이야기",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "箴言集",
+        "subject": "▼a환경 교육[環境敎育]▼0KSH1998020289▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲; ▼a생태 교육[生態敎育]▼0KSH2006003636▲",
+        "display": "환경 교육[環境敎育]",
+        "ddc": "577",
+        "title": "더 자연스러운 자연해설",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "惡에 관하여",
+        "subject": "▼a환경 조사[環境調査]▼0KSH1998011849▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 환경[自然環境]▼0KSH1998039514▲",
+        "display": "환경 조사[環境調査]",
+        "ddc": "577",
+        "title": "전국자연환경조사 시민참여조사 매뉴얼",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "反 그리스도 者",
+        "subject": "▼a생물[生物]▼0KSH1997000610▲; ▼a생태학[生態學]▼0KSH1998016220▲; ▼a동식물[動植物]▼0KSH2002015380▲",
+        "display": "생물[生物]",
+        "ddc": "577",
+        "title": "(연구자들이 들려주는) 우리 생물 이야기",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a현대 철학[現代哲學]▼0KSH2002027908▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말하였다",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 환경[自然環境]▼0KSH1998039514▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "동네에서 자연을 관찰하는 9가지 방법",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하이데거의 哲學思想",
+        "subject": "▼a박(식물)[匏蘆]▼0KSH1998025043▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a외래종[外來種]▼0KSH2004024416▲",
+        "display": "박(식물)[匏蘆]",
+        "ddc": "577",
+        "title": "경상북도 가시박 분포 및 지속 가능한 관리 방향 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "철학적 신앙",
+        "subject": "▼a생태계 파괴[生態系破壞]▼0KSH1998036166▲; ▼a생태계 교란 야생 생물[生態系攪亂野生生物]▼0KSH2018000033▲; ▼a외래 생물[外來生物]▼0KSH2019000239▲",
+        "display": "생태계 파괴[生態系破壞]",
+        "ddc": "577",
+        "title": "2021년 생태계교란 생물 모니터링",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "20世紀의 體驗",
+        "subject": "▼a환경 영향 평가[環境影響評價]▼0KSH1998016748▲; ▼a자연 생태계[自然生態系]▼0KSH2000020865▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "환경 영향 평가[環境影響評價]",
+        "ddc": "577",
+        "title": "(2021) 지역의 생태가치 평가 및 인식 증진방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a헤겔 철학[--哲學]▼0KSH2001015663▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "헤겔 哲學思想의 理解",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a환경 정책[環境政策]▼0KSH1998042284▲; ▼a아태 지역[亞太地域]▼0KSH2000018372▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "아태 지역 생태계 보전 지식공유 플랫폼 구축('21)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말하였다",
+        "subject": "▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲; ▼a생태[生態]▼0KSH2002018405▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "생태계 보전 지역[生態系保全地域]",
+        "ddc": "577",
+        "title": "핵심 생태자산과 생태계서비스 가치 평가 및 보전방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말했다",
+        "subject": "▼a전문가 양성[專門家養成]▼0KSH2000022213▲; ▼a생물 자원[生物資源]▼0KSH2002018176▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲",
+        "display": "전문가 양성[專門家養成]",
+        "ddc": "577",
+        "title": "생물자원 효능 성분분석 전문인력 양성(1차년도)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a서양 철학[西洋哲學]▼0KSH1998028550▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "神은 죽었다 그러나 神은 살아 있다",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲; ▼a생태 환경[生態環境]▼0KSH2002040350▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "제8회 국립생태원 생태동아리 탐구대회 탐구결과 보고서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "人間的인 너무나 人間的인",
+        "subject": "▼a어류[魚類]▼0KSH1998004603▲; ▼a멸종 위기종[滅種危機種]▼0KSH2002017987▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲",
+        "display": "어류[魚類]",
+        "ddc": "577",
+        "title": "우리 물고기의 생물다양성 탐구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "이성과 자유",
+        "subject": "▼a수필[隨筆]▼0KSH1998029906▲; ▼a자연(천연)[自然]▼0KSH1998039554▲; ▼a생태[生態]▼0KSH2002018405▲",
+        "display": "수필[隨筆]",
+        "ddc": "577",
+        "title": "네이처 매트릭스",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "젊은이를 위한 哲學 노우트",
+        "subject": "▼a동식물[動植物]▼0KSH2002015380▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "동식물[動植物]",
+        "ddc": "577",
+        "title": "숲은 고요하지 않다",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말했다",
+        "subject": "▼a정보 관리(경영)[情報管理]▼0KSH1998010915▲; ▼a생물 자원[生物資源]▼0KSH2002018176▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲",
+        "display": "정보 관리(경영)[情報管理]",
+        "ddc": "577",
+        "title": "생물다양성 디지털 정보 구축 및 관리 (2021년)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a헤겔 철학[--哲學]▼0KSH2001015663▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "精神現象学序説",
+        "subject": "▼a환경 영향 평가[環境影響評價]▼0KSH1998016748▲; ▼a자연 생태계[自然生態系]▼0KSH2000020865▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "환경 영향 평가[環境影響評價]",
+        "ddc": "577",
+        "title": "지역의 생태가치 평가 및 인식 증진방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a생의 철학[生--哲學]▼0KSH2001009386▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말했다",
+        "subject": "▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲; ▼a생태[生態]▼0KSH2002018405▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "생태계 보전 지역[生態系保全地域]",
+        "ddc": "577",
+        "title": "핵심 생태자산과 생태계서비스 가치평가 및 보전방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a현대 철학[現代哲學]▼0KSH2002027908▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "니체와 현대철학",
+        "subject": "▼a생물 다양성 협약[生物多樣性協約]▼0KSH1999001784▲; ▼a유전 자원(생물학)[遺傳資源]▼0KSH2018000266▲; ▼a나고야 의정서[名古屋議定書]▼0KSH2020000531▲",
+        "display": "생물 다양성 협약[生物多樣性協約]",
+        "ddc": "577",
+        "title": "나고야의정서 국제동향 2018-2020",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "슬기의 나무가 있는 곳에",
+        "subject": "▼a생물[生物]▼0KSH1997000610▲; ▼a생태학[生態學]▼0KSH1998016220▲; ▼a동식물[動植物]▼0KSH2002015380▲",
+        "display": "생물[生物]",
+        "ddc": "577",
+        "title": "(연구자들이 들려주는) 우리 생물 이야기",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말했다",
+        "subject": "▼a생물학[生物學]▼0KSH1998006221▲; ▼a환경[環境]▼0KSH1998011419▲; ▼a환경 생태학[環境生態學]▼0KSH1998036902▲",
+        "display": "생물학[生物學]",
+        "ddc": "577",
+        "title": "2020 한국환경생물학회 춘계학술대회",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "독일고전철학의 인간론연구",
+        "subject": "▼a환경 조사[環境調査]▼0KSH1998011849▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 환경[自然環境]▼0KSH1998039514▲",
+        "display": "환경 조사[環境調査]",
+        "ddc": "577",
+        "title": "(전국자연환경조사) 시민참여조사매뉴얼",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a역사 철학[歷史哲學]▼0KSH1998037671▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "歷史哲學硏究",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a공무원 시험[公務員試驗]▼0KSH1998018212▲; ▼a환경직[環境職]▼0KSH2005011536▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "비전(vision) 생태학 기출문제 및 예상문제",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a역사 철학[歷史哲學]▼0KSH1998037671▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "歷史哲學硏究",
+        "subject": "▼a생물 자원[生物資源]▼0KSH2002018176▲; ▼a생물종[生物種]▼0KSH2002018404▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "생물 자원[生物資源]",
+        "ddc": "577",
+        "title": "변산과 노령이 전하는 생물이야기",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "포이에르바하와 독일 고전철학의 종말",
+        "subject": "▼a생태[生態]▼0KSH2002018405▲; ▼a생태 환경[生態環境]▼0KSH2002040350▲; ▼a공생 사회[共生社會]▼0KSH2006002463▲",
+        "display": "생태[生態]",
+        "ddc": "577",
+        "title": "생태",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쇼펜하우어",
+        "subject": "▼a환경 교육[環境敎育]▼0KSH1998020289▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲; ▼a생태 교육[生態敎育]▼0KSH2006003636▲",
+        "display": "환경 교육[環境敎育]",
+        "ddc": "577",
+        "title": "더 자연스러운 자연해설",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "19세기 독일 사회철학",
+        "subject": "▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲; ▼a생태[生態]▼0KSH2002018405▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "생태계 보전 지역[生態系保全地域]",
+        "ddc": "577",
+        "title": "핵심 생태자산과 생태계서비스 가치 평가 및 보전방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "계몽과 해방",
+        "subject": "▼a비무장 지대[非武裝地帶]▼0KSH1998001151▲; ▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲; ▼a세계 유산[世界遺産]▼0KSH2002005189▲",
+        "display": "비무장 지대[非武裝地帶]",
+        "ddc": "577",
+        "title": "2019 DMZ 세계유산 등재기반 조성사업",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말했다",
+        "subject": "▼a모니터링[monitoring]▼0KSH2000016969▲; ▼a자연 생태계[自然生態系]▼0KSH2000020865▲; ▼a도서 지역[島嶼地域]▼0KSH2002034162▲",
+        "display": "모니터링[monitoring]",
+        "ddc": "577",
+        "title": "특정도서 자연생태계 모니터링 및 3D 항공촬영",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쇼펜하우어",
+        "subject": "▼a공공 기관[公共機關]▼0KSH2002014041▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a활성화 방안[活性化方案]▼0KSH2002026044▲",
+        "display": "공공 기관[公共機關]",
+        "ddc": "577",
+        "title": "울산생물다양성 센터 기능 확대 방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말했다",
+        "subject": "▼a해양 생물[海洋生物]▼0KSH1998003455▲; ▼a해초(바다풀)[海草]▼0KSH1998025394▲; ▼a해양 환경[海洋環境]▼0KSH1998037051▲",
+        "display": "해양 생물[海洋生物]",
+        "ddc": "577",
+        "title": "(푸르고 푸른 고향의) 잘피밭",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "루드비히 포이에르바하와 독일고전철학의 종말",
+        "subject": "▼a환경 영향 평가[環境影響評價]▼0KSH1998016748▲; ▼a자연 생태계[自然生態系]▼0KSH2000020865▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "환경 영향 평가[環境影響評價]",
+        "ddc": "577",
+        "title": "지역의 생태가치 평가 및 인식 증진방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a철학자[哲學者]▼0KSH1998033868▲; ▼a현상학[現象學]▼0KSH1998039211▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "후설",
+        "subject": "▼a환경 조사[環境調査]▼0KSH1998011849▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 환경[自然環境]▼0KSH1998039514▲",
+        "display": "환경 조사[環境調査]",
+        "ddc": "577",
+        "title": "(제5차) 전국자연환경조사 지침",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a법리학[法理學]▼0KSH2000015631▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "법철학강요",
+        "subject": "▼a환경 조사[環境調査]▼0KSH1998011849▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 환경[自然環境]▼0KSH1998039514▲",
+        "display": "환경 조사[環境調査]",
+        "ddc": "577",
+        "title": "(제5차) 전국자연환경조사 지침",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a헤겔 철학[--哲學]▼0KSH2001015663▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "헤겔철학개념과 정신현상학",
+        "subject": "▼a비무장 지대[非武裝地帶]▼0KSH1998001151▲; ▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲; ▼a생태 개발업[生態開發業]▼0KSH2004036436▲",
+        "display": "비무장 지대[非武裝地帶]",
+        "ddc": "577",
+        "title": "DMZ 도로는 굽은 흙 길로",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하이데거의 實存과 言語",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a생태·경관 보전 지역[生態景觀保全地域]▼0KSH2019000153▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "내성천 생물다양성 지도",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말했다",
+        "subject": "▼a적응[適應]▼0KSH1998008047▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a기후 변화[氣候變化]▼0KSH2000011818▲",
+        "display": "적응[適應]",
+        "ddc": "577",
+        "title": "(2018) 생태계 기후변화 리스크 평가 및 적응대책 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a사회 사상[社會思想]▼0KSH1998007894▲; ▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "사회 사상[社會思想]",
-        "ddc": "193",
-        "title": "하버마스의 사회사상",
+        "subject": "▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲; ▼a생태[生態]▼0KSH2002018405▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "생태계 보전 지역[生態系保全地域]",
+        "ddc": "577",
+        "title": "핵심 생태자산과 생태계서비스 가치 평가 및 보전방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "니체",
+        "subject": "▼a생물학[生物學]▼0KSH1998006221▲; ▼a환경[環境]▼0KSH1998011419▲; ▼a환경 생태학[環境生態學]▼0KSH1998036902▲",
+        "display": "생물학[生物學]",
+        "ddc": "577",
+        "title": "(2018) 한국환경생물학회 추계학술대회",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "삶과 죽음의 번뇌",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "자연생태 복원기사 총설",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하이데거 철학에의 안내",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a산림[山林]▼0KSH1998043076▲; ▼a자연계(세상)[自然界]▼0KSH2005016654▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "자연의 비밀 네트워크",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "기술과 전향",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a평가 시스템[評價--]▼0KSH2002031942▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "(2017) 전국 단위 생태계서비스 평가 체계 수립을 위한 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "人間的인 너무도 人間的인",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a기후 변화[氣候變化]▼0KSH2000011818▲; ▼a아고산대[亞高山帶]▼0KSH2000038439▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "기후변화 민감생태계 관리 및 보전방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "헤겔의 辨證法",
+        "subject": "▼a적응[適應]▼0KSH1998008047▲; ▼a진화(발전)[進化]▼0KSH1998008893▲; ▼a생태[生態]▼0KSH2002018405▲",
+        "display": "적응[適應]",
+        "ddc": "577",
+        "title": "생물 적응과 공존 진화 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "형이상학 입문",
+        "subject": "▼a적응[適應]▼0KSH1998008047▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a기후 변화[氣候變化]▼0KSH2000011818▲",
+        "display": "적응[適應]",
+        "ddc": "577",
+        "title": "생태분야 기후변화 적응 사례집",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a사회 철학[社會哲學]▼0KSH2000007128▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "새로운 불투명성",
+        "subject": "▼a적응[適應]▼0KSH1998008047▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a기후 변화[氣候變化]▼0KSH2000011818▲",
+        "display": "적응[適應]",
+        "ddc": "577",
+        "title": "(2017) 생태계 기후변화 리스크 평가 및 적응대책 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하버마스의 사상",
+        "subject": "▼a환경 조사[環境調査]▼0KSH1998011849▲; ▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연 환경[自然環境]▼0KSH1998039514▲",
+        "display": "환경 조사[環境調査]",
+        "ddc": "577",
+        "title": "자연환경종합 GIS-DB 구축",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a철학 에세이[哲學--]▼0KSH2005012267▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쇼펜하우어 수상록",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(신편) 자연생태복원 기사·산업기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a관념론[觀念論]▼0KSH1998017269▲; ▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a변증[辨證]▼0KSH2002027934▲",
-        "display": "관념론[觀念論]",
-        "ddc": "193",
-        "title": "인생에는 오직 하나의 삶이 있을 뿐입니다",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a메타 데이터[metadata]▼0KSH1998023104▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "생태정보를 위한 메타데이터 카탈로그 시스템 설계 기술 보고서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쇼펜하우어 인생론",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a데이터 분석[--分析]▼0KSH1998028364▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "생태관측 데이터 특성 분석 및 저장소 설계 기술 보고서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "존재의 바람, 사람의 길",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a메타 데이터[metadata]▼0KSH1998023104▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "생태관측 메타데이터 표준화 기술보고서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "차라투스트라는 이렇게 말했다",
+        "subject": "▼a자연 생태계[自然生態系]▼0KSH2000020865▲; ▼a선별[選別]▼0KSH2002004832▲; ▼a유전자 재조합 생물체[遺傳子再組合生物體]▼0KSH2004035511▲",
+        "display": "자연 생태계[自然生態系]",
+        "ddc": "577",
+        "title": "자연생태계 내 유전자변형생물체 선별기술개발",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a서양 철학[西洋哲學]▼0KSH1998028550▲; ▼a계몽[啓蒙]▼0KSH2000006634▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "계몽의 변증법",
+        "subject": "▼a비무장 지대[非武裝地帶]▼0KSH1998001151▲; ▼a포럼[forum]▼0KSH1998035332▲; ▼a생태계[生態系]▼0KSH1998036163▲",
+        "display": "비무장 지대[非武裝地帶]",
+        "ddc": "577",
+        "title": "2016년도 DMZ 생태포럼 운영",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a라이프니츠 철학[--哲學]▼0KSH2000028003▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "주름, 갈래, 울림",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a큰 입 우럭▼0KSH2004006757▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "배스 퇴치사업에 따른 수생태계 변화 모니터링",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "우주에서 인간의 지위",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a큰 입 우럭▼0KSH2004006757▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "배스 퇴치사업에 따른 수생태계 변화 모니터링",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쉘러. 우주에서 인간의 지위",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(신편) 자연생태복원기사·산업기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "막스 셸러 철학의 이해",
+        "subject": "▼a국립 공원[國立公園]▼0KSH1998004147▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a모니터링 시스템[moritoring system]▼0KSH2002039837▲",
+        "display": "국립 공원[國立公園]",
+        "ddc": "577",
+        "title": "기후변화가 생태계에 미치는 영향 모니터링 체계 구축",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쇼펜하우어 인생론",
+        "subject": "▼a자연 환경[自然環境]▼0KSH1998039514▲; ▼a인문 환경[人文環境]▼0KSH2002018666▲; ▼a생태 환경[生態環境]▼0KSH2002040350▲",
+        "display": "자연 환경[自然環境]",
+        "ddc": "577",
+        "title": "자연·인문 환경자원 융합을 통한 물 문화 창출 모델 마련",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "체험·표현·이해",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a큰 입 우럭▼0KSH2004006757▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "배스 퇴치사업에 따른 수생태계 변화 모니터링",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하이데거와 현대 철학자들",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a큰 입 우럭▼0KSH2004006757▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "배스 퇴치사업에 따른 수생태계 변화 모니터링",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "『하이데거 연구』",
+        "subject": "▼a자연 생태계[自然生態系]▼0KSH2000020865▲; ▼a선별[選別]▼0KSH2002004832▲; ▼a유전자 재조합 생물체[遺傳子再組合生物體]▼0KSH2004035511▲",
+        "display": "자연 생태계[自然生態系]",
+        "ddc": "577",
+        "title": "자연생태계 내 유전자변형물체 선별기술개발",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(하이데거)존재와 시간 강의",
+        "subject": "▼a생물 자원[生物資源]▼0KSH2002018176▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a생물 보존[生物保存]▼0KSH2002040099▲",
+        "display": "생물 자원[生物資源]",
+        "ddc": "577",
+        "title": "DMZ일원 '토착생물 유전자원관' 조성 타당성 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(한스 요나스의)사고의 통합",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a동물독[動物毒]▼0KSH1999021564▲; ▼a식물독[植物毒]▼0KSH2002041805▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "독한 것들",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "니체",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(신편) 자연생태복원기사·산업기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "우리는 어디로 가는가?",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a생태 환경[生態環境]▼0KSH2002040350▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "위베르씨, 내일의 지구를 말해 주세요",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "30분에 읽는 니체",
+        "subject": "▼a어류[魚類]▼0KSH1998004603▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲; ▼a수생 곤충[水生昆蟲]▼0KSH2001013631▲",
+        "display": "어류[魚類]",
+        "ddc": "577",
+        "title": "(재미있는) 도랑물속 생물 이야기",
         "type": "biblio"
     },
     {
-        "subject": "▼a가치 철학[價値哲學]▼0KSH1998005039▲; ▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "가치 철학[價値哲學]",
-        "ddc": "193",
-        "title": "막스 셸러의 가치철학",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "자연생태복원기사총설",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "이성과 감성의 평행선",
+        "subject": "▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a제주도[濟州島]▼0KSH2019000497▲",
+        "display": "생물종 다양성[生物種多樣性]",
+        "ddc": "577",
+        "title": "국가생물다양성기관연합 워크숍",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "니체의 숲으로 가다",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(신편) 자연생태복원 기사·산업기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a헤겔 철학[--哲學]▼0KSH2001015663▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(G. W. F. 헤겔) 교수취임 연설문",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생태[生態]▼0KSH2002018405▲; ▼a생태 교육[生態敎育]▼0KSH2006003636▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "국립생태원 생태교육 시범운행 프로그램 모음집",
         "type": "biblio"
     },
     {
-        "subject": "▼a불교[佛敎]▼0KSH1998011557▲; ▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "불교[佛敎]",
-        "ddc": "193",
-        "title": "하이데거와 불교",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "자연생태복원기사총설",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "칸트 평전",
+        "subject": "▼a비무장 지대[非武裝地帶]▼0KSH1998001151▲; ▼a관리 계획[管理計劃]▼0KSH1998017428▲; ▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲",
+        "display": "비무장 지대[非武裝地帶]",
+        "ddc": "577",
+        "title": "DMZ 유네스코 생물권보전지역 관리계획 수립연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "비극의 탄생",
+        "subject": "▼a비무장 지대[非武裝地帶]▼0KSH1998001151▲; ▼a관리 계획[管理計劃]▼0KSH1998017428▲; ▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲",
+        "display": "비무장 지대[非武裝地帶]",
+        "ddc": "577",
+        "title": "DMZ 유네스코 생물권보전지역 관리계획 수립연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "선악의 피안",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(신편) 자연생태복원 기사·산업기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(G.W.F. 헤겔)교수취임 연설문",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "자연생태복원기사총설",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "문화과학과 자연과학",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(신편) 자연생태복원 기사·산업기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쇼펜하우어와 니이체",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(신편) 자연생태복원 기사·산업기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "희망의 원리",
+        "subject": "▼a환경 영향 평가[環境影響評價]▼0KSH1998016748▲; ▼a공간 분석[空間分析]▼0KSH2002032156▲; ▼a경관 생태학[景觀生態學]▼0KSH2003001218▲",
+        "display": "환경 영향 평가[環境影響評價]",
+        "ddc": "577",
+        "title": "경관생태계",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "유고",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(신편) 자연생태복원 기사·산업기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "사랑은 없다",
+        "subject": "▼a자연 학습[自然學習]▼0KSH1998039511▲; ▼a자연 체험[自然體驗]▼0KSH2002002938▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲",
+        "display": "자연 학습[自然學習]",
+        "ddc": "577",
+        "title": "자연생태체험 길라잡이",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쇼펜하우어의 철학",
+        "subject": "▼a자연 학습[自然學習]▼0KSH1998039511▲; ▼a자연 체험[自然體驗]▼0KSH2002002938▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲",
+        "display": "자연 학습[自然學習]",
+        "ddc": "577",
+        "title": "(2005)자연해설가를 위한 교육교재",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(카시러)사회철학과 역사철학",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲; ▼a자연 생태 복원 산업 기사[自然生態復原技士]▼0KSH2015000122▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "자연생태복원 기사·산업기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "의사소통의 철학",
+        "subject": "▼a자연 학습[自然學習]▼0KSH1998039511▲; ▼a자연 체험[自然體驗]▼0KSH2002002938▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲",
+        "display": "자연 학습[自然學習]",
+        "ddc": "577",
+        "title": "(2005) 자연해설가를 위한 교육교재",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "수정궁",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a생물권[生物圈]▼0KSH2000028983▲; ▼a가이아 이론[--理論]▼0KSH2002020061▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "가이아",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 관념론[獨逸觀念論]▼0KSH1999020313▲",
-        "display": "독일 관념론[獨逸觀念論]",
-        "ddc": "193",
-        "title": "존재의 모험",
+        "subject": "▼a국립 공원[國立公園]▼0KSH1998004147▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "국립 공원[國立公園]",
+        "ddc": "577",
+        "title": "국립공원 생태계서비스의 이해",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "니체, 인생을 말하다",
+        "subject": "▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a생태계 보호[生態系保護]▼0KSH2002040348▲",
+        "display": "생물종 다양성[生物種多樣性]",
+        "ddc": "577",
+        "title": "자연 그대로의 자연",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "니체",
+        "subject": "▼a자연(천연)[自然]▼0KSH1998039554▲; ▼a수기(글)[手記]▼0KSH2001003491▲",
+        "display": "자연(천연)[自然]",
+        "ddc": "577",
+        "title": "생각하는 대로 살아가기",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "피히테의 자아론",
+        "subject": "▼a생태계 교란 야생 생물[生態系攪亂野生生物]▼0KSH2018000033▲; ▼a외래 생물[外來生物]▼0KSH2019000239▲",
+        "display": "생태계 교란 야생 생물[生態系攪亂野生生物]",
+        "ddc": "577",
+        "title": "(2023년 지정) 유입주의 생물 150종",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a나치[Nazis]▼0KSH1999009708▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하이데거와 나치",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(2025) 자연생태복원기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "들길의 사상가, 하이데거",
+        "subject": "▼a국립 공원[國立公園]▼0KSH1998004147▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "국립 공원[國立公園]",
+        "ddc": "577",
+        "title": "2024 국립공원 생태계서비스 가치평가 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a격언[格言]▼0KSH1998008916▲; ▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "격언[格言]",
-        "ddc": "193",
-        "title": "진리는 미풍처럼 온다",
+        "subject": "▼a모니터링[monitoring]▼0KSH2000016969▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲",
+        "display": "모니터링[monitoring]",
+        "ddc": "577",
+        "title": "한국 생물다양성 관측 네트워크(K-BON) 운영 (2024)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "즐거운 학문",
+        "subject": "▼a절기(24절기)[節氣]▼0KSH1998000299▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲",
+        "display": "절기(24절기)[節氣]",
+        "ddc": "577",
+        "title": "만나보자 놀아보자 24절기",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(인생론 에세이)어떻게 살 것인가",
+        "subject": "▼a환경 정책[環境政策]▼0KSH1998042284▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "환경 정책[環境政策]",
+        "ddc": "577",
+        "title": "국가 생태계서비스 평가 II",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "사유란 무엇인가",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a기후 변화 대응[氣候變化對應]▼0KSH2005001156▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "기후변화영향평가 생태계 분야 검토 방법론 연구('24)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "냉소적 이성 비판",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "생태계 유형별 탄소-생물다양성 연계 평가 지표 개발('24)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "아름다움과 숭고함의 감정에 관한 고찰",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a온실 가스 배출[溫室--排出]▼0KSH2005005635▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "생태계 유형별 탄소 저장량 및 거동 산정 연구('24)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "유고(1885년 가을~1887년 가을)",
+        "subject": "▼a환경 정책[環境政策]▼0KSH1998042284▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "환경 정책[環境政策]",
+        "ddc": "577",
+        "title": "생태계서비스 평가 기반 정책 결정 지원 체계 수립('24)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "비극의 탄생·반시대적 고찰",
+        "subject": "▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a국가 사업[國家事業]▼0KSH2000006270▲",
+        "display": "생태계 조사[生態系調査]",
+        "ddc": "577",
+        "title": "2023년 국가장기생태연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "정신현상학",
+        "subject": "▼a절기(24절기)[節氣]▼0KSH1998000299▲; ▼a자연 생태계[自然生態系]▼0KSH2000020865▲",
+        "display": "절기(24절기)[節氣]",
+        "ddc": "577",
+        "title": "(절기따라 만나는) 생태이야기",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "이정표",
+        "subject": "▼a창덕궁[昌德宮]▼0KSH1999013923▲; ▼a생태·경관 보전 지역[生態景觀保全地域]▼0KSH2019000153▲",
+        "display": "창덕궁[昌德宮]",
+        "ddc": "577",
+        "title": "창덕궁 후원 생태·경관보전지역 정밀변화관찰 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(쇼펜하우어)철학에세이",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a지역 주민[地域住民]▼0KSH2002027990▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "(2023) 지역주민과 함께하는 생태계서비스평가",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "피히테 「지식학의 기초」",
+        "subject": "▼a스트레스(심리학)[stress]▼0KSH1998004371▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "스트레스(심리학)[stress]",
+        "ddc": "577",
+        "title": "숨 쉬는 것들은 어떻게든 진화한다",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "칼 마르크스",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "(2024) 자연생태복원기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쇼펜하우어 인생론",
+        "subject": "▼a생태계 교란 야생 생물[生態系攪亂野生生物]▼0KSH2018000033▲; ▼a외래 생물[外來生物]▼0KSH2019000239▲",
+        "display": "생태계 교란 야생 생물[生態系攪亂野生生物]",
+        "ddc": "577",
+        "title": "(2023년 지정) 유입주의 생물 150종",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "바이로이트의 리하르트 바그너",
+        "subject": "▼a생물 생태학[生物生態學]▼0KSH1999021618▲; ▼a자연 생태[自然生態]▼0KSH2002036500▲",
+        "display": "생물 생태학[生物生態學]",
+        "ddc": "577",
+        "title": "지금, 자연은",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "精神哲學的 歷史哲學에 對한 硏究",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "Conquest 자연생태복원(산업)기사 필기정복",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a생의 철학[生--哲學]▼0KSH2001009386▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "차라투스트라는 이렇게 말했다",
+        "subject": "▼a환경 정책[環境政策]▼0KSH1998042284▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "환경 정책[環境政策]",
+        "ddc": "577",
+        "title": "「제주형 생태계서비스지불제 도입에 따른 기본 계획 수립」 최종보고서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "세상을 보는 방법",
+        "subject": "▼a낙동강 하류 철새 도래지[洛東江下流--渡來地]▼0KSH2002019178▲; ▼a생태계 복원[生態系復原]▼0KSH2002019245▲",
+        "display": "낙동강 하류 철새 도래지[洛東江下流--渡來地]",
+        "ddc": "577",
+        "title": "생태계모니터링으로 살펴본 을숙도 및 낙동강둔치 복원사업지 평가",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "유고(1876년-1877/78년 겨울)",
+        "subject": "▼a환경 정책[環境政策]▼0KSH1998042284▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "환경 정책[環境政策]",
+        "ddc": "577",
+        "title": "2023 국가생태계서비스 평가보고서 발간을 위한 가이드라인",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하이데거 『이정표』",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a환경 정책[環境政策]▼0KSH1998042284▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "생태계 계정화",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "칸트에서 헤겔까지",
+        "subject": "▼a국립 공원[國立公園]▼0KSH1998004147▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "국립 공원[國立公園]",
+        "ddc": "577",
+        "title": "2023년 국립공원 생태계서비스 가치평가 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a생의 철학[生--哲學]▼0KSH2001009386▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "안티 크리스트",
+        "subject": "▼a생물종[生物種]▼0KSH2002018404▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "생물종[生物種]",
+        "ddc": "577",
+        "title": "전국자연환경조사 자료를 이용한 충북의 생물종 현황 및 정책 제언",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "정오의 그림자",
+        "subject": "▼a데이터베이스[database]▼0KSH1998001052▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲",
+        "display": "데이터베이스[database]",
+        "ddc": "577",
+        "title": "Ecobank 유지관리 및 활용연구(1차년도)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 관념론[獨逸觀念論]▼0KSH1999020313▲",
-        "display": "독일 관념론[獨逸觀念論]",
-        "ddc": "193",
-        "title": "객관적 관념론과 그 근거짓기",
+        "subject": "▼a유전 정보[遺傳情報]▼0KSH1998038978▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲",
+        "display": "유전 정보[遺傳情報]",
+        "ddc": "577",
+        "title": "자연기반해법 적용을 위한 생물다양성 정보분석(2023년)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a서양 철학[西洋哲學]▼0KSH1998028550▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "계몽의 변증법",
+        "subject": "▼a자연 생태계 조사[自然生態系調査]▼0KSH1998036165▲; ▼a생태 도감[生態圖鑑]▼0KSH2001025847▲",
+        "display": "자연 생태계 조사[自然生態系調査]",
+        "ddc": "577",
+        "title": "제6차 전국자연환경조사 지침서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "허버트 마르쿠제",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a온실 가스 배출[溫室--排出]▼0KSH2005005635▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "생태계 유형별 탄소 저장량 및 거동 산정 연구('23)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a생의 철학[生--哲學]▼0KSH2001009386▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "차라투스트라는 이렇게 말했다",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a오름(지형)▼0KSH2004021219▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "어승생오름, 자연을 걷다",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "한 권으로 보는 마르크스",
+        "subject": "▼a자연 생태계 조사[自然生態系調査]▼0KSH1998036165▲; ▼a생태 도감[生態圖鑑]▼0KSH2001025847▲",
+        "display": "자연 생태계 조사[自然生態系調査]",
+        "ddc": "577",
+        "title": "(2023) 시민참여 전국자연환경조사 화보집",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "아도르노와 자본주의적 우울",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a자연 생태 복원 기사[自然生態復原技士]▼0KSH2015000102▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "자연생태복원기사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "니체 「도덕의 계보」",
+        "subject": "▼a환경 문제[環境問題]▼0KSH1998043534▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "환경 문제[環境問題]",
+        "ddc": "577",
+        "title": "사계절 기억책",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "20세기 독일철학",
+        "subject": "▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "생태계 조사[生態系調査]",
+        "ddc": "577",
+        "title": "한강생태지도",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "니체, 디오니소스적 긍정의 철학",
+        "subject": "▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a국가 사업[國家事業]▼0KSH2000006270▲",
+        "display": "생태계 조사[生態系調査]",
+        "ddc": "577",
+        "title": "2022년 국가장기생태연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "칸트와 현대 사회 철학",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a환경 정책[環境政策]▼0KSH1998042284▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "(제1차) 국가 생태계서비스 평가",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a사상(주의)[思想]▼0KSH1998033872▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "미니마 모랄리아",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "강원도 생태계서비스지불제 활성화 방안 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "사랑을 위한 변명",
+        "subject": "▼a국립 공원[國立公園]▼0KSH1998004147▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "국립 공원[國立公園]",
+        "ddc": "577",
+        "title": "2022 국립공원 생태계서비스 가치평가 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a정신 철학[精神哲學]▼0KSH2001003897▲; ▼a헤겔 철학[--哲學]▼0KSH2001015663▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "헤겔 예나 시기 정신철학",
+        "subject": "▼a외래종[外來種]▼0KSH2004024416▲; ▼a외래 생물[外來生物]▼0KSH2019000239▲",
+        "display": "외래종[外來種]",
+        "ddc": "577",
+        "title": "생물다양성 보전을 위한 외래생물 관리체계 개선 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(아놀드 게엘렌의) 문화 철학",
+        "subject": "▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a국가 사업[國家事業]▼0KSH2000006270▲",
+        "display": "생태계 조사[生態系調査]",
+        "ddc": "577",
+        "title": "국가 장기생태연구 결과 데이터북",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "쇼펜하우어 세상을 향해 웃다",
+        "subject": "▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲; ▼a자원 보호 권역[資源保護圈域]▼0KSH2002036517▲",
+        "display": "생물종 다양성[生物種多樣性]",
+        "ddc": "577",
+        "title": "산림유전자원보호구역 생물다양성 보전 및 관리기반 구축",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "30분에 읽는 하이데거",
+        "subject": "▼a데이터베이스[database]▼0KSH1998001052▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲",
+        "display": "데이터베이스[database]",
+        "ddc": "577",
+        "title": "(내 손안에 생태계) 에코뱅크 활용 가이드북",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "헤겔 『대논리학』의 자기의식 이론",
+        "subject": "▼a평가 지표[評價指標]▼0KSH2002031946▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "평가 지표[評價指標]",
+        "ddc": "577",
+        "title": "생태계 서비스 평가지도 매뉴얼",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "오늘 우리는 왜 니체를 읽는가",
+        "subject": "▼a평가 지표[評價指標]▼0KSH2002031946▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "평가 지표[評價指標]",
+        "ddc": "577",
+        "title": "(2022) 생태계서비스 평가지도",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "차라투스트라는 이렇게 말했다",
+        "subject": "▼a유전 정보[遺傳情報]▼0KSH1998038978▲; ▼a생물종 다양성[生物種多樣性]▼0KSH2002020247▲",
+        "display": "유전 정보[遺傳情報]",
+        "ddc": "577",
+        "title": "자연기반해법 적용을 위한 생물다양성 정보 분석 및 변화 모니터링(2022년)",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "생존과 허무",
+        "subject": "▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a외래종[外來種]▼0KSH2004024416▲",
+        "display": "생물 생태[生物生態]",
+        "ddc": "577",
+        "title": "2022년 외래생물 전국 서식실태 조사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하버마스 『인식과 관심』",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "2022년 생태계교란 생물 모니터링",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(사라지지 않는 빛,) 사랑",
+        "subject": "▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a외래종[外來種]▼0KSH2004024416▲",
+        "display": "생물 생태[生物生態]",
+        "ddc": "577",
+        "title": "2022년 외래생물 정밀조사",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "동감의 본질과 형태들",
+        "subject": "▼a비무장 지대[非武裝地帶]▼0KSH1998001151▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "비무장 지대[非武裝地帶]",
+        "ddc": "577",
+        "title": "생태로 만나는 디엠지 이야기",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하이데거 『철학에의 기여』",
+        "subject": "▼a자연 생태계 조사[自然生態系調査]▼0KSH1998036165▲; ▼a생태 도감[生態圖鑑]▼0KSH2001025847▲",
+        "display": "자연 생태계 조사[自然生態系調査]",
+        "ddc": "577",
+        "title": "(2022) 시민참여 전국자연환경조사 화보집",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "칸트 철학에의 초대",
+        "subject": "▼a야생 동물[野生動物]▼0KSH1998029711▲; ▼a도시 환경[都市環境]▼0KSH2001003194▲",
+        "display": "야생 동물[野生動物]",
+        "ddc": "577",
+        "title": "어쩌다 숲",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "칸트 『윤리형이상학 정초』",
+        "subject": "▼a자연(천연)[自然]▼0KSH1998039554▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "자연(천연)[自然]",
+        "ddc": "577",
+        "title": "생명의 태피스트리",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "헤겔에서 니체로",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a자연(천연)[自然]▼0KSH1998039554▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "야생 쪽으로",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "(쇼펜하우어) 진실",
+        "subject": "▼a평가 지표[評價指標]▼0KSH2002031946▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "평가 지표[評價指標]",
+        "ddc": "577",
+        "title": "(2021) 생태계서비스 평가지도",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "셸링 『철학의 원리로서의 자아』",
+        "subject": "▼a절기(24절기)[節氣]▼0KSH1998000299▲; ▼a자연 생태계[自然生態系]▼0KSH2000020865▲",
+        "display": "절기(24절기)[節氣]",
+        "ddc": "577",
+        "title": "(절기따라 만나는) 생태이야기",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하이데거와 기독교",
+        "subject": "▼a조경(예술)[造景]▼0KSH1998013742▲; ▼a도시 조경[都市造景]▼0KSH2006000554▲",
+        "display": "조경(예술)[造景]",
+        "ddc": "577",
+        "title": "생태복원 식물소재 및 식생복원론",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "물화",
+        "subject": "▼a생물권[生物圈]▼0KSH2000028983▲; ▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲",
+        "display": "생물권[生物圈]",
+        "ddc": "577",
+        "title": "생물권보전지역과 평화 워크숍 결과보고서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "비판과 화해",
+        "subject": "▼a생물권[生物圈]▼0KSH2000028983▲; ▼a생태계 보전 지역[生態系保全地域]▼0KSH2001003419▲",
+        "display": "생물권[生物圈]",
+        "ddc": "577",
+        "title": "유네스코 인간과 생물권(MAB) 50주년 기념식 및 심포지엄",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a프랑크푸르트 학파[--學派]▼0KSH2004022000▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "도구적 이성 비판",
+        "subject": "▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a마이크로바이옴[microbiome]▼0KSH2020000183▲",
+        "display": "생물 생태[生物生態]",
+        "ddc": "577",
+        "title": "생물유래 환경문제 대응 마이크로바이옴 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a현대 철학[現代哲學]▼0KSH2002027908▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하버마스의 현대성 주장과 보편적 합리성 문제",
+        "subject": "▼a국립 공원[國立公園]▼0KSH1998004147▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "국립 공원[國立公園]",
+        "ddc": "577",
+        "title": "2021 국립공원 생태계서비스 가치평가 연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "존재와 시간",
+        "subject": "▼a생태계 조사[生態系調査]▼0KSH1998036164▲; ▼a국가 사업[國家事業]▼0KSH2000006270▲",
+        "display": "생태계 조사[生態系調査]",
+        "ddc": "577",
+        "title": "제2차 국가장기생태연구",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "짜라투스트라는 이렇게 말했다",
+        "subject": "▼a생태계[生態系]▼0KSH1998036163▲; ▼a환경 정책[環境政策]▼0KSH1998042284▲",
+        "display": "생태계[生態系]",
+        "ddc": "577",
+        "title": "국제협력을 통한 생태정책 대응연구('21)",
         "type": "biblio"
     },
     {
-        "subject": "▼a형식 주의 윤리학[形式主義倫理學]▼0KSH1998004929▲; ▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "형식 주의 윤리학[形式主義倫理學]",
-        "ddc": "193",
-        "title": "칸트 윤리학과 형식주의",
+        "subject": "▼a데이터베이스[database]▼0KSH1998001052▲; ▼a생태계 조사[生態系調査]▼0KSH1998036164▲",
+        "display": "데이터베이스[database]",
+        "ddc": "577",
+        "title": "Ecobank 3단계 1차년도 구축",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "니체, 생명과 치유의 철학",
+        "subject": "▼a생태[生態]▼0KSH2002018405▲; ▼a생태계 서비스[生態系--]▼0KSH2018000024▲",
+        "display": "생태[生態]",
+        "ddc": "577",
+        "title": "(비대면 시민참여평가를 활용한) 지역 생태자산 평가 매뉴얼",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "아도르노 『부정변증법』",
+        "subject": "▼a산림[山林]▼0KSH1998043076▲; ▼a생태[生態]▼0KSH2002018405▲",
+        "display": "산림[山林]",
+        "ddc": "577",
+        "title": "숲과 생태를 위한 어린이콘텐츠",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a칸트 철학[--哲學]▼0KSH2000027758▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "칸트의 철학 개념",
+        "subject": "▼a모니터링[monitoring]▼0KSH2000016969▲; ▼a자연 생태계[自然生態系]▼0KSH2000020865▲",
+        "display": "모니터링[monitoring]",
+        "ddc": "577",
+        "title": "2020년 내성천 유역 자연생태계 모니터링",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "에른스트 블로흐와 희망의 원리",
+        "subject": "▼a비무장 지대[非武裝地帶]▼0KSH1998001151▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "비무장 지대[非武裝地帶]",
+        "ddc": "577",
+        "title": "DMZ를 보고합니다",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a철학적 인간학[哲學的人間學]▼0KSH2003005631▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "역사 속의 인간",
+        "subject": "▼a비무장 지대[非武裝地帶]▼0KSH1998001151▲; ▼a생물 생태[生物生態]▼0KSH2002040102▲",
+        "display": "비무장 지대[非武裝地帶]",
+        "ddc": "577",
+        "title": "생태의 시대와 DMZ",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "칸트의 인간관과 인식존재론",
+        "subject": "▼a생태학[生態學]▼0KSH1998016220▲; ▼a생태 관광[生態觀光]▼0KSH2006001844▲",
+        "display": "생태학[生態學]",
+        "ddc": "577",
+        "title": "(바람, 물, 자연이 있는) 생태관광",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲; ▼a실존 주의[實存主義]▼0KSH1998035235▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "Heidegger의 세계개념에 대한 해석학적 연구",
+        "subject": "▼a산맥[山脈]▼0KSH1998025737▲; ▼a생물 생태학[生物生態學]▼0KSH1999021618▲",
+        "display": "산맥[山脈]",
+        "ddc": "577",
+        "title": "한국정맥의 이해",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "모나드론 외",
+        "subject": "▼a생물 생태[生物生態]▼0KSH2002040102▲; ▼a외래종[外來種]▼0KSH2004024416▲",
+        "display": "생물 생태[生物生態]",
+        "ddc": "577",
+        "title": "(2021년) 외래생물 전국 서식실태 조사 지침서",
         "type": "biblio"
     },
     {
-        "subject": "▼a철학(사상)[哲學]▼0KSH1998000547▲; ▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "철학(사상)[哲學]",
-        "ddc": "193",
-        "title": "비극의 탄생",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a사후 관리[事後管理]▼0KSH2002039294▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "생태복원 사후관리 기술개발 실증화(test-bed) 최종보고서",
         "type": "biblio"
     },
     {
-        "subject": "▼a독일 철학[獨逸哲學]▼0KSH1998017275▲",
-        "display": "독일 철학[獨逸哲學]",
-        "ddc": "193",
-        "title": "하이데거와 로고스",
+        "subject": "▼a생태계 복원[生態系復原]▼0KSH2002019245▲; ▼a사후 관리[事後管理]▼0KSH2002039294▲",
+        "display": "생태계 복원[生態系復原]",
+        "ddc": "577",
+        "title": "훼손 유형별 생태복원사업 모델 개발 및 평가 체계 구축 사후관리 기술개발 최종보고서",
         "type": "biblio"
     }
 ]
