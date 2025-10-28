@@ -1,5 +1,71 @@
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-10-28 (세션 3): HTML 뷰어 자동 테이블 감지 및 Dewey 탭 지원
+
+- **HTML 보기 기능 개선: 포커스/선택된 테이블 자동 감지**
+  - **배경**: Gemini DDC 분류 탭(2개 테이블), KSH Local 탭(2개 테이블)에서 "표시할 데이터가 없습니다" 오류 발생
+  - **문제**: `current_dataframe`이 업데이트되지 않음
+
+- **해결 방법**:
+  1. **각 탭에서 `current_dataframe` 업데이트** (Option 1 선택)
+     - Gemini 탭: 최종 결과를 `current_dataframe`에 저장, 중간 결과를 `intermediate_dataframe`에 저장
+     - KSH Local 탭: 상단 개념 DB를 `current_dataframe`에, 하단 서지 DB를 `biblio_dataframe`에 저장
+
+  2. **포커스/선택된 테이블 자동 감지 로직 구현** (`qt_base_tab.py`)
+     - `_get_active_table_data()` 메서드 추가 - 현재 활성화된 테이블을 지능적으로 감지
+     - **감지 우선순위**:
+       1. 포커스된 테이블 (`QApplication.focusWidget()`)
+       2. 선택된 행이 있는 테이블 (`selectionModel().hasSelection()`)
+       3. 기본 테이블 (`table_view`)
+     - `_get_dataframe_from_model()` 메서드 추가 - 모델에서 DataFrame 추출
+     - **효과**: 사용자가 클릭한 테이블이 자동으로 HTML 뷰어에 표시됨
+
+- **Gemini DDC 분류 탭** (`qt_TabView_Gemini.py` v2.2.7)
+  - `on_search_completed()`에서 `current_dataframe` 업데이트 추가
+  - `_on_intermediate_rows()`에서 `intermediate_dataframe` 업데이트 추가
+  - `on_clear_results()`에서 두 DataFrame 모두 초기화
+  - `__init__()`에서 `intermediate_dataframe` 초기화
+  - LC Catalog 링크 URL 변경:
+    - Before: `https://lccn.loc.gov/search/?q=813.6&format=web`
+    - After: `https://search.catalog.loc.gov/search?option=advanced&pageNumber=1&query=keyword%20containsAll%20%22813.6%22&recordsPerPage=25`
+  - 순위 개수 표시 수정: "전체 설명" 행을 제외한 실제 순위만 카운트
+
+- **KSH Local 탭** (`qt_TabView_KSH_Local.py` v2.2.1)
+  - `on_search_completed()`에서 `current_dataframe`/`biblio_dataframe` 업데이트
+  - `_on_title_search_completed()`에서 `biblio_dataframe` 업데이트
+  - `_on_biblio_search_completed()`에서 `biblio_dataframe` 업데이트
+
+- **Dewey 탭 HTML 보기 기능 추가** (`qt_TabView_Dewey.py` v4.3.2)
+  - "HTML로 보기" 버튼 추가 (연동검색 ON 버튼과 API 설정 버튼 사이)
+  - `setup_connections()`에서 `column_keys` 설정 추가
+  - `qt_dewey_logic.py` v4.3.2:
+    - `_on_ksh_search_completed()`에서 `current_dataframe` 업데이트 추가
+    - `import pandas as pd` 추가
+
+- **BaseSearchTab** (`qt_base_tab.py` v3.0.2)
+  - `_get_active_table_data()` 메서드 신규 추가
+  - `_get_dataframe_from_model()` 메서드 신규 추가
+  - `show_html_viewer()` 메서드 수정 - 포커스/선택된 테이블 자동 감지
+
+- **Gemini 검색 로직 버그 수정** (`Search_Gemini.py`)
+  - `_fallback_hierarchy_from_text()` 반환 구조 수정
+  - Before: `{"broad": ["키워드"], ...}` (리스트)
+  - After: `{"broad": {"korean": ["키워드"], "english": []}, ...}` (딕셔너리)
+  - `AttributeError: 'list' object has no attribute 'get'` 오류 해결
+
+- **교훈**:
+  - 여러 테이블을 가진 탭에서는 포커스/선택 상태를 추적하여 사용자 의도를 파악해야 함
+  - DataFrame을 별도 변수에 저장해두면 HTML 뷰어/CSV 추출 등 다양한 기능에 재사용 가능
+  - CSV 저장 기능은 HTML 뷰어에 이미 구현되어 있으므로 중복 구현 불필요
+
+- **수정 파일**:
+  - `qt_TabView_Gemini.py` v2.2.7
+  - `qt_TabView_KSH_Local.py` v2.2.1
+  - `qt_TabView_Dewey.py` v4.3.2
+  - `qt_dewey_logic.py` v4.3.2
+  - `qt_base_tab.py` v3.0.2
+  - `Search_Gemini.py`
+
 ### 2025-10-28 (세션 2): 트리메뉴 모드 스타일 적용 및 테마 전환 문제 해결
 
 - **⚠️ 중요 패턴: 인라인 스타일과 테마 전환 문제**

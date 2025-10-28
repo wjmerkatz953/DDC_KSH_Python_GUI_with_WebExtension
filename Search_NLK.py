@@ -2,11 +2,7 @@
 # 파일명: Search_NLK.py
 # Version: v6.0.0 (Refactored)
 # 수정일시: 2025-09-20 KST
-# 설명: NLK OpenAPI 통합 검색 모듈. Search_UPenn.py 스타일의 계층적 구조로 리팩토링됨.
-
-# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
-from ssl_cert_utils import configure_ssl_certificates
-configure_ssl_certificates()
+# 설명: NLK OpenAPI 통합 검색 모듈. Search_UPenn.py 스타일의 계층적 구조로 리팩토링됨 by Gemini 2.5 Pro
 
 import requests
 import xml.etree.ElementTree as ET
@@ -15,6 +11,12 @@ import time
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from qt_api_clients import clean_text
+
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+
+configure_ssl_certificates()
+
 
 # ==============================================================================
 # 🎯 1. 설정 및 예외 클래스 (중앙 집중 관리)

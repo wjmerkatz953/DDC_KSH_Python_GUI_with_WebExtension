@@ -427,6 +427,78 @@ TAB_CONFIGURATIONS = {
 }
 
 
+# Define the TABS attribute to provide tab configurations
+TABS = [
+    {
+        "tab_name": "Dewey",
+        "file": "qt_TabView_Dewey.py",
+        "group": "Classification",
+        "icon": "📚",
+    },
+    {
+        "tab_name": "KSH Local",
+        "file": "qt_TabView_KSH_Local.py",
+        "group": "Local",
+        "icon": "📂",
+    },
+    {
+        "tab_name": "Global",
+        "file": "qt_TabView_Global.py",
+        "group": "Integration",
+        "icon": "🌐",
+    },
+    {
+        "tab_name": "Legal Deposit",
+        "file": "qt_TabView_LegalDeposit.py",
+        "group": "Legal",
+        "icon": "⚖️",
+    },
+    {
+        "tab_name": "MARC Editor",
+        "file": "qt_TabView_MARC_Editor.py",
+        "group": "Editing",
+        "icon": "✏️",
+    },
+    # Extend the TABS attribute to include all relevant tabs from the project
+    {
+        "tab_name": "Gemini",
+        "file": "qt_TabView_Gemini.py",
+        "group": "Classification",
+        "icon": "🔮",
+    },
+    {
+        "tab_name": "Settings",
+        "file": "qt_TabView_Settings.py",
+        "group": "Configuration",
+        "icon": "⚙️",
+    },
+    {
+        "tab_name": "MARC Extractor",
+        "file": "qt_TabView_MARC_Extractor.py",
+        "group": "Extraction",
+        "icon": "📄",
+    },
+    {
+        "tab_name": "NDL",
+        "file": "qt_TabView_NDL.py",
+        "group": "Integration",
+        "icon": "📘",
+    },
+    {
+        "tab_name": "Western",
+        "file": "qt_TabView_Western.py",
+        "group": "Integration",
+        "icon": "🌍",
+    },
+    {
+        "tab_name": "AI Feed",
+        "file": "qt_TabView_AIFeed.py",
+        "group": "AI",
+        "icon": "🤖",
+    },
+]
+
+
 # ----------------------------------------
 # (선택) column_map 유효성 간단 검사
 # ----------------------------------------
@@ -440,7 +512,8 @@ def _validate_column_maps(tab_configs: dict):
         for i, pair in enumerate(cmap):
             if (not isinstance(pair, (list, tuple))) or len(pair) != 2:
                 raise ValueError(
-                    f"[{key}] column_map[{i}]는 (data_key, header) 2-튜플이어야 합니다: {pair}"
+                    f"[{key}] column_map[{i}]는 (data_key, header) 2-튜플이어야 합니다: "
+                    f"{pair}"
                 )
             data_key, header = pair
             if not isinstance(data_key, str) or not isinstance(header, str):

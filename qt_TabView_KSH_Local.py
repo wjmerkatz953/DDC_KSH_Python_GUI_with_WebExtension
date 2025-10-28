@@ -1,11 +1,17 @@
 ﻿# -*- coding: utf-8 -*-
 # 파일명: qt_TabView_KSH_Local.py
 # 설명: KSH Local DB 검색 탭 (상단: 개념 DB, 하단: 서지 DB)
-# 버전: 2.2.0 - QSplitter 자동 저장/복구 기능 추가
+# 버전: 2.2.1 - HTML 뷰어 지원을 위한 DataFrame 저장
 # 생성일: 2025-09-30
-# 수정일: 2025-10-18
+# 수정일: 2025-10-28
 #
 # 변경 이력:
+# v2.2.1 (2025-10-28)
+# - [기능 추가] HTML 뷰어 지원을 위한 DataFrame 저장
+#   : on_search_completed()에서 current_dataframe/biblio_dataframe 업데이트
+#   : _on_title_search_completed()에서 biblio_dataframe 업데이트
+#   : _on_biblio_search_completed()에서 biblio_dataframe 업데이트
+#
 # v2.2.0 (2025-10-18)
 # - [기능 추가] QSplitter 자동 저장/복구 기능 추가
 #   : self.results_splitter가 이미 인스턴스 변수로 정의되어 있어 추가 수정 불필요

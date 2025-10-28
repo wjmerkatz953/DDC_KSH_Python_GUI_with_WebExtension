@@ -1,12 +1,12 @@
 # 파일: qt_TabView_Gemini.py
-# 버전: v2.2.6
-# 수정일: 2025-10-28 - 탭 생성 시점에도 최신 테마 적용되도록 수정
+# 버전: v2.2.7
+# 수정일: 2025-10-28 - HTML 뷰어 지원 및 LC Catalog URL 변경
 
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_Gemini.py
 # 설명: Gemini 기반 계층적 DDC 분류 탭 (BaseSearchTab 상속 최종 버전)
-# 버전: v2.2.6
-# 수정: 2025-10-28 - create_input_section()에서 UI_CONSTANTS를 지역 import로 수정
+# 버전: v2.2.7
+# 수정: 2025-10-28 - HTML 뷰어를 위한 DataFrame 저장 및 LC Catalog URL 변경
 #       - [문제] 모듈 최상단에서 import한 U는 모듈 로드 시점(Dark 테마)의 값으로 고정됨
 #       - [해결] 함수 내에서 `from ui_constants import UI_CONSTANTS as U_CURRENT`로 최신 값 가져옴
 #       - [효과] 앱 시작 시 Light 테마로 로드되어도 정확한 색상 적용됨
