@@ -210,10 +210,11 @@ class SearchGemini:
                 )
             ]
             technical = tech_guess[:3] if tech_guess else ranked[7:10]
+            # ✅ [수정] 새로운 구조에 맞게 딕셔너리 형태로 반환
             return {
-                "broad": broad or ["일반"],
-                "specific": specific or broad or ["일반"],
-                "technical": technical or specific or broad or ["일반"],
+                "broad": {"korean": broad or ["일반"], "english": []},
+                "specific": {"korean": specific or broad or ["일반"], "english": []},
+                "technical": {"korean": technical or specific or broad or ["일반"], "english": []},
             }
 
         def _norm_list(v) -> list[str]:
@@ -288,16 +289,8 @@ class SearchGemini:
         all_empty = all(not (v["korean"] or v["english"]) for v in hierarchy.values())
         if all_empty:
             logging.warning("[Gemini] 파싱 결과가 비어 있어 폴백 사용")
-            fallback = _fallback_hierarchy_from_text(bundle_text)
-            # fallback은 구조가 다르므로 변환
-            hierarchy = {
-                "broad": {"korean": fallback.get("broad", [])[:5], "english": []},
-                "specific": {"korean": fallback.get("specific", [])[:5], "english": []},
-                "technical": {
-                    "korean": fallback.get("technical", [])[:5],
-                    "english": [],
-                },
-            }
+            # ✅ [수정] fallback이 이미 올바른 구조를 반환하므로 직접 사용
+            hierarchy = _fallback_hierarchy_from_text(bundle_text)
 
         return hierarchy
 

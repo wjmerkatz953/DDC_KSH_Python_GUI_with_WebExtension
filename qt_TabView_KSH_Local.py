@@ -408,6 +408,12 @@ class QtKSHLocalSearchTab(BaseSearchTab):
                     None,
                 )
 
+            # ✅ [핵심 추가] HTML 뷰어/추출 기능을 위해 current_dataframe 업데이트
+            # 상단 개념 DB를 기본으로 설정 (나중에 포커스된 테이블로 자동 전환 가능)
+            self.current_dataframe = df_concepts.copy() if not df_concepts.empty else pd.DataFrame()
+            # ✅ [추가] 하단 서지 DB도 별도 변수에 저장
+            self.biblio_dataframe = df_biblio.copy() if not df_biblio.empty else pd.DataFrame()
+
             # 상단 개념 DB 테이블 업데이트
             self.table_model.clear_data()
             if not df_concepts.empty:
@@ -587,6 +593,11 @@ class QtKSHLocalSearchTab(BaseSearchTab):
         self.animation.setEasingCurve(QEasingCurve.InOutCubic)
         self.animation.start()
 
+        # ✅ [추가] HTML 뷰어/추출 기능을 위해 biblio_dataframe 업데이트
+        self.biblio_dataframe = df_biblio.copy() if df_biblio is not None and not df_biblio.empty else pd.DataFrame()
+        # ✅ [추가] 제목 검색 시 상단은 비움
+        self.current_dataframe = pd.DataFrame()
+
         # 하단 서지 테이블만 업데이트
         self.biblio_model.clear_data()
         if df_biblio is not None and not df_biblio.empty:
@@ -689,6 +700,9 @@ class QtKSHLocalSearchTab(BaseSearchTab):
         self.biblio_search_thread.start()
 
     def _on_biblio_search_completed(self, df_biblio):
+        # ✅ [추가] HTML 뷰어/추출 기능을 위해 biblio_dataframe 업데이트
+        self.biblio_dataframe = df_biblio.copy() if df_biblio is not None and not df_biblio.empty else pd.DataFrame()
+
         self.biblio_model.clear_data()
         if df_biblio is not None and not df_biblio.empty:
             records = df_biblio.to_dict("records")

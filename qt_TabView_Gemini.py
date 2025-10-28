@@ -115,8 +115,9 @@ class GeminiWorker(QThread):
                 if not ddc_number or str(ddc_number).lower() in ["nan", "n/a", "none"]:
                     ddc_number = ""
 
+                # ✅ [수정] LC Catalog 고급 검색 URL로 변경
                 lc_link = (
-                    f"https://lccn.loc.gov/search/?q={ddc_number}&format=web"
+                    f'https://search.catalog.loc.gov/search?option=advanced&pageNumber=1&query=keyword%20containsAll%20%22{ddc_number}%22&recordsPerPage=25'
                     if ddc_number
                     else ""
                 )
@@ -147,6 +148,8 @@ class QtGeminiTab(BaseSearchTab):
     def __init__(self, config, app_instance):
         super().__init__(config, app_instance)
         self.worker = None
+        # ✅ [추가] 중간 결과 DataFrame 초기화
+        self.intermediate_dataframe = pd.DataFrame()
         # progress_bar를 항상 보이도록 설정
         if hasattr(self, "progress_bar"):
             self.progress_bar.setVisible(False)
@@ -420,7 +423,12 @@ class QtGeminiTab(BaseSearchTab):
         # 결과가 DataFrame인지 확인
         if result_df is None or (hasattr(result_df, "empty") and result_df.empty):
             self.status_label.setText("DDC 분류 결과가 없습니다.")
+            # ✅ [추가] current_dataframe 초기화
+            self.current_dataframe = pd.DataFrame()
             return
+
+        # ✅ [핵심 추가] HTML 뷰어/추출 기능을 위해 current_dataframe 업데이트
+        self.current_dataframe = result_df.copy()
 
         # 하단 테이블에 결과 표시
         self.table_model.clear_data()
@@ -437,9 +445,13 @@ class QtGeminiTab(BaseSearchTab):
             column_headers=self.column_headers,
         )
 
-        self.status_label.setText(f"✅ DDC 분류 완료 - {len(result_df)}개 추천")
+        # ✅ [수정] "전체 설명" 행을 제외한 실제 순위 개수만 표시
+        # "순위" 컬럼에서 "순위"로 끝나는 행만 카운트 (예: "1순위", "2순위", ...)
+        ranking_count = len(result_df[result_df['순위'].astype(str).str.endswith('순위')]) if '순위' in result_df.columns else len(result_df)
+
+        self.status_label.setText(f"✅ DDC 분류 완료 - {ranking_count}개 추천")
         self.app_instance.log_message(
-            f"✅ Gemini DDC 분류 완료: {len(result_df)}개 결과", "INFO"
+            f"✅ Gemini DDC 분류 완료: {ranking_count}개 추천", "INFO"
         )
 
     def on_search_failed(self, error_message):
@@ -459,6 +471,9 @@ class QtGeminiTab(BaseSearchTab):
         self.inter_model.clear_data()
         if self.table_model:
             self.table_model.clear_data()
+        # ✅ [추가] DataFrame도 초기화
+        self.intermediate_dataframe = pd.DataFrame()
+        self.current_dataframe = pd.DataFrame()
         # ❌ self.intermediate_group.setVisible(False) 제거
         self.status_label.setText("결과가 지워졌습니다.")
 
@@ -507,12 +522,17 @@ class QtGeminiTab(BaseSearchTab):
 
         if self.inter_model.rowCount() > 0:
             df = pd.DataFrame(rows)
+            # ✅ [추가] HTML 뷰어/추출 기능을 위해 intermediate_dataframe 저장
+            self.intermediate_dataframe = df.copy()
             adjust_qtableview_columns(
                 table_view=self.inter_table,
                 current_dataframe=df,
                 column_keys=self.intermediate_column_keys,
                 column_headers=self.intermediate_column_headers,
             )
+        else:
+            # ✅ [추가] 데이터가 없을 때 빈 DataFrame으로 초기화
+            self.intermediate_dataframe = pd.DataFrame()
 
     def _stop_worker_if_running(self):
         if self.worker and self.worker.isRunning():
