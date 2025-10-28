@@ -118,7 +118,7 @@ def get_app_stylesheet():
         border: none;
     }}
     QGroupBox::title {{
-        top: 0px; /* 이 항목의 값을 올리면 title 텍스트가 아래로 내려감 */
+        top: 1px; /* 이 항목의 값을 올리면 title 텍스트가 아래로 내려감 */
         padding-left: 2px;
         padding-right: 2px;
         margin-bottom: 0px;
