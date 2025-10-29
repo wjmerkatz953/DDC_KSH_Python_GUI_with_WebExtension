@@ -92,6 +92,25 @@ _TAIL_PAREN_RE = _re.compile(
     r"[\(\[\{（［｛〔【][^)\]\}）］｝〕】]*[\)\]\}）］｝〕】]\s*$"
 )
 
+# ================================
+# 스키마 상수화 & 레코드 팩토리
+# ================================
+SCHEMA_FIELDS: tuple[str, ...] = (
+    "검색소스", "서명", "저자",
+    "분류 정보 취합", "저자소개", "목차", "서평",
+    "ISBN", "출판사", "출간일", "가격", "링크",
+)
+
+_DEFAULT_RECORD: dict[str, str] = {k: "" for k in SCHEMA_FIELDS}
+
+def make_record(**kwargs):
+    rec = _DEFAULT_RECORD.copy()
+    for k, v in kwargs.items():
+        if k not in _DEFAULT_RECORD:
+            raise KeyError(f"정의되지 않은 필드: {k}")
+        rec[k] = v
+    return rec
+
 # ============================================================
 # ISBN 정규화 유틸리티 (모듈 전역)
 # ============================================================
@@ -484,20 +503,12 @@ def get_naver_api_credentials(db_manager):
 
 def _create_error_record(error_type, error_msg, search_type, primary_query):
     """표준화된 오류 레코드를 생성합니다."""
-    return {
-        "서명": error_type,
-        "저자": "",
-        "출판사": "",
-        "출간일": "",
-        "ISBN": primary_query if "ISBN" in search_type else "",
-        "가격": "",
-        "서평": error_msg,
-        "분류 정보 취합": "",
-        "저자소개": "",
-        "목차": "",
-        "검색소스": search_type,
-        "링크": "",
-    }
+    return make_record(
+        검색소스=search_type,
+        서명=error_type,
+        서평=error_msg,
+        ISBN=primary_query if "ISBN" in search_type else "",
+    )
 
 def _validate_search_input(title_query, author_query, isbn_query, app_instance=None):
     """검색어 유효성을 검사합니다."""
@@ -588,12 +599,22 @@ def _parse_naver_api_response(response_text, search_type, primary_query, app_ins
                     if pubdate and pubdate != "정보 없음" and len(pubdate) == 8 and pubdate.isdigit():
                         pubdate = f"{pubdate[:4]}-{pubdate[4:6]}-{pubdate[6:8]}"
 
-                    naver_record = {
-                        "검색소스": "Naver", "서명": title, "저자": author,
-                        "분류 정보 취합": description, "저자소개": "", "목차": "",
-                        "서평": description, "ISBN": isbn, "출판사": publisher,
-                        "출간일": pubdate, "가격": price, "링크": link,
-                    }
+                    naver_record = make_record(
+                        **{
+                            "검색소스": "Naver",
+                            "서명": title,
+                            "저자": author,
+                            "분류 정보 취합": description,
+                            "저자소개": "",
+                            "목차": "",
+                            "서평": description,
+                            "ISBN": isbn,
+                            "출판사": publisher,
+                            "출간일": pubdate,
+                            "가격": price,
+                            "링크": link,
+                        }
+                    )
                     results.append(naver_record)
                     if app_instance:
                          app_instance.log_message(
@@ -670,12 +691,22 @@ def _process_scraped_data(naver_record, yes24_info, kyobo_info):
     if toc_y24: review_parts_y24.append(f"2. 목차\n{toc_y24}")
     if review_y24: review_parts_y24.append(f"3. 서평\n{review_y24}")
 
-    yes24_record = {
-        **base_info, "검색소스": "Yes24",
-        "분류 정보 취합": "\n\n".join(review_parts_y24),
-        "저자소개": author_intro_y24, "목차": toc_y24, "서평": review_y24,
-        "링크": link_y24,
-    }
+    yes24_record = make_record(
+        **{
+            "검색소스": "Yes24",
+            "서명": base_info.get("서명", ""),
+            "저자": base_info.get("저자", ""),
+            "분류 정보 취합": "\n\n".join(review_parts_y24),
+            "저자소개": author_intro_y24,
+            "목차": toc_y24,
+            "서평": review_y24,
+            "ISBN": base_info.get("ISBN", ""),
+            "출판사": base_info.get("출판사", ""),
+            "출간일": base_info.get("출간일", ""),
+            "가격": base_info.get("가격", ""),
+            "링크": link_y24,
+        }
+    )
     processed_results.append(yes24_record)
 
     # 2. Kyobo 레코드 생성
@@ -688,12 +719,22 @@ def _process_scraped_data(naver_record, yes24_info, kyobo_info):
     if toc_kb: review_parts_kb.append(f"2. 목차\n{toc_kb}")
     if review_kb: review_parts_kb.append(f"3. 서평\n{review_kb}")
 
-    kyobo_record = {
-        **base_info, "검색소스": "Kyobo Book",
-        "분류 정보 취합": "\n\n".join(review_parts_kb),
-        "저자소개": author_intro_kb, "목차": toc_kb, "서평": review_kb,
-        "링크": link_kb,
-    }
+    kyobo_record = make_record(
+        **{
+            "검색소스": "Kyobo Book",
+            "서명": base_info.get("서명", ""),
+            "저자": base_info.get("저자", ""),
+            "분류 정보 취합": "\n\n".join(review_parts_kb),
+            "저자소개": author_intro_kb,
+            "목차": toc_kb,
+            "서평": review_kb,
+            "ISBN": base_info.get("ISBN", ""),
+            "출판사": base_info.get("출판사", ""),
+            "출간일": base_info.get("출간일", ""),
+            "가격": base_info.get("가격", ""),
+            "링크": link_kb,
+        }
+    )
     processed_results.append(kyobo_record)
 
     # 3. AI-Feed Merge 레코드 생성 (길이 우선 병합)
@@ -710,12 +751,22 @@ def _process_scraped_data(naver_record, yes24_info, kyobo_info):
     if merged_toc: merged_parts.append(f"2. 목차\n{merged_toc}")
     if merged_review: merged_parts.append(f"3. 서평\n{merged_review}")
 
-    merged_record = {
-        **base_info, "검색소스": "AI-Feed Merge",
-        "분류 정보 취합": "\n\n".join(merged_parts).strip(),
-        "저자소개": merged_author, "목차": merged_toc, "서평": merged_review,
-        "링크": merged_link,
-    }
+    merged_record = make_record(
+        **{
+            "검색소스": "AI-Feed Merge",
+            "서명": base_info.get("서명", ""),
+            "저자": base_info.get("저자", ""),
+            "분류 정보 취합": "\n\n".join(merged_parts).strip(),
+            "저자소개": merged_author,
+            "목차": merged_toc,
+            "서평": merged_review,
+            "ISBN": base_info.get("ISBN", ""),
+            "출판사": base_info.get("출판사", ""),
+            "출간일": base_info.get("출간일", ""),
+            "가격": base_info.get("가격", ""),
+            "링크": merged_link,
+        }
+    )
     processed_results.append(merged_record)
 
     # 4. OtherWorks Merge 레코드 생성
@@ -735,11 +786,22 @@ def _process_scraped_data(naver_record, yes24_info, kyobo_info):
     groups = extract_other_works_grouped(author_blocks, base_info.get("서명", ""))
     if groups:
         pattern_text = render_other_works_grouped(groups, author_names or None)
-        otherworks_record = {
-            **base_info, "검색소스": "OtherWorks Merge",
-            "분류 정보 취합": pattern_text, "저자소개": "", "목차": "", "서평": "",
-            "링크": merged_link,
-        }
+        otherworks_record = make_record(
+            **{
+                "검색소스": "OtherWorks Merge",
+                "서명": base_info.get("서명", ""),
+                "저자": base_info.get("저자", ""),
+                "분류 정보 취합": pattern_text,
+                "저자소개": "",
+                "목차": "",
+                "서평": "",
+                "ISBN": base_info.get("ISBN", ""),
+                "출판사": base_info.get("출판사", ""),
+                "출간일": base_info.get("출간일", ""),
+                "가격": base_info.get("가격", ""),
+                "링크": merged_link,
+            }
+        )
         processed_results.append(otherworks_record)
 
     return processed_results
