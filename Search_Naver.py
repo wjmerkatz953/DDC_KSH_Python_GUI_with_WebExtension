@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
-# Version: v1.1.1
+# Version: v1.2.0
 # 생성일시: 2025-08-10 KST (GAS 네이버 API 로직을 파이썬으로 포팅)
 # 수정일시: 2025-10-29 KST
 """
 Search_Naver.py - 네이버 검색을 위한 하이브리드 도서 정보 수집 모듈
 
 [변경 이력]
+v1.2.0 (2025-10-29)
+- [개선] 네트워크 탄력성 강화: 단일 재시도 + 지수 백오프 로직 추가
+  - 429/503 응답 및 타임아웃 시 자동 재시도 (0.6~1.2초 대기)
+- [개선] HTTP 세션 재사용: 사이트별 세션 캐싱 및 공통 헤더 팩토리 추가
+  - 커넥션 재수립 오버헤드 감소, 성능 향상
+- [개선] ISBN 정규화 유틸리티: normalize_isbn_digits, split_isbn_tokens 추가
+  - 공백/하이픈/ISBN10·13 혼재 대응, 매칭 정확도 향상
+- [개선] 스크레이핑 결과 캐시: 2시간 TTL 메모리 캐시 추가 (최대 100개)
+  - 동일 ISBN 반복 조회 시 체감 속도 대폭 향상, 외부 사이트 부하 감소
+- [버그 수정] _call_naver_api 반환값 불일치 수정 (성공 시 2개 값 반환)
+
 v1.1.1 (2025-10-29)
-리팩토링 메인 함수: search_naver_catalog
+- 리팩토링 메인 함수: search_naver_catalog
 
 v1.1.0 (2025-10-29)
 - [버그 수정] scrape_kyobo_book_info 함수가 저자, 번역자 등 모든 'writer_info_box'를
@@ -37,6 +48,8 @@ import re
 import time
 import urllib.parse
 import threading  # ✅ [추가] 병렬 처리를 위해 threading 모듈을 임포트합니다.
+import random  # ✅ [추가] 지수 백오프용
+from typing import Literal, Optional, Tuple  # ✅ [추가] 타입 힌트용
 from bs4 import BeautifulSoup  # ✅ 새로 추가
 from qt_api_clients import clean_text
 from database_manager import DatabaseManager
@@ -74,10 +87,222 @@ _MEDIA_STOPWORDS = (
     "동아일보",
 )
 
-_EDGE_QUOTES_RE = _re.compile(r'^[《〈<«≪『「“"\']+|[》〉>»≫』」”"\']+$')
+_EDGE_QUOTES_RE = _re.compile(r'^[《〈<«≪『「""\']+|[》〉>»≫』」""\']+$')
 _TAIL_PAREN_RE = _re.compile(
     r"[\(\[\{（［｛〔【][^)\]\}）］｝〕】]*[\)\]\}）］｝〕】]\s*$"
 )
+
+# ============================================================
+# ISBN 정규화 유틸리티 (모듈 전역)
+# ============================================================
+def normalize_isbn_digits(isbn_str: str) -> str:
+    """ISBN 문자열에서 숫자만 추출하여 반환합니다.
+
+    Args:
+        isbn_str: 원본 ISBN 문자열 (공백, 하이픈 포함 가능)
+
+    Returns:
+        숫자만으로 구성된 ISBN 문자열
+    """
+    return _re.sub(r"\D", "", str(isbn_str or ""))
+
+
+def split_isbn_tokens(isbn_str: str) -> set[str]:
+    """ISBN 문자열을 토큰으로 분리하여 정규화된 숫자 집합으로 반환합니다.
+    '9788901297378 8901297370' 형태의 ISBN13+ISBN10 조합을 분리합니다.
+
+    Args:
+        isbn_str: 원본 ISBN 문자열
+
+    Returns:
+        정규화된 ISBN 숫자들의 집합
+    """
+    raw = str(isbn_str or "").strip()
+    tokens = _re.split(r"[\s/|,]+", raw)  # 공백/슬래시/파이프/콤마로 분리
+    return {normalize_isbn_digits(t) for t in tokens if normalize_isbn_digits(t)}
+
+
+# ============================================================
+# HTTP 세션 관리 (사이트별 캐시 + 공통 헤더)
+# ============================================================
+_HTTP_SESSIONS: dict[str, requests.Session] = {}
+_SESSION_LOCK = threading.Lock()
+
+
+def get_http_session(site: Literal["naver", "yes24", "kyobo"]) -> requests.Session:
+    """사이트별 HTTP 세션을 반환합니다. 세션은 모듈 전역에 캐시됩니다.
+
+    Args:
+        site: 사이트 이름 ("naver", "yes24", "kyobo")
+
+    Returns:
+        사이트별 설정이 적용된 requests.Session 객체
+    """
+    with _SESSION_LOCK:
+        if site not in _HTTP_SESSIONS:
+            session = requests.Session()
+
+            # 공통 헤더
+            common_headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+            }
+
+            # 사이트별 특화 헤더
+            if site == "naver":
+                session.headers.update({
+                    **common_headers,
+                    "Accept": "application/xml,text/xml,*/*;q=0.8",
+                })
+            elif site == "yes24":
+                session.headers.update({
+                    **common_headers,
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                })
+            elif site == "kyobo":
+                session.headers.update({
+                    **common_headers,
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                    "Upgrade-Insecure-Requests": "1",
+                })
+
+            _HTTP_SESSIONS[site] = session
+
+        return _HTTP_SESSIONS[site]
+
+
+# ============================================================
+# 스크레이핑 결과 캐시 (2시간 TTL)
+# ============================================================
+_SCRAPING_CACHE: dict[str, Tuple[dict, float]] = {}  # {isbn: (result, timestamp)}
+_CACHE_LOCK = threading.Lock()
+_CACHE_TTL = 7200  # 2시간 (초 단위)
+
+
+def _get_cached_scraping_result(isbn: str, site: str) -> Optional[dict]:
+    """캐시된 스크레이핑 결과를 반환합니다.
+
+    Args:
+        isbn: ISBN 문자열
+        site: 사이트 이름 ("yes24" 또는 "kyobo")
+
+    Returns:
+        캐시된 결과 딕셔너리 또는 None
+    """
+    cache_key = f"{site}:{normalize_isbn_digits(isbn)}"
+
+    with _CACHE_LOCK:
+        if cache_key in _SCRAPING_CACHE:
+            result, timestamp = _SCRAPING_CACHE[cache_key]
+            # TTL 체크
+            if time.time() - timestamp < _CACHE_TTL:
+                return result.copy()  # 복사본 반환
+            else:
+                # 만료된 캐시 삭제
+                del _SCRAPING_CACHE[cache_key]
+
+    return None
+
+
+def _set_cached_scraping_result(isbn: str, site: str, result: dict) -> None:
+    """스크레이핑 결과를 캐시에 저장합니다.
+
+    Args:
+        isbn: ISBN 문자열
+        site: 사이트 이름 ("yes24" 또는 "kyobo")
+        result: 저장할 결과 딕셔너리
+    """
+    cache_key = f"{site}:{normalize_isbn_digits(isbn)}"
+
+    with _CACHE_LOCK:
+        _SCRAPING_CACHE[cache_key] = (result.copy(), time.time())
+
+        # 캐시 크기 제한 (최대 100개)
+        if len(_SCRAPING_CACHE) > 100:
+            # 가장 오래된 항목 제거
+            oldest_key = min(_SCRAPING_CACHE.keys(), key=lambda k: _SCRAPING_CACHE[k][1])
+            del _SCRAPING_CACHE[oldest_key]
+
+
+# ============================================================
+# 네트워크 재시도 로직 (단일 재시도 + 지수 백오프)
+# ============================================================
+def _retry_request(
+    func: callable,
+    *args,
+    max_retries: int = 1,
+    initial_delay: float = 0.6,
+    max_delay: float = 1.2,
+    app_instance=None,
+    **kwargs
+) -> Tuple[Optional[requests.Response], Optional[str]]:
+    """HTTP 요청을 재시도 로직과 함께 실행합니다.
+
+    Args:
+        func: 실행할 함수 (requests.get 등)
+        max_retries: 최대 재시도 횟수 (기본 1회)
+        initial_delay: 초기 대기 시간 (초)
+        max_delay: 최대 대기 시간 (초)
+        app_instance: 로깅용 앱 인스턴스
+        *args, **kwargs: func에 전달할 인자
+
+    Returns:
+        (response, error_msg) 튜플. 성공 시 (response, None), 실패 시 (None, error_msg)
+    """
+    last_error = None
+
+    for attempt in range(max_retries + 1):
+        try:
+            response = func(*args, **kwargs)
+
+            # 429 (Too Many Requests) 또는 503 (Service Unavailable)은 재시도
+            if response.status_code in (429, 503) and attempt < max_retries:
+                delay = random.uniform(initial_delay, max_delay) * (2 ** attempt)
+                if app_instance:
+                    app_instance.log_message(
+                        f"경고: HTTP {response.status_code} 응답, {delay:.2f}초 후 재시도 ({attempt + 1}/{max_retries})",
+                        level="WARNING"
+                    )
+                time.sleep(delay)
+                continue
+
+            # 성공 또는 재시도하지 않을 상태 코드
+            return response, None
+
+        except requests.exceptions.Timeout as e:
+            last_error = f"타임아웃: {str(e)}"
+            if attempt < max_retries:
+                delay = random.uniform(initial_delay, max_delay) * (2 ** attempt)
+                if app_instance:
+                    app_instance.log_message(
+                        f"경고: 요청 타임아웃, {delay:.2f}초 후 재시도 ({attempt + 1}/{max_retries})",
+                        level="WARNING"
+                    )
+                time.sleep(delay)
+                continue
+
+        except requests.exceptions.RequestException as e:
+            last_error = f"네트워크 오류: {str(e)}"
+            # ConnectionError, HTTPError 등은 재시도할 가치가 있음
+            if attempt < max_retries and isinstance(e, (requests.exceptions.ConnectionError, requests.exceptions.HTTPError)):
+                delay = random.uniform(initial_delay, max_delay) * (2 ** attempt)
+                if app_instance:
+                    app_instance.log_message(
+                        f"경고: {type(e).__name__}, {delay:.2f}초 후 재시도 ({attempt + 1}/{max_retries})",
+                        level="WARNING"
+                    )
+                time.sleep(delay)
+                continue
+
+            # 기타 RequestException은 즉시 실패
+            break
+
+    # 모든 재시도 실패
+    if app_instance:
+        app_instance.log_message(f"오류: 요청 실패 - {last_error}", level="ERROR")
+    return None, last_error
 
 
 def normalize_title_for_match(s: str) -> str:
@@ -309,25 +534,32 @@ def _prepare_naver_api_request(title_query, author_query, isbn_query):
     return api_url, search_type, primary_query
 
 def _call_naver_api(api_url, client_id, client_secret, app_instance=None):
-    """네이버 API를 호출하고 응답 객체를 반환합니다. 네트워크 오류를 처리합니다."""
+    """네이버 API를 호출하고 응답 객체를 반환합니다. 재시도 로직 포함."""
+    if app_instance:
+        app_instance.log_message(f"정보: 네이버 API 요청 URL: {api_url}")
+
+    # 세션 사용
+    session = get_http_session("naver")
+
+    # API 인증 헤더 추가 (세션 기본 헤더 + API 키)
     headers = {
         "X-Naver-Client-Id": client_id,
         "X-Naver-Client-Secret": client_secret,
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     }
-    try:
-        if app_instance: app_instance.log_message(f"정보: 네이버 API 요청 URL: {api_url}")
-        response = requests.get(api_url, headers=headers, timeout=10)
-        if app_instance: app_instance.log_message(f"정보: 네이버 API 응답 코드: {response.status_code}")
-        return response, None  # 성공 시 응답 객체와 None 반환
-    except requests.exceptions.RequestException as e:
-        error_msg = f"네트워크 오류: {str(e)}"
-        if app_instance:
-            app_instance.log_message(
-                f"오류: 네이버 API 호출 중 네트워크 오류: {e}", level="ERROR"
-            )
-        # 네트워크 오류 시 None과 에러 메시지 반환
-        return None, error_msg
+
+    # 재시도 로직 적용
+    response, error_msg = _retry_request(
+        session.get,
+        api_url,
+        headers=headers,
+        timeout=10,
+        app_instance=app_instance
+    )
+
+    if response and app_instance:
+        app_instance.log_message(f"정보: 네이버 API 응답 코드: {response.status_code}")
+
+    return response, error_msg
 
 def _parse_naver_api_response(response_text, search_type, primary_query, app_instance=None):
     """네이버 API 응답(XML)을 파싱하여 기본 도서 정보 레코드 리스트를 반환합니다. XML 오류를 처리합니다."""
@@ -540,8 +772,9 @@ def search_naver_catalog(title_query, author_query, isbn_query, app_instance=Non
         if app_instance: app_instance.log_message("오류: DatabaseManager 인스턴스가 필요합니다.", level="ERROR")
         return []
 
-    # 3. 로그 시작 및 진행률 초기화
-    search_info = f"제목='{title_query}', 저자='{author_query}', ISBN='{isbn_query}'"
+    # 3. 로그 시작 및 진행률 초기화 (ISBN은 정규화하여 로깅)
+    isbn_normalized = normalize_isbn_digits(isbn_query) if isbn_query else ""
+    search_info = f"제목='{title_query}', 저자='{author_query}', ISBN='{isbn_normalized or isbn_query}'"
     if app_instance:
         app_instance.log_message(f"정보: 네이버 책 API 검색 시작 ({search_info})")
         app_instance.update_progress(10)
@@ -602,23 +835,16 @@ def search_naver_catalog(title_query, author_query, isbn_query, app_instance=Non
             s = str(s or "").strip()
             return bool(s and s != "정보 없음")
 
-        # 네이버 ISBN 필드는 'ISBN13 ISBN10' 형태일 수 있어 분리하여 비교
-        def _digits(s: str | None) -> str:
-            return re.sub(r"\D", "", str(s or ""))
-
-        def _isbn_tokens(s: str | None) -> set[str]:
-            raw = str(s or "").strip()
-            toks = re.split(r"[\s/|,]+", raw)  # 공백/슬래시/파이프/콤마 분리
-            return set(_digits(t) for t in toks if _digits(t))
-
         # 스크레이핑 기준 레코드 인덱스 찾기
         base_idx = -1
         # 1순위: 검색어(primary_query)와 ISBN 필드 값이 일치하는 레코드
+        normalized_query = normalize_isbn_digits(primary_query)
         for i, rec in enumerate(naver_records):
             if rec.get("검색소스") != "Naver": continue
             isbn_field = rec.get("ISBN")
             if not _valid_isbn(isbn_field): continue
-            if _digits(primary_query) in _isbn_tokens(isbn_field):
+            # 모듈 전역 함수 사용
+            if normalized_query in split_isbn_tokens(isbn_field):
                 base_idx = i
                 break
 
@@ -717,34 +943,57 @@ def scrape_yes24_book_info(isbn, app_instance=None):
     if not isbn:
         return result
 
+    # 캐시 확인
+    cached = _get_cached_scraping_result(isbn, "yes24")
+    if cached:
+        if app_instance:
+            app_instance.log_message(
+                f"정보: 예스24 ISBN {normalize_isbn_digits(isbn)} 캐시 사용"
+            )
+        return cached
+
     try:
         if app_instance:
             app_instance.log_message(
-                f"정보: 예스24에서 ISBN {isbn} 정보 스크레이핑 시작"
+                f"정보: 예스24에서 ISBN {normalize_isbn_digits(isbn)} 정보 스크레이핑 시작"
             )
 
         search_url = f"https://www.yes24.com/product/search?domain=BOOK&query={isbn}"
 
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
-        }
+        # 공유 세션 사용
+        session = get_http_session("yes24")
 
-        session = requests.Session()
-        session.headers.update(headers)
+        # 쿠키 획득을 위한 홈페이지 방문 (재시도 적용)
+        home_response, home_error = _retry_request(
+            session.get,
+            "https://www.yes24.com/",
+            timeout=10,
+            app_instance=app_instance
+        )
 
-        try:
-            session.get("https://www.yes24.com/", timeout=10)
+        if home_response:
             time.sleep(0.5)
             session.headers.update({"Referer": "https://www.yes24.com/"})
-        except requests.exceptions.RequestException:
+        elif app_instance:
+            app_instance.log_message(
+                f"경고: 예스24 홈페이지 방문 실패 (쿠키 획득 실패): {home_error}", level="WARNING"
+            )
+
+        # 검색 페이지 요청 (재시도 적용)
+        search_response, search_error = _retry_request(
+            session.get,
+            search_url,
+            timeout=15,
+            app_instance=app_instance
+        )
+
+        if not search_response:
             if app_instance:
                 app_instance.log_message(
-                    "경고: 예스24 홈페이지 방문 실패 (쿠키 획득 실패)", level="WARNING"
+                    f"오류: 예스24 검색 페이지 요청 실패: {search_error}", level="ERROR"
                 )
+            return result
 
-        search_response = session.get(search_url, timeout=15)
         search_response.raise_for_status()
 
         # -------------------
@@ -781,7 +1030,21 @@ def scrape_yes24_book_info(isbn, app_instance=None):
 
         time.sleep(1)
 
-        detail_response = session.get(product_link, timeout=15)
+        # 상세 페이지 요청 (재시도 적용)
+        detail_response, detail_error = _retry_request(
+            session.get,
+            product_link,
+            timeout=15,
+            app_instance=app_instance
+        )
+
+        if not detail_response:
+            if app_instance:
+                app_instance.log_message(
+                    f"오류: 예스24 상세 페이지 요청 실패: {detail_error}", level="ERROR"
+                )
+            return result
+
         detail_response.raise_for_status()
 
         # -------------------
@@ -854,6 +1117,9 @@ def scrape_yes24_book_info(isbn, app_instance=None):
                     f"정보: 예스24에서 추가 정보를 찾을 수 없었습니다"
                 )
 
+        # 캐시에 저장 (성공 시)
+        _set_cached_scraping_result(isbn, "yes24", result)
+
     except requests.exceptions.RequestException as e:
         if app_instance:
             app_instance.log_message(
@@ -885,26 +1151,42 @@ def scrape_kyobo_book_info(isbn, app_instance=None):
     if not isbn:
         return result
 
+    # 캐시 확인
+    cached = _get_cached_scraping_result(isbn, "kyobo")
+    if cached:
+        if app_instance:
+            app_instance.log_message(
+                f"정보: 교보문고 ISBN {normalize_isbn_digits(isbn)} 캐시 사용"
+            )
+        return cached
+
     try:
         if app_instance:
             app_instance.log_message(
-                f"정보: 교보문고에서 ISBN {isbn} 정보 스크레이핑 시작"
+                f"정보: 교보문고에서 ISBN {normalize_isbn_digits(isbn)} 정보 스크레이핑 시작"
             )
 
         # 교보문고 검색 URL (ISBN으로 검색)
         search_url = f"https://search.kyobobook.co.kr/search?keyword={isbn}&gbCode=TOT&target=total"
 
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Connection": "keep-alive",
-            "Upgrade-Insecure-Requests": "1",
-        }
+        # 공유 세션 사용
+        session = get_http_session("kyobo")
 
-        # 검색 페이지에서 상품 링크 찾기
-        search_response = requests.get(search_url, headers=headers, timeout=10)
+        # 검색 페이지 요청 (재시도 적용)
+        search_response, search_error = _retry_request(
+            session.get,
+            search_url,
+            timeout=10,
+            app_instance=app_instance
+        )
+
+        if not search_response:
+            if app_instance:
+                app_instance.log_message(
+                    f"오류: 교보문고 검색 페이지 요청 실패: {search_error}", level="ERROR"
+                )
+            return result
+
         search_response.raise_for_status()
 
         search_soup = BeautifulSoup(search_response.content, "html.parser")
@@ -950,8 +1232,21 @@ def scrape_kyobo_book_info(isbn, app_instance=None):
         # 요청 간격 조절
         time.sleep(1)
 
-        # 상품 상세 페이지 접근
-        detail_response = requests.get(product_link, headers=headers, timeout=10)
+        # 상세 페이지 요청 (재시도 적용)
+        detail_response, detail_error = _retry_request(
+            session.get,
+            product_link,
+            timeout=10,
+            app_instance=app_instance
+        )
+
+        if not detail_response:
+            if app_instance:
+                app_instance.log_message(
+                    f"오류: 교보문고 상세 페이지 요청 실패: {detail_error}", level="ERROR"
+                )
+            return result
+
         detail_response.raise_for_status()
 
         detail_soup = BeautifulSoup(detail_response.content, "html.parser")
@@ -1045,6 +1340,9 @@ def scrape_kyobo_book_info(isbn, app_instance=None):
                 app_instance.log_message(
                     f"정보: 교보문고에서 추가 정보를 찾을 수 없었습니다"
                 )
+
+        # 캐시에 저장 (성공 시)
+        _set_cached_scraping_result(isbn, "kyobo", result)
 
     except requests.exceptions.RequestException as e:
         if app_instance:
