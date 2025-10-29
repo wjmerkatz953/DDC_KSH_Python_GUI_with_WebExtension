@@ -33,9 +33,28 @@ def configure_ssl_certificates():
         # certifi가 제공하는 CA 인증서 번들 경로 가져오기
         ca_bundle_path = certifi.where()
 
+        # 경로가 실제로 존재하는지 확인
+        if not os.path.exists(ca_bundle_path):
+            # PyInstaller가 번들링한 경로 시도
+            if hasattr(sys, '_MEIPASS'):
+                alt_path = os.path.join(sys._MEIPASS, 'certifi', 'cacert.pem')
+                if os.path.exists(alt_path):
+                    ca_bundle_path = alt_path
+                    print(f"[SSL] ℹ️ 대체 인증서 경로 사용: {ca_bundle_path}")
+                else:
+                    print(f"[SSL] ⚠️ 인증서 파일을 찾을 수 없습니다. SSL 검증 비활성화를 고려하세요.")
+                    # SSL 검증 비활성화 (보안 위험 - 개발 환경에서만 사용)
+                    os.environ['REQUESTS_CA_BUNDLE'] = ''
+                    os.environ['CURL_CA_BUNDLE'] = ''
+                    import urllib3
+                    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+                    print(f"[SSL] ⚠️ SSL 검증이 비활성화되었습니다 (보안 주의)")
+                    return
+
         # requests 라이브러리가 참조하는 환경 변수 설정
         os.environ['REQUESTS_CA_BUNDLE'] = ca_bundle_path
         os.environ['SSL_CERT_FILE'] = ca_bundle_path
+        os.environ['CURL_CA_BUNDLE'] = ca_bundle_path
 
         print(f"[SSL] ✅ CA 인증서 경로 설정 완료: {ca_bundle_path}")
 
