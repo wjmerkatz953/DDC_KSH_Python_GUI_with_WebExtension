@@ -1,5 +1,5 @@
 # SOTP – Status of the Project (자동 생성)
-> **생성 시각**: 2025-10-29 00:07:12
+> **생성 시각**: 2025-10-29 23:16:12
 > **상태**: All Green **All Green** > **AI 전용 초고속 컨텍스트 문서** | 30초 파악 완료
 
 ---
@@ -48,50 +48,35 @@
 
 ## 4. 최근 변경 (✅ [개선] 파일 변경 내역 포함)
 
-### 2025-10-28 (세션 3): HTML 뷰어 자동 테이블 감지 및 Dewey 탭 지원
-- **HTML 보기 기능 개선: 포커스/선택된 테이블 자동 감지**
-- **해결 방법**:
-- **Gemini DDC 분류 탭** (`qt_TabView_Gemini.py` v2.2.7)
-- **KSH Local 탭** (`qt_TabView_KSH_Local.py` v2.2.1)
-- **Dewey 탭 HTML 보기 기능 추가** (`qt_TabView_Dewey.py` v4.3.2)
-- **BaseSearchTab** (`qt_base_tab.py` v3.0.2)
-- **Gemini 검색 로직 버그 수정** (`Search_Gemini.py`)
-- **교훈**:
+### 2025-10-29 (세션 4): PyInstaller SSL 인증서 번들링 개선
+- **SSL 인증서 경로 문제 해결** (`.spec`, `ssl_cert_utils.py`)
 - **수정 파일**:
 
-### 2025-10-28 (세션 2): 트리메뉴 모드 스타일 적용 및 테마 전환 문제 해결
-- **⚠️ 중요 패턴: 인라인 스타일과 테마 전환 문제**
-- **트리메뉴 모드 테마 전환 에러 수정** (`qt_TabView_Settings.py` v1.0.4)
-- **MARC 추출 및 Gemini 탭 테마 적용 완전 수정** (`qt_TabView_MARC_Extractor.py` v2.1.6, `qt_TabView_Gemini.py` v2.2.6)
-- **트리메뉴 네비게이션 스타일 강제 적용** (`qt_tree_menu_navigation.py` v1.2.2)
+### 2025-10-29 (세션 3): Search_Naver.py v1.2.0 - 네트워크 안정성 및 성능 최적화
+- **네트워크 탄력성 강화** (`Search_Naver.py` v1.2.0)
+- **HTTP 세션 재사용 및 공통 헤더 관리**
+- **ISBN 정규화 유틸리티 추가**
+- **스크레이핑 결과 캐시 시스템 (2시간 TTL)**
+- **버그 수정**
+- **코드 품질 개선**
+- **변경 통계**: +355줄, -57줄 (총 412줄 변경)
 - **수정 파일**:
 
-### 2025-10-28 (세션 1): 트리메뉴와 탭뷰 완전 통일
-- **트리메뉴 네비게이션 아키텍처 개선** (`qt_tree_menu_navigation.py` v1.2.0)
-- **스타일시트 적용 문제 해결** (`qt_TabView_MARC_Extractor.py` v2.1.3, `qt_TabView_Gemini.py` v2.2.3, `qt_styles.py` v3.0.4)
-- **배경**:
-- **데이터 전송 로직 간소화** (`qt_main_app.py`)
-- **MARC 파서 버그 수정** (`marc_parser.py`, `qt_TabView_Dewey.py`)
+### 2025-10-29 (세션 2): 레코드 스키마 상수화 및 팩토리 패턴 도입
+- **레코드 생성 로직 리팩토링** (`Search_Naver.py`, 기타 검색 모듈)
+- **어플리케이션 버전 업데이트** (`qt_main_app.py`)
+- **.gitignore 업데이트**
 - **수정 파일**:
 
-### 2025-10-27: 테마 대응 개선 및 기능 추가
-- **API 설정 다이얼로그 테마 대응 및 버그 수정** (`qt_api_settings.py` v1.1.2, `qt_styles.py` v3.0.3)
-- **세로 헤더(행 번호) 스타일 추가** (`qt_styles.py`, `qt_TabView_MARC_Extractor.py`, `qt_TabView_Dewey.py`)
-- **API 상태 표시 테마 대응** (`qt_styles.py`, `qt_TabView_NLK.py`, `qt_TabView_Gemini.py`, `qt_TabView_AIFeed.py`, `qt_dewey_logic.py`)
-- **NDL 및 Western 탭 델리게이트 테마 대응** (`qt_TabView_NDL.py`, `qt_TabView_Western.py`, `ui_constants.py`, `qt_TabView_Settings.py`)
-- **Western 탭 출처별 색상 상수 추가** (`ui_constants.py`)
-- **Western 탭 Google Books API 설정 기능 추가** (`qt_TabView_Western.py`)
-- **Cornell 상세 링크에 librarian_view 추가** (`Search_Cornell.py`)
-- **Global 탭 델리게이트 테마 대응** (`qt_TabView_Global.py`, `ui_constants.py`)
-- **테이블 헤더뷰 테마 대응** (`qt_widget_events.py` v2.1.1, `qt_base_tab.py`)
-- **레이아웃 설정 저장/복구 트리메뉴 모드 지원** (`qt_main_app.py`)
+### 2025-10-29 (세션 1): Search_Naver.py 리팩토링 완료
+- **search_naver_catalog 함수 대규모 리팩토링** (`Search_Naver.py` v1.1.1)
+- **신규 헬퍼 함수 추가**:
+- **개선 사항**:
+- **교보문고 스크레이핑 개선**
 - **수정 파일**:
 
-### 2025-10-25 (세션 2): UI 일관성 개선 및 테마 호환성 강화
-- **MARC_Gemini 입력 위젯 그룹 스타일 추가** (`qt_styles.py`, `qt_TabView_MARC_Extractor.py`, `qt_TabView_Gemini.py`)
-- **라디오 버튼 스타일 개선** (`qt_styles.py`)
-- **설정 탭 "적용" 버튼 텍스트 색상 수정** (`qt_TabView_Settings.py`)
-- **트리메뉴 테두리 색상 수정** (`qt_tree_menu_navigation.py`)
+### 2025-10-29: 기타 버그 수정 및 개선
+- **웹 확장 기능 데이터 업데이트** (`extension/data.json`)
 - **수정 파일**:
 
 ---

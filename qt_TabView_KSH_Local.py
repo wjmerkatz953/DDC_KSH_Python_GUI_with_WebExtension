@@ -1,11 +1,18 @@
 ﻿# -*- coding: utf-8 -*-
 # 파일명: qt_TabView_KSH_Local.py
 # 설명: KSH Local DB 검색 탭 (상단: 개념 DB, 하단: 서지 DB)
-# 버전: 2.2.1 - HTML 뷰어 지원을 위한 DataFrame 저장
+# 버전: 4.4.1 - HTML 뷰어 다중 테이블 지원 개선
 # 생성일: 2025-09-30
-# 수정일: 2025-10-28
+# 수정일: 2025-10-29
 #
 # 변경 이력:
+# v4.4.1 (2025-10-29)
+# - [기능 추가] HTML 뷰어 다중 테이블 지원 개선
+#   : last_clicked_table 속성 추가 ("table_view" | "biblio_table")
+#   : _on_table_view_clicked(): 상단 개념 DB 테이블 클릭 시 기록
+#   : _on_biblio_table_clicked(): 하단 서지 DB 테이블 클릭 시 기록
+#   : HTML 뷰어가 마지막으로 클릭한 테이블 데이터를 정확히 표시
+#
 # v2.2.1 (2025-10-28)
 # - [기능 추가] HTML 뷰어 지원을 위한 DataFrame 저장
 #   : on_search_completed()에서 current_dataframe/biblio_dataframe 업데이트
@@ -165,6 +172,8 @@ class QtKSHLocalSearchTab(BaseSearchTab):
         self.current_search_type = None  # ✅ [추가] 검색 유형 저장 변수
         self._last_selected_row = None  # ✅ [추가] 마지막 선택 행 저장 (상단)
         self._last_selected_biblio_row = None  # ✅ [추가] 마지막 선택 행 저장 (하단)
+        # ✅ [추가] 최근 클릭된 테이블 추적 (HTML 뷰어용)
+        self.last_clicked_table = None  # "table_view" or "biblio_table"
 
         # ✅ [신규 추가] 스레드 관리 변수 초기화
         self.stop_flag = threading.Event()
@@ -643,6 +652,10 @@ class QtKSHLocalSearchTab(BaseSearchTab):
             self.biblio_table.selectionModel().currentChanged.connect(biblio_handler)
         # -------------------
 
+        # ✅ [추가] 테이블 클릭 시 last_clicked_table 업데이트 (HTML 뷰어용)
+        self.table_view.clicked.connect(self._on_table_view_clicked)
+        self.biblio_table.clicked.connect(self._on_biblio_table_clicked)
+
         # ✅ primary_search_field 속성 설정 (BaseSearchTab.set_initial_focus()에서 사용)
         self.primary_search_field = self.input_widgets["search_term"]
 
@@ -1018,6 +1031,14 @@ class QtKSHLocalSearchTab(BaseSearchTab):
         self._cleanup_concept_thread()
         self._cleanup_title_thread()  # ✅ [추가] 제목 검색 스레드 정리
         self.app_instance.log_message("✅ KSH Local 탭: 모든 스레드 정리 완료", "INFO")
+
+    def _on_table_view_clicked(self, index):
+        """상단 개념 테이블 클릭 시 최근 클릭 테이블 기록"""
+        self.last_clicked_table = "table_view"
+
+    def _on_biblio_table_clicked(self, index):
+        """하단 서지 테이블 클릭 시 최근 클릭 테이블 기록"""
+        self.last_clicked_table = "biblio_table"
 
     def closeEvent(self, event):
         """위젯 종료 시 호출되는 이벤트 핸들러"""

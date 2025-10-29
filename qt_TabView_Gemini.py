@@ -1,15 +1,18 @@
 # 파일: qt_TabView_Gemini.py
-# 버전: v2.2.7
-# 수정일: 2025-10-28 - HTML 뷰어 지원 및 LC Catalog URL 변경
+# 버전: v2.2.8
+# 수정일: 2025-10-29 - HTML 뷰어 다중 테이블 지원 개선
 
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_Gemini.py
 # 설명: Gemini 기반 계층적 DDC 분류 탭 (BaseSearchTab 상속 최종 버전)
-# 버전: v2.2.7
-# 수정: 2025-10-28 - HTML 뷰어를 위한 DataFrame 저장 및 LC Catalog URL 변경
-#       - [문제] 모듈 최상단에서 import한 U는 모듈 로드 시점(Dark 테마)의 값으로 고정됨
-#       - [해결] 함수 내에서 `from ui_constants import UI_CONSTANTS as U_CURRENT`로 최신 값 가져옴
-#       - [효과] 앱 시작 시 Light 테마로 로드되어도 정확한 색상 적용됨
+# 버전: v2.2.8
+# 수정: 2025-10-29 - HTML 뷰어 다중 테이블 지원 개선
+#       - [문제] HTML 뷰어 클릭 시 항상 중간 결과만 표시되는 버그
+#       - [해결] last_clicked_table 속성 추가 및 클릭 추적 기능 구현
+#         · _on_inter_table_clicked(): 중간 결과 테이블 클릭 시 기록
+#         · _on_table_view_clicked(): 최종 결과 테이블 클릭 시 기록
+#       - [효과] HTML 뷰어가 마지막으로 클릭한 테이블 데이터를 정확히 표시
+# 이전: 2025-10-28 - HTML 뷰어를 위한 DataFrame 저장 및 LC Catalog URL 변경
 # 이전: 2025-10-18 - QSplitter 자동 저장/복구 기능 추가
 # 이전: 2025-10-09 - 입력 영역 UI 표준화 및 중간 결과창 상시 표시
 
@@ -150,6 +153,8 @@ class QtGeminiTab(BaseSearchTab):
         self.worker = None
         # ✅ [추가] 중간 결과 DataFrame 초기화
         self.intermediate_dataframe = pd.DataFrame()
+        # ✅ [추가] 최근 클릭된 테이블 추적 (HTML 뷰어용)
+        self.last_clicked_table = None  # "inter_table" or "table_view"
         # progress_bar를 항상 보이도록 설정
         if hasattr(self, "progress_bar"):
             self.progress_bar.setVisible(False)
@@ -369,10 +374,16 @@ class QtGeminiTab(BaseSearchTab):
         # 중간 결과 테이블 더블클릭 연결
         self.inter_table.doubleClicked.connect(self.on_inter_table_double_click)
 
+        # ✅ [추가] 중간 결과 테이블 클릭 시 last_clicked_table 업데이트
+        self.inter_table.clicked.connect(self._on_inter_table_clicked)
+
         # ✅ 중간 결과 테이블의 선택 변경 시 상세 정보 업데이트
         self.inter_table.selectionModel().currentChanged.connect(
             self._update_detail_view_from_intermediate
         )
+
+        # ✅ [추가] 최종 결과 테이블(table_view) 클릭 시 last_clicked_table 업데이트
+        self.table_view.clicked.connect(self._on_table_view_clicked)
 
     def start_search(self):
         bundle_text = self.input_edit.toPlainText().strip()
@@ -539,6 +550,14 @@ class QtGeminiTab(BaseSearchTab):
             self.worker.stop()
             self.worker.wait(2000)
         self.worker = None
+
+    def _on_inter_table_clicked(self, index):
+        """중간 결과 테이블 클릭 시 최근 클릭 테이블 기록"""
+        self.last_clicked_table = "inter_table"
+
+    def _on_table_view_clicked(self, index):
+        """최종 결과 테이블 클릭 시 최근 클릭 테이블 기록"""
+        self.last_clicked_table = "table_view"
 
     def _update_detail_view_from_intermediate(self, current, previous=None):
         """중간 결과 테이블의 선택된 행을 상세 정보 뷰에 표시합니다."""

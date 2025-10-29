@@ -524,7 +524,9 @@ class MainApplicationWindow(QMainWindow):
 
     def setup_ui(self):
         """UI 설정"""
-        self.setWindowTitle("통합 검색 시스템 - Qt Model/View Edition V. 5.1.0 for PNU Library 자료조직팀 by InnovaNex")
+        self.setWindowTitle(
+            "통합 검색 시스템 - Qt Model/View Edition V. 5.0.9 Beta for PNU Library 자료조직팀 by InnovaNex"
+        )
         self.setMinimumSize(1200, 850)
         self.resize(1850, 1000)
 
@@ -1285,7 +1287,10 @@ class MainApplicationWindow(QMainWindow):
                         if sizes:
                             tab.right_content_splitter.setSizes(sizes)
             else:
-                self.app_instance.log_message("ℹ️ 트리메뉴 모드: 탭 스플리터 설정은 탭 생성 시 개별 복구됩니다.", "INFO")
+                self.app_instance.log_message(
+                    "ℹ️ 트리메뉴 모드: 탭 스플리터 설정은 탭 생성 시 개별 복구됩니다.",
+                    "INFO",
+                )
 
             # 위젯 표시/숨김 설정 복구
             widget_config = self.layout_settings_manager.load_widget_visibility(

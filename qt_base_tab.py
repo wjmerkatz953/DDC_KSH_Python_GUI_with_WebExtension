@@ -1,11 +1,18 @@
 ﻿# -*- coding: utf-8 -*-
 # 파일명: qt_base_tab.py
 # 설명: 모든 검색 탭의 공통 기능과 UI를 정의하는 부모 클래스 (모델/뷰 아키텍처)
-# 버전: 3.0.2 - HTML 뷰어 자동 테이블 감지 기능 추가
+# 버전: 3.0.3 - HTML 뷰어 다중 테이블 지원 개선
 # 생성일: 2025-09-25
-# 수정일: 2025-10-28
+# 수정일: 2025-10-29
 #
 # 변경 이력:
+# v3.0.3 (2025-10-29)
+# - [기능 개선] _get_active_table_data() 메서드 우선순위 재설계
+#   : last_clicked_table 속성을 최우선으로 체크 (Gemini/KSH Local 탭 전용)
+#   : 우선순위: 1) last_clicked_table → 2) 포커스 → 3) 선택 → 4) 기본 테이블
+#   : 다중 테이블 탭에서 사용자가 마지막으로 클릭한 테이블을 정확히 감지
+# - [효과] HTML 뷰어/엑셀 추출 등 데이터 내보내기 기능의 정확도 향상
+#
 # v3.0.2 (2025-10-28)
 # - [기능 추가] _get_active_table_data() 메서드 추가 - 포커스/선택된 테이블 자동 감지
 # - [기능 추가] _get_dataframe_from_model() 메서드 추가 - 모델에서 DataFrame 추출
@@ -1156,21 +1163,76 @@ class BaseSearchTab(QWidget):
         ✅ [신규 메서드] 포커스/선택된 테이블의 데이터를 자동으로 감지합니다.
 
         우선순위:
-        1. 포커스된 테이블 (현재 커서가 있는 테이블)
-        2. 선택된 행이 있는 테이블
-        3. 기본 테이블 (self.table_view)
+        1. last_clicked_table 속성 (Gemini/KSH Local 탭 전용) - 최우선
+        2. 포커스된 테이블 (현재 커서가 있는 테이블)
+        3. 선택된 행이 있는 테이블
+        4. 기본 테이블 (self.table_view)
 
         Returns:
             tuple: (dataframe, column_keys, column_headers, table_name)
         """
         from PySide6.QtWidgets import QApplication
 
-        # 1. 포커스된 위젯 확인
+        # ✅ [최우선] last_clicked_table 속성 체크 (Gemini/KSH Local 탭 전용)
+        if hasattr(self, 'last_clicked_table') and self.last_clicked_table:
+            # Gemini 탭: 중간 결과 테이블이 마지막 클릭
+            if self.last_clicked_table == "inter_table":
+                if hasattr(self, 'inter_table') and hasattr(self, 'intermediate_dataframe'):
+                    if not self.intermediate_dataframe.empty:
+                        return (
+                            self.intermediate_dataframe,
+                            self.intermediate_column_keys,
+                            self.intermediate_column_headers,
+                            "계층적 검색 결과"
+                        )
+            # Gemini/KSH Local 탭: 메인 테이블이 마지막 클릭
+            elif self.last_clicked_table == "table_view":
+                if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
+                    if hasattr(self, 'inter_table'):
+                        table_name = "DDC 추천 결과"
+                    elif hasattr(self, 'biblio_table'):
+                        table_name = "개념 DB"
+                    else:
+                        table_name = "검색 결과"
+                    return (
+                        self.current_dataframe,
+                        self.column_keys,
+                        self.column_headers,
+                        table_name
+                    )
+            # KSH Local 탭: 서지 테이블이 마지막 클릭
+            elif self.last_clicked_table == "biblio_table":
+                if hasattr(self, 'biblio_table') and hasattr(self, 'biblio_dataframe'):
+                    if not self.biblio_dataframe.empty:
+                        return (
+                            self.biblio_dataframe,
+                            self.biblio_keys,
+                            self.biblio_headers,
+                            "서지 DB"
+                        )
+
+        # 1. 포커스된 위젯 확인 (차순위)
         focused_widget = QApplication.focusWidget()
 
-        # ✅ [KSH Local 탭] 하단 서지 테이블이 포커스되었거나 선택된 경우
+        # ✅ [우선순위 2] 메인 테이블(table_view)이 포커스된 경우
+        if hasattr(self, 'table_view') and (focused_widget == self.table_view or self.table_view.hasFocus()):
+            if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
+                # Gemini 탭의 경우 "DDC 추천 결과", KSH Local은 "개념 DB", 기타는 "검색 결과"
+                if hasattr(self, 'inter_table'):
+                    table_name = "DDC 추천 결과"
+                elif hasattr(self, 'biblio_table'):
+                    table_name = "개념 DB"
+                else:
+                    table_name = "검색 결과"
+                return (
+                    self.current_dataframe,
+                    self.column_keys,
+                    self.column_headers,
+                    table_name
+                )
+
+        # ✅ [우선순위 2] KSH Local 탭: 하단 서지 테이블이 포커스된 경우
         if hasattr(self, 'biblio_table') and hasattr(self, 'biblio_dataframe'):
-            # 포커스 체크
             if focused_widget == self.biblio_table or self.biblio_table.hasFocus():
                 if not self.biblio_dataframe.empty:
                     return (
@@ -1179,19 +1241,9 @@ class BaseSearchTab(QWidget):
                         self.biblio_headers,
                         "서지 DB"
                     )
-            # 선택된 행이 있는지 체크
-            elif self.biblio_table.selectionModel() and self.biblio_table.selectionModel().hasSelection():
-                if not self.biblio_dataframe.empty:
-                    return (
-                        self.biblio_dataframe,
-                        self.biblio_keys,
-                        self.biblio_headers,
-                        "서지 DB"
-                    )
 
-        # ✅ [Gemini 탭] 중간 결과 테이블 체크
+        # ✅ [우선순위 3] Gemini 탭: 중간 결과 테이블이 포커스된 경우
         if hasattr(self, 'inter_table') and hasattr(self, 'intermediate_dataframe'):
-            # 포커스 체크
             if focused_widget == self.inter_table or self.inter_table.hasFocus():
                 if not self.intermediate_dataframe.empty:
                     return (
@@ -1200,8 +1252,38 @@ class BaseSearchTab(QWidget):
                         self.intermediate_column_headers,
                         "계층적 검색 결과"
                     )
-            # 선택된 행이 있는지 체크
-            elif self.inter_table.selectionModel() and self.inter_table.selectionModel().hasSelection():
+
+        # ✅ [우선순위 4] 포커스가 명확하지 않을 때: 선택된 행이 있는 테이블 체크
+        # 메인 테이블 우선 체크 (Gemini의 최종 결과, KSH Local의 개념 DB)
+        if hasattr(self, 'table_view') and self.table_view.selectionModel() and self.table_view.selectionModel().hasSelection():
+            if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
+                if hasattr(self, 'inter_table'):
+                    table_name = "DDC 추천 결과"
+                elif hasattr(self, 'biblio_table'):
+                    table_name = "개념 DB"
+                else:
+                    table_name = "검색 결과"
+                return (
+                    self.current_dataframe,
+                    self.column_keys,
+                    self.column_headers,
+                    table_name
+                )
+
+        # KSH Local 탭: 서지 테이블에 선택된 행이 있는 경우
+        if hasattr(self, 'biblio_table') and hasattr(self, 'biblio_dataframe'):
+            if self.biblio_table.selectionModel() and self.biblio_table.selectionModel().hasSelection():
+                if not self.biblio_dataframe.empty:
+                    return (
+                        self.biblio_dataframe,
+                        self.biblio_keys,
+                        self.biblio_headers,
+                        "서지 DB"
+                    )
+
+        # Gemini 탭: 중간 결과 테이블에 선택된 행이 있는 경우
+        if hasattr(self, 'inter_table') and hasattr(self, 'intermediate_dataframe'):
+            if self.inter_table.selectionModel() and self.inter_table.selectionModel().hasSelection():
                 if not self.intermediate_dataframe.empty:
                     return (
                         self.intermediate_dataframe,
@@ -1210,9 +1292,14 @@ class BaseSearchTab(QWidget):
                         "계층적 검색 결과"
                     )
 
-        # 2. 기본 테이블 (상단 또는 메인 테이블)
+        # ✅ [우선순위 5] 기본 테이블 (선택이나 포커스가 없을 때)
         if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
-            table_name = "개념 DB" if hasattr(self, 'biblio_table') else "검색 결과"
+            if hasattr(self, 'inter_table'):
+                table_name = "DDC 추천 결과"
+            elif hasattr(self, 'biblio_table'):
+                table_name = "개념 DB"
+            else:
+                table_name = "검색 결과"
             return (
                 self.current_dataframe,
                 self.column_keys,

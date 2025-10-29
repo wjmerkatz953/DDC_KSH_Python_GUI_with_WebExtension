@@ -311,20 +311,27 @@ CREATE TABLE IF NOT EXISTS biblio (
     kac_codes TEXT,
     raw_json TEXT
 );
+-- FTS5가 커버하므로 title, creator, author_names, kac_codes 인덱스 제거
 CREATE INDEX IF NOT EXISTS idx_biblio_year ON biblio(year);
-CREATE INDEX IF NOT EXISTS idx_biblio_creator ON biblio(creator);
-CREATE INDEX IF NOT EXISTS idx_biblio_dc_creator ON biblio(dc_creator);
-CREATE INDEX IF NOT EXISTS idx_biblio_dcterms_creator ON biblio(dcterms_creator);
-CREATE INDEX IF NOT EXISTS idx_biblio_title ON biblio(title);
-CREATE INDEX IF NOT EXISTS idx_biblio_author_names ON biblio(author_names);
-CREATE INDEX IF NOT EXISTS idx_biblio_kac_codes ON biblio(kac_codes);
 
+/* [최종 FTS5 전략]
+  - 검색이 필요한 모든 텍스트 필드를 통합.
+  - tokenize='unicode61': CJK 및 세미콜론(;) 분리 지원.
+  - tokenchars=':': 'nlk:KAC...'를 단일 토큰으로 처리.
+*/
 CREATE VIRTUAL TABLE IF NOT EXISTS biblio_fts USING fts5(
-    nlk_id UNINDEXED,
-    title, creator, dc_creator, dcterms_creator,
-    content=''
+    title,
+    creator,
+    dc_creator,
+    dcterms_creator,
+    author_names,
+    kac_codes,
+    content='biblio',
+    content_rowid='rowid', -- biblio 테이블의 내부 rowid와 연결
+    tokenize = 'unicode61 remove_diacritics 0 tokenchars ":"'
 );
 """
+
 BIBLIO_SCHEMA_LIGHT = """
 CREATE TABLE IF NOT EXISTS biblio (
     nlk_id TEXT PRIMARY KEY,
@@ -555,20 +562,20 @@ def upsert_biblio(
     # ✅ [핵심 추가] 모든 저자 관련 정보를 취합하여 이름과 KAC 코드로 분리
     all_items = set()
     if creator_str:
-        all_items.update(item.strip() for item in creator_str.split(';'))
+        all_items.update(item.strip() for item in creator_str.split(";"))
     if dc_creator_str:
-        all_items.update(item.strip() for item in dc_creator_str.split(';'))
+        all_items.update(item.strip() for item in dc_creator_str.split(";"))
     if dcterms_creator_str:
-        all_items.update(item.strip() for item in dcterms_creator_str.split(';'))
+        all_items.update(item.strip() for item in dcterms_creator_str.split(";"))
 
     author_names_list = []
     kac_codes_list = []
     for item in all_items:
         if item.startswith("nlk:KAC") or item.startswith("nlk:KAB"):
             kac_codes_list.append(item)
-        elif item and item != 'NULL':
+        elif item and item != "NULL":
             author_names_list.append(item)
-    
+
     # 최종적으로 정렬된 문자열로 저장
     final_author_names = ";".join(sorted(author_names_list))
     final_kac_codes = ";".join(sorted(kac_codes_list))
@@ -591,7 +598,16 @@ def upsert_biblio(
                 author_names=excluded.author_names,
                 kac_codes=excluded.kac_codes
             """,
-            (nlk_id, year, creator_str, dc_creator_str, dcterms_creator_str, title, final_author_names, final_kac_codes),
+            (
+                nlk_id,
+                year,
+                creator_str,
+                dc_creator_str,
+                dcterms_creator_str,
+                title,
+                final_author_names,
+                final_kac_codes,
+            ),
         )
     else:
         cur.execute(
@@ -621,17 +637,42 @@ def upsert_biblio(
             ),
         )
         if build_fts:
-            cur.execute("DELETE FROM biblio_fts WHERE nlk_id=?", (nlk_id,))
-            cur.execute(
-                "INSERT INTO biblio_fts (nlk_id, title, creator, dc_creator, dcterms_creator) VALUES (?, ?, ?, ?, ?)",
-                (
-                    nlk_id,
-                    title or "",
-                    creator_str or "",
-                    dc_creator_str or "",
-                    dcterms_creator_str or "",
-                ),
-            )
+            # content='biblio', content_rowid='rowid' 옵션 사용 시,
+            # FTS 테이블은 biblio 테이블의 rowid와 자동 연결됩니다.
+            # 따라서 별도로 DELETE/INSERT 할 필요 없이, biblio 테이블 INSERT/UPDATE 시
+            # 트리거가 자동으로 FTS 내용을 동기화합니다.
+            # 만약 트리거를 사용하지 않고 직접 FTS를 채우려면 아래 코드를 사용하되,
+            # biblio 테이블의 rowid를 알아내야 합니다.
+
+            # === 트리거를 사용하지 않고 *수동*으로 FTS를 채우는 경우 ===
+            # 먼저 biblio 테이블의 rowid를 가져옵니다.
+            cur.execute("SELECT rowid FROM biblio WHERE nlk_id = ?", (nlk_id,))
+            rowid_result = cur.fetchone()
+            if rowid_result:
+                biblio_rowid = rowid_result[0]
+                # 기존 FTS 데이터 삭제 (rowid 기준)
+                cur.execute("DELETE FROM biblio_fts WHERE rowid=?", (biblio_rowid,))
+                # 새 FTS 데이터 삽입 (rowid 기준)
+                cur.execute(
+                    """INSERT INTO biblio_fts (
+                                rowid, title, creator, dc_creator, dcterms_creator, author_names, kac_codes
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        biblio_rowid,
+                        title or "",
+                        creator_str or "",
+                        dc_creator_str or "",
+                        dcterms_creator_str or "",
+                        final_author_names or "",  # ✅ author_names 추가
+                        final_kac_codes or "",  # ✅ kac_codes 추가
+                    ),
+                )
+            # =======================================================
+            # !!! 중요: 하지만 우리는 트리거를 정의했으므로, 이 Python 코드 블록은
+            #     실제로는 필요하지 않거나 주석 처리해야 합니다.
+            #     트리거가 이 역할을 대신 수행합니다.
+            #     build_fts 플래그는 Fast Mode 후처리에서만 의미를 가집니다.
+            pass  # 트리거가 처리하므로 Python에서는 아무것도 안 함
 
 
 # =====================
@@ -885,25 +926,43 @@ INSERT INTO authority_fts(authority_fts) VALUES('optimize');
 PRAGMA synchronous=NORMAL;
 """
                         )
-                    else:
+                    else:  # kind == 'biblio'
+                        self._log(
+                            "[i] Biblio: Rebuilding indexes and FTS table (Fast Mode)..."
+                        )
                         conn.executescript(
                             """
--- recreate indexes
+/* --- Recreate non-FTS indexes --- */
 CREATE INDEX IF NOT EXISTS idx_biblio_year ON biblio(year);
-CREATE INDEX IF NOT EXISTS idx_biblio_kac_creator ON biblio(kac_creator);
-CREATE INDEX IF NOT EXISTS idx_biblio_title ON biblio(title);
+/* FTS가 커버하므로 title, creator 등 텍스트 인덱스는 제거 */
 
--- bulk build FTS
+/* --- Bulk rebuild FTS table --- */
+-- 1. 기존 FTS 데이터 삭제
 DELETE FROM biblio_fts;
-INSERT INTO biblio_fts (nlk_id, title, name)
-SELECT b.nlk_id,
-       COALESCE(b.title, ''),
-       COALESCE(b.name, '')
-FROM biblio b;
+
+-- 2. biblio 테이블에서 모든 데이터를 읽어 FTS 테이블 재구성
+--    (rowid를 사용하여 원본 테이블과 연결)
+INSERT INTO biblio_fts (
+    rowid, title, creator, dc_creator, dcterms_creator, author_names, kac_codes
+)
+SELECT
+    rowid,
+    COALESCE(title, ''),
+    COALESCE(creator, ''),
+    COALESCE(dc_creator, ''),
+    COALESCE(dcterms_creator, ''),
+    COALESCE(author_names, ''), -- ✅ author_names 추가
+    COALESCE(kac_codes, '')     -- ✅ kac_codes 추가
+FROM biblio;
+
+-- 3. FTS 인덱스 최적화
 INSERT INTO biblio_fts(biblio_fts) VALUES('optimize');
+
+-- 4. 동기화 모드 복원
 PRAGMA synchronous=NORMAL;
 """
                         )
+                        self._log("[✓] Biblio: Indexes and FTS table rebuilt.")
                 except Exception as e:
                     self._log(f"[WARN] post-build optimize failed: {e}")
                 finally:
@@ -931,7 +990,9 @@ PRAGMA synchronous=NORMAL;
                     cur.execute("SELECT COUNT(*) FROM authority")
                     actual_count = cur.fetchone()[0]
                     conn.close()
-                    self.sig_log.emit(f"[i] Authority: Processed {processed:,} records → {actual_count:,} unique records in DB")
+                    self.sig_log.emit(
+                        f"[i] Authority: Processed {processed:,} records → {actual_count:,} unique records in DB"
+                    )
                 except Exception as e:
                     self.sig_log.emit(f"[WARN] Could not count authority records: {e}")
 
@@ -951,11 +1012,16 @@ PRAGMA synchronous=NORMAL;
                     cur.execute("SELECT COUNT(*) FROM biblio")
                     actual_count = cur.fetchone()[0]
                     conn.close()
-                    self.sig_log.emit(f"[i] Biblio: Processed {processed:,} records → {actual_count:,} unique records in DB")
+                    self.sig_log.emit(
+                        f"[i] Biblio: Processed {processed:,} records → {actual_count:,} unique records in DB"
+                    )
                 except Exception as e:
                     self.sig_log.emit(f"[WARN] Could not count biblio records: {e}")
 
-            self.sig_done.emit(True, f"Completed. Total processed: {grand_total_processed:,} records (check log for unique counts)")
+            self.sig_done.emit(
+                True,
+                f"Completed. Total processed: {grand_total_processed:,} records (check log for unique counts)",
+            )
         except Exception as e:
             self.sig_log.emit(f"[ERROR] {e}")
             self.sig_done.emit(False, str(e))
@@ -1077,7 +1143,7 @@ class BuilderGUI(QWidget):
         self.worker: Optional[BuildWorker] = None
 
     def on_add_indexes(self):
-        """Add indexes and FTS to an existing DB"""
+        """Apply final FTS strategy and indexes to existing DBs."""
         auth_path = self.auth_db.text().strip()
         bib_path = self.bib_db.text().strip()
 
@@ -1087,16 +1153,25 @@ class BuilderGUI(QWidget):
 
         reply = QMessageBox.question(
             self,
-            "Add Indexes",
-            "This will add indexes and FTS to the selected DBs. Continue?",
-            QMessageBox.Yes | QMessageBox.No,
+            "Apply Final Indexes & FTS",
+            "This will apply the final indexing and FTS5 strategy (potentially replacing existing ones) to the selected DBs. Ensure you have backups. Continue?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,  # Default to No
         )
-        if reply != QMessageBox.Yes:
+        if reply != QMessageBox.StandardButton.Yes:
             return
 
+        self.log.clear()  # 로그 초기화
+        self.append_log("[i] Starting to apply indexes and FTS...")
+        self.progress.setRange(0, 0)  # Indicate busy state
+        self.btn_add_indexes.setEnabled(False)  # Disable button during operation
+
         try:
+            # --- Authority DB ---
             if auth_path and os.path.exists(auth_path):
+                self.append_log(f"[*] Processing Authority DB: {auth_path}")
                 conn = sqlite3.connect(auth_path)
+                # (Authority 부분은 이전 코드와 동일하게 유지 - 필요시 이 부분도 업데이트 가능)
                 conn.executescript(
                     """
                     -- recreate indexes
@@ -1113,11 +1188,14 @@ class BuilderGUI(QWidget):
                     CREATE VIRTUAL TABLE IF NOT EXISTS authority_fts USING fts5(
                         kac_id_full UNINDEXED,
                         name, pref_label, label,
-                        alt_labels, job_titles, fields, sources
+                        alt_labels, job_titles, fields, sources,
+                        content='authority', -- Assuming content/content_rowid needed if using triggers
+                        content_rowid='rowid' -- Assuming rowid PK for authority table
                     );
                     DELETE FROM authority_fts;
-                    INSERT INTO authority_fts
+                    INSERT INTO authority_fts (rowid, kac_id_full, name, pref_label, label, alt_labels, job_titles, fields, sources)
                     SELECT
+                        a.rowid, -- Use rowid for content_rowid
                         a.kac_id_full,
                         COALESCE(a.name, ''),
                         COALESCE(a.pref_label, ''),
@@ -1136,41 +1214,116 @@ class BuilderGUI(QWidget):
                 )
                 conn.commit()
                 conn.close()
+                self.append_log(f"[✓] Authority DB processed: {auth_path}")
 
+            # --- Biblio DB (Compromise Strategy - No advanced tokenizer) ---
             if bib_path and os.path.exists(bib_path):
+                self.append_log(
+                    f"[*] Processing Biblio DB (Compromise FTS): {bib_path}"
+                )
                 conn = sqlite3.connect(bib_path)
                 conn.executescript(
                     """
-                    -- recreate indexes
-                    CREATE INDEX IF NOT EXISTS idx_biblio_year ON biblio(year);
-                    CREATE INDEX IF NOT EXISTS idx_biblio_kac_creator ON biblio(kac_creator);
-                    CREATE INDEX IF NOT EXISTS idx_biblio_title ON biblio(title);
+                    /* [1단계: 기존 FTS 및 트리거 정리 (오류 발생 시 무시)] */
+                    DROP TRIGGER IF EXISTS biblio_ai;
+                    DROP TRIGGER IF EXISTS biblio_au;
+                    DROP TRIGGER IF EXISTS biblio_ad;
+                    DROP TABLE IF EXISTS biblio_fts; /* Use DROP TABLE for virtual tables */
 
-                    -- add FTS
-                    CREATE VIRTUAL TABLE IF NOT EXISTS biblio_fts USING fts5(
-                        nlk_id UNINDEXED,
+                    /* [2단계: 중복 B-Tree 인덱스 삭제 (선택적)] - 그대로 유지 */
+                    DROP INDEX IF EXISTS idx_biblio_creator;
+                    DROP INDEX IF EXISTS idx_biblio_dc_creator;
+                    DROP INDEX IF EXISTS idx_biblio_dcterms_creator;
+                    DROP INDEX IF EXISTS idx_biblio_title;
+                    DROP INDEX IF EXISTS idx_biblio_author_names;
+                    DROP INDEX IF EXISTS idx_biblio_kac_codes;
+                    CREATE INDEX IF NOT EXISTS idx_biblio_year ON biblio(year);
+
+                    /* [3단계: 새로운 FTS5 테이블 (타협안 - tokenize 옵션 없음)] */
+                    CREATE VIRTUAL TABLE biblio_fts USING fts5(
                         title,
-                        name,
-                        tokenize='unicase'
+                        creator,
+                        dc_creator,
+                        dcterms_creator,
+                        author_names,
+                        kac_codes,
+                        content='biblio',
+                        content_rowid='rowid'
+                        /* tokenize 옵션 제거됨 */
                     );
+
+                    /* 3-2 ~ 3-4: 트리거 생성 (이전과 동일) */
+                    CREATE TRIGGER IF NOT EXISTS biblio_ai AFTER INSERT ON biblio BEGIN
+                      INSERT INTO biblio_fts(
+                        rowid, title, creator, dc_creator, dcterms_creator, author_names, kac_codes
+                      ) VALUES (
+                        new.rowid, new.title, new.creator, new.dc_creator, new.dcterms_creator, new.author_names, new.kac_codes
+                      );
+                    END;
+                    CREATE TRIGGER IF NOT EXISTS biblio_au AFTER UPDATE ON biblio BEGIN
+                      UPDATE biblio_fts
+                      SET title = new.title,
+                          creator = new.creator,
+                          dc_creator = new.dc_creator,
+                          dcterms_creator = new.dcterms_creator,
+                          author_names = new.author_names,
+                          kac_codes = new.kac_codes
+                      WHERE rowid = old.rowid;
+                    END;
+                    CREATE TRIGGER IF NOT EXISTS biblio_ad AFTER DELETE ON biblio BEGIN
+                      DELETE FROM biblio_fts WHERE rowid = old.rowid;
+                    END;
+
+                    /* [4단계: 기존 데이터 인덱싱] (이전과 동일) */
                     DELETE FROM biblio_fts;
-                    INSERT INTO biblio_fts (nlk_id, title, name)
-                    SELECT
-                        b.nlk_id,
-                        COALESCE(b.title, ''),
-                        COALESCE(b.name, '')
-                    FROM biblio b;
+                    INSERT INTO biblio_fts(rowid, title, creator, dc_creator, dcterms_creator, author_names, kac_codes)
+                    SELECT rowid, title, creator, dc_creator, dcterms_creator, author_names, kac_codes FROM biblio;
+
+                    /* [5단계: 최적화] (이전과 동일) */
                     INSERT INTO biblio_fts(biblio_fts) VALUES('optimize');
                 """
                 )
                 conn.commit()
                 conn.close()
+                self.append_log(f"[✓] Biblio DB processed (Compromise FTS): {bib_path}")
 
+            # --- Completion ---
+            self.progress.setRange(0, 100)  # Indicate completion
+            self.progress.setValue(100)
+            self.btn_add_indexes.setEnabled(True)  # Re-enable button
             QMessageBox.information(
-                self, "Success", "Indexes and FTS have been added successfully"
+                self, "Success", "Final indexes and FTS strategy applied successfully!"
             )
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to add indexes: {str(e)}")
+            self.append_log("[✓] Operation completed.")
+
+        except sqlite3.Error as e:  # Catch SQLite specific errors
+            error_msg = f"Failed to apply indexes/FTS: {str(e)}"
+            self.append_log(f"[❌ ERROR] {error_msg}")
+            # Check for the specific parse error
+            if "parse error" in str(e) or "no such tokenizer" in str(e):
+                self.append_log(
+                    "[!] The SQLite version being used likely lacks ICU support for the advanced tokenizer."
+                )
+                self.append_log(
+                    "    Consider running this operation using the Python environment where the main app runs,"
+                )
+                self.append_log(
+                    "    or use a simpler FTS configuration (without 'tokenize' options) as a fallback."
+                )
+                error_msg += "\n\n(SQLite ICU support might be missing)"
+
+            QMessageBox.critical(self, "Error", error_msg)
+            self.progress.setRange(0, 100)  # Reset progress
+            self.progress.setValue(0)
+            self.btn_add_indexes.setEnabled(True)  # Re-enable button on error
+
+        except Exception as e:  # Catch other potential errors
+            error_msg = f"An unexpected error occurred: {str(e)}"
+            self.append_log(f"[❌ ERROR] {error_msg}")
+            QMessageBox.critical(self, "Error", error_msg)
+            self.progress.setRange(0, 100)
+            self.progress.setValue(0)
+            self.btn_add_indexes.setEnabled(True)
 
     # ---------- helpers
     def _list_items(self, lw: QListWidget) -> List[str]:

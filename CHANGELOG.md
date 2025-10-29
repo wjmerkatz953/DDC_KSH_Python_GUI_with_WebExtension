@@ -1,5 +1,55 @@
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-10-29 (세션 5): HTML 뷰어 다중 테이블 지원 개선
+
+- **문제**: Gemini DDC 분류 탭에서 HTML 뷰어 버튼 클릭 시 항상 중간 결과만 표시되는 버그
+  - **원인**: 두 개의 테이블(상단 "계층적 검색 결과", 하단 "DDC 추천 결과")이 있을 때, 포커스/선택 우선순위만으로는 사용자 의도 파악 불가
+  - **증상**: 사용자가 하단 테이블을 클릭해도 상단 테이블에 선택된 행이 남아있으면 계속 상단 데이터 표시
+
+- **해결책**: 최근 클릭된 테이블 추적(Last Clicked Table Tracking) 패턴 도입
+  - **핵심 개념**: 사용자가 마지막으로 클릭한 테이블을 `last_clicked_table` 속성에 기록
+  - **우선순위 재설계** (`qt_base_tab.py`의 `_get_active_table_data()` 메서드):
+    1. `last_clicked_table` 속성 (최우선) ✅ **신규 추가**
+    2. 포커스된 테이블
+    3. 선택된 행이 있는 테이블
+    4. 기본 테이블 (`current_dataframe`)
+
+- **Gemini DDC 분류 탭 개선** (`qt_TabView_Gemini.py` v2.2.8)
+  - `last_clicked_table` 속성 추가: `None` | `"inter_table"` | `"table_view"`
+  - 중간 결과 테이블(`inter_table`) 클릭 시 `_on_inter_table_clicked()` 호출
+  - 최종 결과 테이블(`table_view`) 클릭 시 `_on_table_view_clicked()` 호출
+  - HTML 뷰어가 정확히 마지막 클릭한 테이블 데이터 표시
+
+- **KSH Local 탭 개선** (`qt_TabView_KSH_Local.py` v4.4.1)
+  - 동일한 패턴 적용: `last_clicked_table` = `"table_view"` | `"biblio_table"`
+  - 상단 개념 DB 테이블 클릭 시 `_on_table_view_clicked()` 호출
+  - 하단 서지 DB 테이블 클릭 시 `_on_biblio_table_clicked()` 호출
+  - 기존 기능 유지하면서 HTML 뷰어 정확도 향상
+
+- **BaseSearchTab 핵심 로직 업데이트** (`qt_base_tab.py` v3.0.2)
+  - `_get_active_table_data()` 메서드 완전 재설계
+  - `last_clicked_table` 속성 최우선 체크 로직 추가
+  - Gemini 탭과 KSH Local 탭 모두 지원
+  - 단일 테이블 탭은 기존 로직 유지 (하위 호환성 보장)
+
+- **테스트 결과** ✅
+  - **Gemini DDC 분류 탭**:
+    - 상단 "계층적 검색 결과" 클릭 → HTML 뷰어 → 중간 결과 표시 ✅
+    - 하단 "DDC 추천 결과" 클릭 → HTML 뷰어 → 최종 결과 표시 ✅
+  - **KSH Local 탭**:
+    - 상단 "개념 DB" 클릭 → HTML 뷰어 → 개념 DB 표시 ✅
+    - 하단 "서지 DB" 클릭 → HTML 뷰어 → 서지 DB 표시 ✅
+
+- **효과**:
+  - 다중 테이블 탭에서 HTML 뷰어가 사용자 의도를 정확히 파악
+  - 엑셀 추출, HTML 뷰어 등 모든 데이터 내보내기 기능에 적용
+  - 향후 다중 테이블 탭 추가 시 패턴 재사용 가능
+
+- **수정 파일**:
+  - `qt_base_tab.py` v3.0.2 (우선순위 로직 재설계)
+  - `qt_TabView_Gemini.py` v2.2.8 (클릭 추적 기능 추가)
+  - `qt_TabView_KSH_Local.py` v4.4.1 (클릭 추적 기능 추가)
+
 ### 2025-10-29 (세션 4): PyInstaller SSL 인증서 번들링 개선
 
 - **SSL 인증서 경로 문제 해결** (`.spec`, `ssl_cert_utils.py`)
