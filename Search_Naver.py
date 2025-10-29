@@ -1060,18 +1060,25 @@ def scrape_kyobo_book_info(isbn, app_instance=None):
         detail_soup = BeautifulSoup(detail_response.content, "html.parser")
 
         # ✅ 저자소개 추출: `writer_info_box`를 먼저 찾고, 그 안에서 `info_text` 클래스의 `p` 태그를 찾습니다.
-        author_box = detail_soup.find("div", class_="writer_info_box")
-        if author_box:
-            # writer_info_box 안에 여러 명의 info_text 단락이 존재 가능
-            author_ps = author_box.find_all("p", class_="info_text")
-            author_chunks = []
-            for p in author_ps:
-                t = p.get_text(separator="\n", strip=True)
-                if t and len(t) > 30:
-                    author_chunks.append(t)
+        # -------------------
+        # [수정] .find()는 첫 번째 저자(앨리슨 우드 브룩스)만 찾습니다.
+        #       .find_all()로 변경하여 저자, 번역자 등 모든 'writer_info_box'를 순회해야 합니다.
+        author_boxes = detail_soup.find_all("div", class_="writer_info_box")
+        author_chunks = []  # 모든 저자/번역자의 소개 블록을 담을 리스트
+
+        if author_boxes:
+            for box in author_boxes:  # 👈 [수정] 발견된 모든 박스를 순회
+                # writer_info_box 안에 여러 명의 info_text 단락이 존재 가능
+                author_ps = box.find_all("p", class_="info_text")
+                for p in author_ps:  # 👈 [수정] 각 박스 안의 p 태그 순회
+                    t = p.get_text(separator="\n", strip=True)
+                    if t and len(t) > 30:
+                        author_chunks.append(t)  # 👈 [수정] 단일 리스트에 모두 추가
+
             if author_chunks:
                 result["저자소개"] = "\n\n---\n\n".join(author_chunks)
-                result["저자소개_리스트"] = author_chunks  # ✅ 추가
+                result["저자소개_리스트"] = author_chunks  # ✅ 수정: 저자/번역자 블록이 모두 포함됨
+        # -------------------
 
         # ✅ 목차 추출: <h2 class="title_heading">목차</h2> → <ul class="book_contents_list">
         toc_heading = detail_soup.find("h2", class_="title_heading", string="목차")
