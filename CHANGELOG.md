@@ -1,5 +1,126 @@
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-10-29 (세션 4): PyInstaller SSL 인증서 번들링 개선
+
+- **SSL 인증서 경로 문제 해결** (`.spec`, `ssl_cert_utils.py`)
+  - **문제**: PyInstaller로 빌드된 exe에서 HTTPS 요청 시 `Could not find a suitable TLS CA certificate bundle` 오류 발생
+  - **원인**: certifi 패키지의 `cacert.pem` 파일이 exe에 포함되지 않음
+  - **해결책 1**: `qt_main_app.spec` 파일에 certifi 인증서 명시적 포함
+    - `datas`에 `cacert.pem` 추가: `(cacert_file, 'certifi')`
+    - `hiddenimports`에 `certifi` 추가
+  - **해결책 2**: `ssl_cert_utils.py` 강화
+    - PyInstaller 번들링 경로(`sys._MEIPASS/certifi/cacert.pem`) 확인 로직 추가
+    - 인증서를 찾을 수 없는 경우 폴백으로 SSL 검증 비활성화 (개발 환경용)
+    - 더 많은 환경 변수 설정 (`CURL_CA_BUNDLE` 추가)
+  - **테스트 스크립트 추가**: `test_ssl.py` - SSL 설정이 제대로 되었는지 확인
+  - **빌드 방법**: `pyinstaller qt_main_app.spec --clean`
+
+- **수정 파일**:
+  - `qt_main_app.spec` (certifi 인증서 포함)
+  - `ssl_cert_utils.py` v1.0.1 (폴백 로직 및 대체 경로 추가)
+  - `test_ssl.py` (신규 생성)
+
+### 2025-10-29 (세션 3): Search_Naver.py v1.2.0 - 네트워크 안정성 및 성능 최적화
+
+- **네트워크 탄력성 강화** (`Search_Naver.py` v1.2.0)
+  - **재시도 로직 + 지수 백오프 구현**
+    - `_retry_request()` 함수 추가: 단일 재시도 + 0.6~1.2초 랜덤 대기
+    - 429 (Too Many Requests), 503 (Service Unavailable) 자동 재시도
+    - 타임아웃 및 ConnectionError 시 자동 재시도
+    - 효과: 일시적 네트워크 오류나 서버 과부하 시 성공률 대폭 향상
+
+- **HTTP 세션 재사용 및 공통 헤더 관리**
+  - `get_http_session(site)` 함수 추가: 사이트별 세션 캐싱
+  - 네이버, Yes24, 교보문고 각각의 최적화된 헤더 설정
+  - 모듈 전역 세션 딕셔너리 + 스레드 락으로 동시성 보장
+  - 효과: 커넥션 재수립 오버헤드 감소, 속도 향상
+
+- **ISBN 정규화 유틸리티 추가**
+  - `normalize_isbn_digits(isbn_str)`: 숫자만 추출 (공백, 하이픈 제거)
+  - `split_isbn_tokens(isbn_str)`: ISBN13+ISBN10 조합 분리 및 정규화
+  - 모든 ISBN 비교 및 로깅에 정규화 적용
+  - 효과: ISBN10·13 혼재, 하이픈/공백 포함 등 다양한 형식 대응, 매칭 정확도 향상
+
+- **스크레이핑 결과 캐시 시스템 (2시간 TTL)**
+  - `_get_cached_scraping_result()`, `_set_cached_scraping_result()` 함수 추가
+  - 메모리 기반 LRU 캐시 (최대 100개, 2시간 TTL)
+  - Yes24, 교보문고 스크레이핑 결과 자동 캐싱
+  - 캐시 히트 시 로그 출력으로 디버깅 가능
+  - 효과: 동일 ISBN 반복 조회 시 즉시 응답, 외부 사이트 부하 감소
+
+- **버그 수정**
+  - `_call_naver_api()` 반환값 불일치 수정
+    - 문제: 성공 시 1개 값 반환, 실패 시 2개 값 반환 → 언패킹 오류
+    - 해결: 항상 `(response, error_msg)` 2개 값 반환하도록 통일
+
+- **코드 품질 개선**
+  - 타입 힌트 추가: `Literal`, `Optional`, `Tuple` 사용
+  - 로깅 개선: ISBN은 정규화하여 로깅 (가독성 향상)
+  - 코드 모듈화: 각 기능별로 명확한 함수 분리
+
+- **변경 통계**: +355줄, -57줄 (총 412줄 변경)
+
+- **수정 파일**:
+  - `Search_Naver.py` v1.2.0 (대규모 리팩토링 및 기능 개선)
+
+### 2025-10-29 (세션 2): 레코드 스키마 상수화 및 팩토리 패턴 도입
+
+- **레코드 생성 로직 리팩토링** (`Search_Naver.py`, 기타 검색 모듈)
+  - **스키마 상수 정의**: 모든 검색 모듈에서 사용하는 레코드 필드를 상수로 정의
+  - **팩토리 함수 패턴**: `_create_error_record()` 같은 팩토리 함수로 레코드 생성 통일
+  - **효과**: 코드 유지보수성 향상, 오타 방지, 필드 추가/제거 시 일관성 보장
+
+- **어플리케이션 버전 업데이트** (`qt_main_app.py`)
+  - 윈도우 타이틀에 표시되는 버전을 v5.1.0으로 업데이트
+  - 버전 관리 체계 확립
+
+- **.gitignore 업데이트**
+  - JavaScript 파일(`*.js`) 예외 추가
+  - 웹 확장 기능 개발 파일 포함
+
+- **수정 파일**:
+  - `qt_main_app.py` (버전 5.1.0)
+  - `.gitignore`
+  - 다수의 검색 모듈 (레코드 스키마 상수화)
+
+### 2025-10-29 (세션 1): Search_Naver.py 리팩토링 완료
+
+- **search_naver_catalog 함수 대규모 리팩토링** (`Search_Naver.py` v1.1.1)
+  - **문제점**: 500줄 넘는 거대한 단일 함수, 가독성 및 유지보수성 저하
+  - **리팩토링 목표**: 함수 분해, 단일 책임 원칙 적용, 오류 처리 개선
+
+- **신규 헬퍼 함수 추가**:
+  - `_validate_search_input()`: 검색어 유효성 검사
+  - `_prepare_naver_api_request()`: API 요청 URL 및 검색 타입 결정
+  - `_call_naver_api()`: API 호출 및 네트워크 오류 처리
+  - `_parse_naver_api_response()`: XML 응답 파싱 및 오류 처리
+  - `_scrape_additional_info()`: Yes24/교보문고 병렬 스크레이핑
+  - `_process_scraped_data()`: 스크레이핑 데이터 병합 및 레코드 생성
+  - `_create_error_record()`: 표준화된 오류 레코드 생성
+
+- **개선 사항**:
+  - 명확한 단계별 흐름: 입력 검증 → API 호출 → 파싱 → 스크레이핑 → 병합
+  - 오류 처리 강화: 네트워크 오류, XML 파싱 오류, 검색 결과 없음 등 세분화
+  - 코드 재사용성 향상: 헬퍼 함수들을 다른 곳에서도 활용 가능
+  - 테스트 용이성: 각 함수를 독립적으로 테스트 가능
+
+- **교보문고 스크레이핑 개선**
+  - **버그 수정**: 제2저자(번역자 등)의 "다른 작품" 정보가 누락되던 문제 해결
+  - **원인**: `.find()`는 첫 번째 `writer_info_box`만 찾음 (지은이만 추출)
+  - **해결**: `.find_all()`로 변경하여 저자, 번역자 등 모든 `writer_info_box` 순회
+  - **효과**: 번역서의 경우 번역자의 다른 작품 목록도 정상 추출
+
+- **수정 파일**:
+  - `Search_Naver.py` v1.1.0 → v1.1.1 (대규모 리팩토링)
+
+### 2025-10-29: 기타 버그 수정 및 개선
+
+- **웹 확장 기능 데이터 업데이트** (`extension/data.json`)
+  - 웹 확장 기능에서 사용하는 설정 및 데이터 파일 업데이트
+
+- **수정 파일**:
+  - `extension/data.json`
+
 ### 2025-10-28 (세션 3): HTML 뷰어 자동 테이블 감지 및 Dewey 탭 지원
 
 - **HTML 보기 기능 개선: 포커스/선택된 테이블 자동 감지**
