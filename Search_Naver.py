@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-# Version: v1.1.0
+# Version: v1.1.1
 # 생성일시: 2025-08-10 KST (GAS 네이버 API 로직을 파이썬으로 포팅)
 # 수정일시: 2025-10-29 KST
 """
 Search_Naver.py - 네이버 검색을 위한 하이브리드 도서 정보 수집 모듈
 
 [변경 이력]
+v1.1.1 (2025-10-29)
+리팩토링 메인 함수: search_naver_catalog
+
 v1.1.0 (2025-10-29)
 - [버그 수정] scrape_kyobo_book_info 함수가 저자, 번역자 등 모든 'writer_info_box'를
   수집하도록 .find()를 .find_all()로 수정했습니다.
@@ -1105,18 +1108,3 @@ def get_additional_book_info(isbn, app_instance=None):
         result = yes24_info
 
     return result
-
-
-# 테스트용 메인 함수
-if __name__ == "__main__":
-    print("Search_Naver.py 테스트 실행")
-
-    # 테스트 ISBN
-    test_isbn = "9788960773417"
-
-    # 간단한 테스트 (실제 API 키 없이)
-    print(f"테스트 ISBN: {test_isbn}")
-
-    # DatabaseManager 없이 테스트
-    results = search_naver_catalog(test_isbn, app_instance=None, db_manager=None)
-    print("테스트 결과:", results)
