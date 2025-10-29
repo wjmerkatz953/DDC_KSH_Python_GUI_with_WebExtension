@@ -254,541 +254,427 @@ def get_naver_api_credentials(db_manager):
         return None, None
 
 
-def search_naver_catalog(
-    title_query, author_query, isbn_query, app_instance=None, db_manager=None
-):
-    """
-    네이버 책 API를 사용하여 제목, 저자, ISBN으로 도서 정보를 검색합니다.
-    GAS fetchNaverBookInfo() 함수를 파이썬으로 포팅하여 다중 검색 조건 지원
+def _create_error_record(error_type, error_msg, search_type, primary_query):
+    """표준화된 오류 레코드를 생성합니다."""
+    return {
+        "서명": error_type,
+        "저자": "",
+        "출판사": "",
+        "출간일": "",
+        "ISBN": primary_query if "ISBN" in search_type else "",
+        "가격": "",
+        "서평": error_msg,
+        "분류 정보 취합": "",
+        "저자소개": "",
+        "목차": "",
+        "검색소스": search_type,
+        "링크": "",
+    }
 
-    Args:
-        title_query (str): 검색할 책 제목
-        author_query (str): 검색할 저자명
-        isbn_query (str): 검색할 ISBN
-        app_instance (object, optional): GUI 애플리케이션 인스턴스 (로그용)
-        db_manager (DatabaseManager, optional): 데이터베이스 매니저 인스턴스
-
-    Returns:
-        list: 검색 결과 레코드 목록. 각 레코드는 딕셔너리 형태
-    """
-    # 검색어 유효성 검사
+def _validate_search_input(title_query, author_query, isbn_query, app_instance=None):
+    """검색어 유효성을 검사합니다."""
     if not any([title_query, author_query, isbn_query]):
         if app_instance:
             app_instance.log_message(
                 "경고: 제목, 저자, ISBN 중 하나 이상을 입력해주세요.", level="WARNING"
             )
-        return []
+        return False
+    return True
 
-    if not db_manager:
-        if app_instance:
-            app_instance.log_message(
-                "오류: DatabaseManager 인스턴스가 필요합니다.", level="ERROR"
-            )
-        return []
-
-    if app_instance:
-        search_info = (
-            f"제목='{title_query}', 저자='{author_query}', ISBN='{isbn_query}'"
-        )
-        app_instance.log_message(f"정보: 네이버 책 API 검색 시작 ({search_info})")
-        app_instance.update_progress(10)
-
-    # 네이버 API 인증 정보 가져오기
-    client_id, client_secret = get_naver_api_credentials(db_manager)
-    if not client_id or not client_secret:
-        if app_instance:
-            app_instance.log_message(
-                "오류: 네이버 API 클라이언트 ID 또는 시크릿이 설정되지 않았습니다. 설정 탭에서 API 키를 입력해주세요.",
-                level="ERROR",
-            )
-        return []
-
-    # 검색 쿼리 생성 (우선순위: ISBN > 제목+저자 > 제목 > 저자)
+def _prepare_naver_api_request(title_query, author_query, isbn_query):
+    """검색 조건에 따라 네이버 API 요청 URL과 검색 타입을 결정합니다."""
     if isbn_query:
-        # ISBN 검색 (가장 정확함)
-        api_url = (
-            f"https://openapi.naver.com/v1/search/book_adv.xml?d_isbn={isbn_query}"
-        )
+        api_url = f"https://openapi.naver.com/v1/search/book_adv.xml?d_isbn={isbn_query}"
         search_type = "ISBN 검색"
         primary_query = isbn_query
     elif title_query and author_query:
-        # 제목 + 저자 조합 검색
         query = f"{title_query} {author_query}"
         api_url = f"https://openapi.naver.com/v1/search/book.xml?query={requests.utils.quote(query)}&display=100"
         search_type = "제목+저자 검색"
         primary_query = query
     elif title_query:
-        # 제목만 검색
         api_url = f"https://openapi.naver.com/v1/search/book.xml?query={requests.utils.quote(title_query)}&display=100"
         search_type = "제목 검색"
         primary_query = title_query
     elif author_query:
-        # 저자만 검색
         api_url = f"https://openapi.naver.com/v1/search/book.xml?query={requests.utils.quote(author_query)}&display=100"
         search_type = "저자 검색"
         primary_query = author_query
-    else:
-        return []
+    else: # 이 경우는 _validate_search_input 에서 걸러지지만 안전을 위해 추가
+        return None, None, None
 
-    if app_instance:
-        app_instance.log_message(f"정보: 네이버 API 요청 URL: {api_url}")
-        app_instance.update_progress(30)
+    return api_url, search_type, primary_query
 
-    # API 요청 헤더 설정
+def _call_naver_api(api_url, client_id, client_secret, app_instance=None):
+    """네이버 API를 호출하고 응답 객체를 반환합니다. 네트워크 오류를 처리합니다."""
     headers = {
         "X-Naver-Client-Id": client_id,
         "X-Naver-Client-Secret": client_secret,
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     }
-
-    # 기본값 설정
-    results = []
-
     try:
-        # API 호출
+        if app_instance: app_instance.log_message(f"정보: 네이버 API 요청 URL: {api_url}")
         response = requests.get(api_url, headers=headers, timeout=10)
-        response_code = response.status_code
-        response_text = response.text
-
-        if app_instance:
-            app_instance.log_message(f"정보: 네이버 API 응답 코드: {response_code}")
-            app_instance.update_progress(60)
-
-        if response_code == 200:
-            try:
-                # XML 파싱 (GAS 코드와 동일한 구조)
-                root = ET.fromstring(response_text)
-                channel = root.find("channel")
-
-                if channel is not None:
-                    items = channel.findall("item")
-
-                    if items:
-                        for item in items:
-                            # 각 항목에서 정보 추출 (HTML 태그 제거)
-                            title = clean_text(item.findtext("title", "정보 없음"))
-                            author = clean_text(item.findtext("author", "정보 없음"))
-                            publisher = clean_text(
-                                item.findtext("publisher", "정보 없음")
-                            )
-                            pubdate = clean_text(item.findtext("pubdate", "정보 없음"))
-                            isbn = clean_text(item.findtext("isbn", "정보 없음"))
-                            price = clean_text(item.findtext("price", "정보 없음"))
-                            description = clean_text(
-                                item.findtext("description", "정보 없음")
-                            )
-                            link = item.findtext("link", "")
-
-                            # 가격 포맷팅
-                            if price and price != "정보 없음" and price.isdigit():
-                                price = f"{int(price):,}원"
-
-                            # 출간일 포맷팅 (YYYYMMDD → YYYY-MM-DD)
-                            if (
-                                pubdate
-                                and pubdate != "정보 없음"
-                                and len(pubdate) == 8
-                                and pubdate.isdigit()
-                            ):
-                                pubdate = f"{pubdate[:4]}-{pubdate[4:6]}-{pubdate[6:8]}"
-
-                            # ✅ 1. 네이버 API 기본 결과
-                            naver_record = {
-                                "검색소스": "Naver",
-                                "서명": title,
-                                "저자": author,
-                                "분류 정보 취합": description,
-                                "저자소개": "",  # 네이버 API는 제공 안함
-                                "목차": "",  # 네이버 API는 제공 안함
-                                "서평": description,
-                                "ISBN": isbn,
-                                "출판사": publisher,
-                                "출간일": pubdate,
-                                "가격": price,
-                                "링크": link,
-                            }
-                            results.append(naver_record)
-                            # ✅ 2. 예스24 및 교보문고 추가 정보
-                            # -------------------
-                            # ✅ 수정: ISBN으로 검색했을 때만 웹스크레이핑 로직 실행
-                            if (
-                                search_type == "ISBN 검색"
-                                and isbn
-                                and isbn != "정보 없음"
-                            ):
-                                clean_isbn = isbn.strip()
-                                if clean_isbn:
-                                    # 각 스크레이퍼의 결과를 저장할 딕셔너리
-                                    scraping_results = {"yes24": {}, "kyobo": {}}
-
-                                    # 스레드에서 실행할 함수 정의
-                                    def run_scraper(site, isbn_code):
-                                        if site == "yes24":
-                                            scraping_results["yes24"] = (
-                                                scrape_yes24_book_info(
-                                                    isbn_code, app_instance
-                                                )
-                                            )
-                                        elif site == "kyobo":
-                                            scraping_results["kyobo"] = (
-                                                scrape_kyobo_book_info(
-                                                    isbn_code, app_instance
-                                                )
-                                            )
-
-                                    # 스레드 생성 및 시작
-                                    yes24_thread = threading.Thread(
-                                        target=run_scraper, args=("yes24", clean_isbn)
-                                    )
-                                    kyobo_thread = threading.Thread(
-                                        target=run_scraper, args=("kyobo", clean_isbn)
-                                    )
-
-                                    yes24_thread.start()
-                                    kyobo_thread.start()
-
-                                    # 두 스레드가 모두 끝날 때까지 대기
-                                    yes24_thread.join(timeout=15)
-                                    kyobo_thread.join(timeout=15)
-
-                                    yes24_info = scraping_results["yes24"]
-                                    kyobo_info = scraping_results["kyobo"]
-
-                                    # -------------------
-                                    # -------------------
-                                    # ✅ [수정] 예스24: 저자소개, 목차, 서평 수집
-                                    author_intro_y24 = yes24_info.get("저자소개", "")
-                                    toc_y24 = yes24_info.get("목차", "")
-                                    review_y24 = yes24_info.get("출판사서평", "")
-
-                                    review_parts_y24 = []
-                                    if author_intro_y24:
-                                        review_parts_y24.append(
-                                            f"1. 저자 소개\n{author_intro_y24}"
-                                        )
-                                    if toc_y24:
-                                        review_parts_y24.append(f"2. 목차\n{toc_y24}")
-                                    if review_y24:
-                                        review_parts_y24.append(
-                                            f"3. 서평\n{review_y24}"
-                                        )
-
-                                    # ✅ [핵심 추가] 예스24 행 생성 및 append (빠져있던 부분)
-                                    yes24_record = {
-                                        "검색소스": "Yes24",
-                                        "서명": title,
-                                        "저자": author,
-                                        "분류 정보 취합": "\n\n".join(review_parts_y24),
-                                        "저자소개": author_intro_y24,
-                                        "목차": toc_y24,
-                                        "서평": review_y24,
-                                        "ISBN": isbn,
-                                        "출판사": publisher,
-                                        "출간일": pubdate,
-                                        "가격": price,
-                                        "링크": yes24_info.get("상품링크", link),
-                                    }
-                                    results.append(yes24_record)
-
-                                    # ✅ 예스24 / 교보 저자소개 취합
-                                    author_intro_kb = kyobo_info.get("저자소개", "")
-                                    toc_kb = kyobo_info.get("목차", "")
-                                    review_kb = kyobo_info.get("출판사서평", "")
-
-                                    review_parts_kb = []
-                                    if author_intro_kb:
-                                        review_parts_kb.append(
-                                            f"1. 저자 소개\n{author_intro_kb}"
-                                        )
-                                    if toc_kb:
-                                        review_parts_kb.append(f"2. 목차\n{toc_kb}")
-                                    if review_kb:
-                                        review_parts_kb.append(f"3. 서평\n{review_kb}")
-
-                                    kyobo_record = {
-                                        "검색소스": "Kyobo Book",
-                                        "서명": title,
-                                        "저자": author,
-                                        "분류 정보 취합": "\n\n".join(review_parts_kb),
-                                        "저자소개": author_intro_kb,
-                                        "목차": toc_kb,
-                                        "서평": review_kb,
-                                        "ISBN": isbn,
-                                        "출판사": publisher,
-                                        "출간일": pubdate,
-                                        "가격": price,
-                                        "링크": kyobo_info.get("상품링크", link),
-                                    }
-                                    results.append(kyobo_record)
-
-                                    # ✅ 3-a) 길이 우선 병합(저자/목차/서평) 계산 추가
-                                    def _longer(a: str, b: str) -> str:
-                                        return (
-                                            (a or "")
-                                            if len(a or "") >= len(b or "")
-                                            else (b or "")
-                                        )
-
-                                    merged_author = _longer(
-                                        author_intro_y24, author_intro_kb
-                                    )
-                                    merged_toc = _longer(toc_y24, toc_kb)
-                                    merged_review = _longer(review_y24, review_kb)
-
-                                    merged_parts = []
-                                    if merged_author:
-                                        merged_parts.append(
-                                            f"1. 저자 소개\n{merged_author}"
-                                        )
-                                    if merged_toc:
-                                        merged_parts.append(f"2. 목차\n{merged_toc}")
-                                    if merged_review:
-                                        merged_parts.append(f"3. 서평\n{merged_review}")
-
-                                    # ✅ 3-b) 저자별 블록 추출/렌더 (우선: 리스트 기반)
-                                    author_blocks = []
-                                    y24_blocks = yes24_info.get("저자소개_리스트") or []
-                                    kb_blocks = kyobo_info.get("저자소개_리스트") or []
-                                    author_blocks.extend(y24_blocks)
-                                    author_blocks.extend(kb_blocks)
-
-                                    # ✅ 3-c) 리스트가 비면 합본 텍스트로라도 그룹 생성 (fallback)
-                                    if not author_blocks:
-                                        combined_bio = combine_author_bios(
-                                            author_intro_y24, author_intro_kb
-                                        )
-                                        author_blocks = (
-                                            [combined_bio] if combined_bio else []
-                                        )
-
-                                    # 저자명 파싱
-                                    author_names = []
-                                    if author and isinstance(author, str):
-                                        parts = [
-                                            p.strip()
-                                            for p in re.split(r"[|,／/]", author)
-                                            if p.strip()
-                                        ]
-                                        if parts:
-                                            author_names = parts
-
-                                    groups = extract_other_works_grouped(
-                                        author_blocks, title
-                                    )
-                                    pattern_text = render_other_works_grouped(
-                                        groups, author_names or None
-                                    )
-
-                                    # 평탄화 리스트 (AI-Feed Merge용)
-                                    other_works_flat = []
-                                    for g in groups:
-                                        for w in g["works"]:
-                                            other_works_flat.append(
-                                                f"{w['title']}({w['orig']})"
-                                                if w["orig"]
-                                                else w["title"]
-                                            )
-
-                                    # 4번째 행 — AI-Feed Merge
-                                    merged_record = {
-                                        "검색소스": "AI-Feed Merge",
-                                        "서명": title,
-                                        "저자": author,
-                                        "분류 정보 취합": "\n\n".join(
-                                            merged_parts
-                                        ).strip(),
-                                        "저자소개": merged_author,
-                                        "목차": merged_toc,
-                                        "서평": merged_review,
-                                        "ISBN": isbn,
-                                        "출판사": publisher,
-                                        "출간일": pubdate,
-                                        "가격": price,
-                                        "링크": yes24_info.get("상품링크")
-                                        or kyobo_info.get("상품링크")
-                                        or link,
-                                    }
-                                    results.append(merged_record)
-
-                                    # 5번째 행 — OtherWorks Merge (저자별 패턴)
-                                    if groups:
-                                        otherworks_record = {
-                                            "검색소스": "OtherWorks Merge",
-                                            "서명": title,
-                                            "저자": author,
-                                            "분류 정보 취합": pattern_text,  # 저자A/작품/원서명 형식
-                                            "저자소개": "",
-                                            "목차": "",
-                                            "서평": "",
-                                            "ISBN": isbn,
-                                            "출판사": publisher,
-                                            "출간일": pubdate,
-                                            "가격": price,
-                                            "링크": yes24_info.get("상품링크")
-                                            or kyobo_info.get("상품링크")
-                                            or link,
-                                        }
-                                        results.append(otherworks_record)
-
-                            if app_instance:
-                                app_instance.log_message(
-                                    f"정보: 네이버 API 결과 - 서명: {title[:50]}{'...' if len(title) > 50 else ''}"
-                                )
-
-                    else:
-                        # 검색 결과 없음
-                        if app_instance:
-                            app_instance.log_message(
-                                "정보: 네이버 API 검색 결과가 없습니다."
-                            )
-
-                        results = [
-                            {
-                                "서명": "검색 결과 없음",
-                                "저자": "",
-                                "출판사": "",
-                                "출간일": "",
-                                "ISBN": primary_query if isbn_query else "",
-                                "가격": "",
-                                "서평": f"'{primary_query}'에 대한 검색 결과를 찾을 수 없습니다.",
-                                "분류 정보 취합": "",
-                                "저자소개": "",
-                                "목차": "",
-                                "검색소스": search_type,
-                                "링크": "",
-                            }
-                        ]
-                else:
-                    # XML 구조 오류
-                    error_msg = "네이버 API 응답에서 channel 태그를 찾을 수 없습니다."
-                    if app_instance:
-                        app_instance.log_message(f"오류: {error_msg}", level="ERROR")
-
-                    results = [
-                        {
-                            "서명": "API 응답 오류",
-                            "저자": "",
-                            "출판사": "",
-                            "출간일": "",
-                            "ISBN": primary_query if isbn_query else "",
-                            "가격": "",
-                            "서평": error_msg,
-                            "분류 정보 취합": "",
-                            "저자소개": "",
-                            "목차": "",
-                            "검색소스": search_type,
-                            "링크": "",
-                        }
-                    ]
-
-            except ET.ParseError as e:
-                # XML 파싱 오류
-                error_msg = f"XML 파싱 실패: {str(e)}"
-                if app_instance:
-                    app_instance.log_message(
-                        f"오류: 네이버 API 응답 XML 파싱 실패: {e}", level="ERROR"
-                    )
-
-                results = [
-                    {
-                        "서명": "XML 파싱 오류",
-                        "저자": "",
-                        "출판사": "",
-                        "출간일": "",
-                        "ISBN": primary_query if isbn_query else "",
-                        "가격": "",
-                        "서평": error_msg,
-                        "분류 정보 취합": "",
-                        "저자소개": "",
-                        "목차": "",
-                        "검색소스": search_type,
-                        "링크": "",
-                    }
-                ]
-
-        else:
-            # API 오류 처리 (GAS 코드와 동일)
-            error_msg = f"API 오류 ({response_code}): {response_text[:100]}..."
-            if app_instance:
-                app_instance.log_message(
-                    f"오류: 네이버 API 호출 오류: 응답 코드 {response_code}, 응답 텍스트: {response_text[:100]}...",
-                    level="ERROR",
-                )
-
-            results = [
-                {
-                    "서명": "API 호출 오류",
-                    "저자": "",
-                    "출판사": "",
-                    "출간일": "",
-                    "ISBN": primary_query if isbn_query else "",
-                    "가격": "",
-                    "서평": error_msg,
-                    "분류 정보 취합": "",
-                    "저자소개": "",
-                    "목차": "",
-                    "검색소스": search_type,
-                    "링크": "",
-                }
-            ]
-
+        if app_instance: app_instance.log_message(f"정보: 네이버 API 응답 코드: {response.status_code}")
+        return response, None  # 성공 시 응답 객체와 None 반환
     except requests.exceptions.RequestException as e:
-        # 네트워크 오류 처리
         error_msg = f"네트워크 오류: {str(e)}"
         if app_instance:
             app_instance.log_message(
                 f"오류: 네이버 API 호출 중 네트워크 오류: {e}", level="ERROR"
             )
+        # 네트워크 오류 시 None과 에러 메시지 반환
+        return None, error_msg
 
-        results = [
-            {
-                "서명": "네트워크 오류",
-                "저자": "",
-                "출판사": "",
-                "출간일": "",
-                "ISBN": primary_query if isbn_query else "",
-                "가격": "",
-                "서평": error_msg,
-                "분류 정보 취합": "",
-                "저자소개": "",
-                "목차": "",
-                "검색소스": search_type,
-                "링크": "",
-            }
-        ]
+def _parse_naver_api_response(response_text, search_type, primary_query, app_instance=None):
+    """네이버 API 응답(XML)을 파싱하여 기본 도서 정보 레코드 리스트를 반환합니다. XML 오류를 처리합니다."""
+    results = []
+    try:
+        root = ET.fromstring(response_text)
+        channel = root.find("channel")
 
-    except Exception as e:
-        # 기타 예외 처리 (GAS 코드와 동일)
-        error_msg = f"오류 발생: {str(e)}"
+        if channel is not None:
+            items = channel.findall("item")
+            if items:
+                for item in items:
+                    title = clean_text(item.findtext("title", "정보 없음"))
+                    author = clean_text(item.findtext("author", "정보 없음"))
+                    publisher = clean_text(item.findtext("publisher", "정보 없음"))
+                    pubdate = clean_text(item.findtext("pubdate", "정보 없음"))
+                    isbn = clean_text(item.findtext("isbn", "정보 없음"))
+                    price = clean_text(item.findtext("price", "정보 없음"))
+                    description = clean_text(item.findtext("description", "정보 없음"))
+                    link = item.findtext("link", "")
+
+                    # 가격 포맷팅
+                    if price and price != "정보 없음" and price.isdigit():
+                        price = f"{int(price):,}원"
+                    # 출간일 포맷팅
+                    if pubdate and pubdate != "정보 없음" and len(pubdate) == 8 and pubdate.isdigit():
+                        pubdate = f"{pubdate[:4]}-{pubdate[4:6]}-{pubdate[6:8]}"
+
+                    naver_record = {
+                        "검색소스": "Naver", "서명": title, "저자": author,
+                        "분류 정보 취합": description, "저자소개": "", "목차": "",
+                        "서평": description, "ISBN": isbn, "출판사": publisher,
+                        "출간일": pubdate, "가격": price, "링크": link,
+                    }
+                    results.append(naver_record)
+                    if app_instance:
+                         app_instance.log_message(
+                             f"정보: 네이버 API 결과 - 서명: {title[:50]}{'...' if len(title) > 50 else ''}"
+                         )
+                return results, None # 성공 시 결과 리스트와 None 반환
+            else:
+                # 검색 결과 없음
+                msg = f"'{primary_query}'에 대한 검색 결과를 찾을 수 없습니다."
+                if app_instance: app_instance.log_message("정보: 네이버 API 검색 결과가 없습니다.")
+                return [_create_error_record("검색 결과 없음", msg, search_type, primary_query)], None
+        else:
+            # XML 구조 오류
+            error_msg = "네이버 API 응답에서 channel 태그를 찾을 수 없습니다."
+            if app_instance: app_instance.log_message(f"오류: {error_msg}", level="ERROR")
+            return [_create_error_record("API 응답 오류", error_msg, search_type, primary_query)], None
+
+    except ET.ParseError as e:
+        # XML 파싱 오류
+        error_msg = f"XML 파싱 실패: {str(e)}"
+        if app_instance:
+            app_instance.log_message(f"오류: 네이버 API 응답 XML 파싱 실패: {e}", level="ERROR")
+        return [_create_error_record("XML 파싱 오류", error_msg, search_type, primary_query)], None
+
+def _scrape_additional_info(isbn, app_instance=None):
+    """Yes24와 교보문고에서 병렬로 추가 정보를 스크레이핑합니다."""
+    if not isbn or isbn == "정보 없음":
+        return {}, {}
+
+    clean_isbn = isbn.strip()
+    if not clean_isbn:
+        return {}, {}
+
+    scraping_results = {"yes24": {}, "kyobo": {}}
+
+    def run_scraper(site, isbn_code):
+        scraper_func = scrape_yes24_book_info if site == "yes24" else scrape_kyobo_book_info
+        try:
+            scraping_results[site] = scraper_func(isbn_code, app_instance)
+        except Exception as e:
+            if app_instance:
+                app_instance.log_message(f"오류: {site} 스크레이핑 중 예외 발생: {e}", level="ERROR")
+
+    yes24_thread = threading.Thread(target=run_scraper, args=("yes24", clean_isbn))
+    kyobo_thread = threading.Thread(target=run_scraper, args=("kyobo", clean_isbn))
+
+    yes24_thread.start()
+    kyobo_thread.start()
+
+    # 스레드 완료 대기 (타임아웃 설정)
+    yes24_thread.join(timeout=15)
+    kyobo_thread.join(timeout=15)
+
+    if yes24_thread.is_alive() and app_instance:
+        app_instance.log_message("경고: Yes24 스크레이핑 시간 초과", level="WARNING")
+    if kyobo_thread.is_alive() and app_instance:
+        app_instance.log_message("경고: 교보문고 스크레이핑 시간 초과", level="WARNING")
+
+    return scraping_results["yes24"], scraping_results["kyobo"]
+
+def _process_scraped_data(naver_record, yes24_info, kyobo_info):
+    """스크레이핑된 데이터와 네이버 API 데이터를 병합하여 추가 레코드를 생성합니다."""
+    processed_results = []
+    base_info = {k: v for k, v in naver_record.items() if k not in ["검색소스", "분류 정보 취합", "저자소개", "목차", "서평", "링크"]}
+    link_naver = naver_record.get("링크", "")
+
+    # 1. Yes24 레코드 생성
+    author_intro_y24 = yes24_info.get("저자소개", "")
+    toc_y24 = yes24_info.get("목차", "")
+    review_y24 = yes24_info.get("출판사서평", "")
+    link_y24 = yes24_info.get("상품링크", link_naver)
+    review_parts_y24 = []
+    if author_intro_y24: review_parts_y24.append(f"1. 저자 소개\n{author_intro_y24}")
+    if toc_y24: review_parts_y24.append(f"2. 목차\n{toc_y24}")
+    if review_y24: review_parts_y24.append(f"3. 서평\n{review_y24}")
+
+    yes24_record = {
+        **base_info, "검색소스": "Yes24",
+        "분류 정보 취합": "\n\n".join(review_parts_y24),
+        "저자소개": author_intro_y24, "목차": toc_y24, "서평": review_y24,
+        "링크": link_y24,
+    }
+    processed_results.append(yes24_record)
+
+    # 2. Kyobo 레코드 생성
+    author_intro_kb = kyobo_info.get("저자소개", "")
+    toc_kb = kyobo_info.get("목차", "")
+    review_kb = kyobo_info.get("출판사서평", "")
+    link_kb = kyobo_info.get("상품링크", link_naver)
+    review_parts_kb = []
+    if author_intro_kb: review_parts_kb.append(f"1. 저자 소개\n{author_intro_kb}")
+    if toc_kb: review_parts_kb.append(f"2. 목차\n{toc_kb}")
+    if review_kb: review_parts_kb.append(f"3. 서평\n{review_kb}")
+
+    kyobo_record = {
+        **base_info, "검색소스": "Kyobo Book",
+        "분류 정보 취합": "\n\n".join(review_parts_kb),
+        "저자소개": author_intro_kb, "목차": toc_kb, "서평": review_kb,
+        "링크": link_kb,
+    }
+    processed_results.append(kyobo_record)
+
+    # 3. AI-Feed Merge 레코드 생성 (길이 우선 병합)
+    def _longer(a: str, b: str) -> str:
+        return (a or "") if len(a or "") >= len(b or "") else (b or "")
+
+    merged_author = _longer(author_intro_y24, author_intro_kb)
+    merged_toc = _longer(toc_y24, toc_kb)
+    merged_review = _longer(review_y24, review_kb)
+    merged_link = link_y24 or link_kb or link_naver
+
+    merged_parts = []
+    if merged_author: merged_parts.append(f"1. 저자 소개\n{merged_author}")
+    if merged_toc: merged_parts.append(f"2. 목차\n{merged_toc}")
+    if merged_review: merged_parts.append(f"3. 서평\n{merged_review}")
+
+    merged_record = {
+        **base_info, "검색소스": "AI-Feed Merge",
+        "분류 정보 취합": "\n\n".join(merged_parts).strip(),
+        "저자소개": merged_author, "목차": merged_toc, "서평": merged_review,
+        "링크": merged_link,
+    }
+    processed_results.append(merged_record)
+
+    # 4. OtherWorks Merge 레코드 생성
+    author_blocks = []
+    author_blocks.extend(yes24_info.get("저자소개_리스트", []))
+    author_blocks.extend(kyobo_info.get("저자소개_리스트", []))
+    if not author_blocks: # 리스트가 비면 합본 텍스트로 fallback
+        combined_bio = combine_author_bios(author_intro_y24, author_intro_kb)
+        if combined_bio: author_blocks = [combined_bio]
+
+    author_names = []
+    author_str = base_info.get("저자", "")
+    if author_str and isinstance(author_str, str):
+        parts = [p.strip() for p in re.split(r"[|,／/]", author_str) if p.strip()]
+        if parts: author_names = parts
+
+    groups = extract_other_works_grouped(author_blocks, base_info.get("서명", ""))
+    if groups:
+        pattern_text = render_other_works_grouped(groups, author_names or None)
+        otherworks_record = {
+            **base_info, "검색소스": "OtherWorks Merge",
+            "분류 정보 취합": pattern_text, "저자소개": "", "목차": "", "서평": "",
+            "링크": merged_link,
+        }
+        processed_results.append(otherworks_record)
+
+    return processed_results
+
+
+# --------------------------------------------------
+# 리팩토링된 메인 함수: search_naver_catalog
+# --------------------------------------------------
+def search_naver_catalog(title_query, author_query, isbn_query, app_instance=None, db_manager=None):
+    """
+    네이버 책 API와 웹 스크레이핑을 결합하여 도서 정보를 검색하고 가공합니다.
+    (GAS fetchNaverBookInfo 포팅 및 확장)
+
+    Args:
+        title_query (str): 검색할 책 제목
+        author_query (str): 검색할 저자명
+        isbn_query (str): 검색할 ISBN
+        app_instance (object, optional): GUI 애플리케이션 인스턴스 (로그 및 진행률 표시용)
+        db_manager (DatabaseManager, optional): 데이터베이스 매니저 (API 키 조회용)
+
+    Returns:
+        list: 검색 결과 레코드 목록. 각 레코드는 딕셔너리 형태. 오류 발생 시 오류 레코드 포함.
+    """
+    # 1. 입력 유효성 검사
+    if not _validate_search_input(title_query, author_query, isbn_query, app_instance):
+        return []
+
+    # 2. DB 매니저 확인
+    if not db_manager:
+        if app_instance: app_instance.log_message("오류: DatabaseManager 인스턴스가 필요합니다.", level="ERROR")
+        return []
+
+    # 3. 로그 시작 및 진행률 초기화
+    search_info = f"제목='{title_query}', 저자='{author_query}', ISBN='{isbn_query}'"
+    if app_instance:
+        app_instance.log_message(f"정보: 네이버 책 API 검색 시작 ({search_info})")
+        app_instance.update_progress(10)
+
+    # 4. API 인증 정보 가져오기
+    client_id, client_secret = get_naver_api_credentials(db_manager)
+    if not client_id or not client_secret:
         if app_instance:
             app_instance.log_message(
-                f"오류: 네이버 API 호출 중 예외 발생: {e}", level="ERROR"
+                "오류: 네이버 API 클라이언트 ID 또는 시크릿 미설정.", level="ERROR"
             )
+        return [] # 오류 레코드 대신 빈 리스트 반환 (설정 문제이므로)
 
-        results = [
-            {
-                "서명": "예외 오류",
-                "저자": "",
-                "출판사": "",
-                "출간일": "",
-                "ISBN": primary_query if isbn_query else "",
-                "가격": "",
-                "서평": error_msg,
-                "분류 정보 취합": "",
-                "저자소개": "",
-                "목차": "",
-                "검색소스": search_type,
-                "링크": "",
-            }
-        ]
+    # 5. API 요청 준비 (URL, 검색 타입 결정)
+    api_url, search_type, primary_query = _prepare_naver_api_request(
+        title_query, author_query, isbn_query
+    )
+    if not api_url: # 유효한 검색 조건이 없는 경우 (이론상 발생 안 함)
+        return []
 
+    if app_instance: app_instance.update_progress(30)
+
+    # 6. API 호출
+    api_response, network_error_msg = _call_naver_api(api_url, client_id, client_secret, app_instance)
+
+    # 6-1. 네트워크 오류 처리
+    if api_response is None:
+        if app_instance:
+            app_instance.update_progress(100)  # 세이프가드
+        return [_create_error_record("네트워크 오류", network_error_msg, search_type, primary_query)]
+
+    if app_instance: app_instance.update_progress(60)
+
+    # 6-2. API 상태 코드 오류 처리 (200이 아닌 경우)
+    if api_response.status_code != 200:
+        error_msg = f"API 오류 ({api_response.status_code}): {api_response.text[:100]}..."
+        if app_instance:
+             app_instance.log_message(
+                 f"오류: 네이버 API 호출 오류: 코드 {api_response.status_code}, 응답: {api_response.text[:100]}...", level="ERROR"
+             )
+        return [_create_error_record("API 호출 오류", error_msg, search_type, primary_query)]
+
+# 7. API 응답 파싱
+    # -------------------
+    # [수정 1: ChatGPT 피드백 반영] parse_error 변수 제거. 오류는 naver_records 안에 포함됨.
+    naver_records, _ = _parse_naver_api_response(
+        api_response.text, search_type, primary_query, app_instance
+    )
+    # -------------------
+
+    # 8. (ISBN 검색 시) 추가 정보 스크레이핑 및 처리
+    final_results = []
+    # -------------------
+    # [수정 2: ChatGPT 피드백 반영] 스크레이핑 진입 조건 강화 및 Naver 결과 보존 로직
+    if search_type == "ISBN 검색" and naver_records:
+        # 유효 레코드 판별 함수: '검색소스'가 'Naver'이고 유효한 ISBN을 가짐
+        def _valid_isbn(s: str | None) -> bool:
+            s = str(s or "").strip()
+            return bool(s and s != "정보 없음")
+
+        # 네이버 ISBN 필드는 'ISBN13 ISBN10' 형태일 수 있어 분리하여 비교
+        def _digits(s: str | None) -> str:
+            return re.sub(r"\D", "", str(s or ""))
+
+        def _isbn_tokens(s: str | None) -> set[str]:
+            raw = str(s or "").strip()
+            toks = re.split(r"[\s/|,]+", raw)  # 공백/슬래시/파이프/콤마 분리
+            return set(_digits(t) for t in toks if _digits(t))
+
+        # 스크레이핑 기준 레코드 인덱스 찾기
+        base_idx = -1
+        # 1순위: 검색어(primary_query)와 ISBN 필드 값이 일치하는 레코드
+        for i, rec in enumerate(naver_records):
+            if rec.get("검색소스") != "Naver": continue
+            isbn_field = rec.get("ISBN")
+            if not _valid_isbn(isbn_field): continue
+            if _digits(primary_query) in _isbn_tokens(isbn_field):
+                base_idx = i
+                break
+
+        # 2순위: 1순위가 없으면, 첫 번째 유효한 Naver 레코드
+        if base_idx < 0:
+            for i, rec in enumerate(naver_records):
+                 if rec.get("검색소스") == "Naver" and _valid_isbn(rec.get("ISBN")):
+                     base_idx = i
+                     break
+
+        # 기준 레코드를 찾은 경우 스크레이핑 및 병합 수행
+        if base_idx >= 0:
+            base_rec = naver_records[base_idx]
+            isbn_to_scrape = base_rec.get("ISBN") # 실제 스크레이핑에 사용할 ISBN (공백 포함 가능)
+
+            if _valid_isbn(isbn_to_scrape): # 유효한 ISBN일 때만 스크레이핑 시도
+                yes24_info, kyobo_info = _scrape_additional_info(isbn_to_scrape, app_instance)
+                processed_scraped_data = _process_scraped_data(base_rec, yes24_info, kyobo_info)
+
+                # 최종 결과: 기준 Naver 레코드 + 가공 레코드 + 나머지 Naver 레코드
+                final_results.append(base_rec)
+                final_results.extend(processed_scraped_data)
+
+                # 기준 레코드 외 다른 Naver 결과도 보존 (중복 방지)
+                seen = {(base_rec.get("서명", ""), base_rec.get("ISBN", ""))}
+                for i, rec in enumerate(naver_records):
+                    if rec.get("검색소스") != "Naver" or i == base_idx:
+                        continue
+                    key = (rec.get("서명", ""), rec.get("ISBN", ""))
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    final_results.append(rec)
+            else:
+                 # 기준 레코드는 찾았으나 유효 ISBN이 없는 경우 (이론상 드묾)
+                 final_results.extend(naver_records)
+
+        else:
+            # 유효한 Naver 레코드를 찾지 못한 경우 (API 오류 레코드만 있거나 빈 결과)
+            final_results.extend(naver_records)
+    else:
+        # ISBN 검색이 아니거나, API 결과가 없는 경우 원본 결과 그대로 사용
+        final_results.extend(naver_records)
+
+    # 9. 완료 로그 및 진행률 업데이트
     if app_instance:
         app_instance.update_progress(100)
-        app_instance.log_message(
-            f"정보: 네이버 책 API 검색 완료. ({len(results)}개 결과)"
-        )
+        # 최종 결과 수 (오류 포함)
+        result_count = len(final_results)
+        # 실제 데이터 건수 (오류 제외)
+        data_count = len([r for r in final_results if "오류" not in r.get("서명", "") and "검색 결과 없음" not in r.get("서명", "")])
 
-    return results
+        if data_count > 0:
+             app_instance.log_message(f"정보: 네이버 책 API 검색 완료. ({data_count}개 유효 결과 / 총 {result_count}개 레코드)")
+        else:
+             app_instance.log_message(f"정보: 네이버 책 API 검색 완료. (결과 없음 또는 오류 발생 / 총 {result_count}개 레코드)")
+
+
+    return final_results
 
 
 def set_naver_api_credentials(client_id, client_secret, db_manager):
