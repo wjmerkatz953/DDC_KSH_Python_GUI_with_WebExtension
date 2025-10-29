@@ -1,9 +1,13 @@
 ﻿"""파일명: qt_TabView_Dewey.py
 설명: Dewey 분류 검색 탭 (전체 기능 리팩토링)
-버전: v4.3.1
-수정일: 2025-10-27
+버전: v4.3.2
+수정일: 2025-10-28
 
 변경 이력:
+v4.3.2 (2025-10-28)
+- [기능 추가] HTML로 보기 버튼 추가 (연동검색 ON 버튼과 API 설정 버튼 사이)
+- [기능 추가] column_keys 설정 추가 (HTML 뷰어 지원)
+- [기능 추가] qt_dewey_logic.py에서 current_dataframe 업데이트 추가
 v4.3.1 (2025-10-27)
 - [기능 추가] 세로 헤더(행 번호) 표시 및 중앙 정렬 추가
 - [기능 추가] API 상태 라벨 추가 (API 설정 버튼 옆)
@@ -281,6 +285,12 @@ class QtDeweySearchTab(BaseSearchTab):
         self.dewey_ksh_cancel_button.setFixedHeight(32)
         self.dewey_ksh_cancel_button.setEnabled(False)
 
+        # ✅ [신규 추가] HTML 보기 버튼
+        self.html_viewer_button = QPushButton("HTML로 보기")
+        self.html_viewer_button.setObjectName("DeweyButton")
+        self.html_viewer_button.setFixedWidth(100)
+        self.html_viewer_button.setFixedHeight(32)
+
         self.dewey_api_button = QPushButton("API 설정")
         self.dewey_api_button.setObjectName("DeweyButton")  # ✅ 오브젝트 이름 추가
         self.dewey_api_button.setFixedWidth(70)
@@ -305,6 +315,7 @@ class QtDeweySearchTab(BaseSearchTab):
         layout.addWidget(self.dewey_ksh_search_button)
         layout.addWidget(self.dewey_ksh_cancel_button)
         layout.addWidget(self.dewey_interlock_button)
+        layout.addWidget(self.html_viewer_button)  # ✅ HTML 보기 버튼 추가
         layout.addWidget(self.dewey_api_button)
         layout.addWidget(self.api_status_label)
 
@@ -503,11 +514,13 @@ class QtDeweySearchTab(BaseSearchTab):
         self.search_button = self.dewey_ksh_search_button
         self.stop_button = self.dewey_ksh_cancel_button
         self.clear_all_filters_button = QPushButton()
-        self.html_viewer_button = QPushButton()
+        # ✅ [수정] html_viewer_button은 이미 _create_ksh_search_bar에서 생성되므로 여기서 다시 만들지 않음
         # ✅ BaseSearchTab의 더블클릭 핸들러가 proxy_model, table_model, column_headers를 참조하므로 설정
         self.proxy_model = self.ksh_proxy
         self.table_model = self.ksh_model
         self.column_headers = self.ksh_column_headers
+        # ✅ [추가] HTML 뷰어를 위해 column_keys도 설정
+        self.column_keys = self.ksh_column_keys
         super().setup_connections()
 
         self.dewey_classify_button.clicked.connect(

@@ -34,40 +34,46 @@ DB_GLOSSARY = ROOT / "glossary.db"
 #             ["git", "log", f"-n{limit}", "--oneline", "--no-merges"],
 #             capture_output=True, text=True, check=True
 #         )
-#         return [f"# {line.split(' ', 1)[0][:7]} {line.split(' ', 1)[1]}" 
+#         return [f"# {line.split(' ', 1)[0][:7]} {line.split(' ', 1)[1]}"
 #                 for line in result.stdout.strip().splitlines()]
 #     except:
 #         return ["_git 로그 없음_"]
+
 
 # ===== AFTER (수정 후: get_git_log) =====
 def get_git_log(limit=5):
     """✅ [개선] 변경된 파일 목록(--name-status)을 포함하는 Git 로그를 가져옵니다."""
     try:
         import subprocess
+
         # --name-status 옵션 추가
         result = subprocess.run(
             ["git", "log", f"-n{limit}", "--oneline", "--name-status", "--no-merges"],
-            capture_output=True, text=True, check=True, encoding="utf-8"
+            capture_output=True,
+            text=True,
+            check=True,
+            encoding="utf-8",
         )
         output_lines = []
         for line in result.stdout.strip().splitlines():
-            if re.match(r"^[AMD]\t", line): # M, A, D (Modified, Added, Deleted)
+            if re.match(r"^[AMD]\t", line):  # M, A, D (Modified, Added, Deleted)
                 # 파일 경로는 2-space 들여쓰기
                 output_lines.append(f"  {line.strip()}")
-            elif re.match(r"^[RC]\d+\t", line): # R, C (Renamed, Copied)
+            elif re.match(r"^[RC]\d+\t", line):  # R, C (Renamed, Copied)
                 output_lines.append(f"  {line.strip()}")
             else:
                 # 커밋 메시지 (앞에 개행 추가하여 그룹화)
-                hash_msg = line.split(' ', 1)
+                hash_msg = line.split(" ", 1)
                 output_lines.append(f"\n# {hash_msg[0][:7]} {hash_msg[1]}")
-        
+
         # 첫 줄의 불필요한 \n 제거
         if output_lines and output_lines[0].startswith("\n"):
             output_lines[0] = output_lines[0][1:]
-            
+
         return output_lines
     except Exception as e:
         return [f"_git 로그 없음 ({e})_"]
+
 
 # ===== BEFORE (수정 전: get_db_stats) =====
 # def get_db_stats(db_path, table_query):
@@ -85,6 +91,7 @@ def get_git_log(limit=5):
 #     except Exception as e:
 #         return "ERR", f"ERR ({e})"
 
+
 # ===== AFTER (수정 후: get_db_stats) =====
 def get_db_stats(db_path, core_tables=[]):
     """✅ [개선] DB 파일 존재 여부와 핵심 테이블 존재 여부를 확인합니다."""
@@ -95,7 +102,9 @@ def get_db_stats(db_path, core_tables=[]):
         cur = conn.cursor()
         statuses = []
         for table in core_tables:
-            cur.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}';")
+            cur.execute(
+                f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}';"
+            )
             status_emoji = "✅" if cur.fetchone() else "❌"
             statuses.append(f"{status_emoji} `{table}`")
         conn.close()
@@ -104,6 +113,7 @@ def get_db_stats(db_path, core_tables=[]):
         return separator.join(statuses)
     except Exception as e:
         return f"⚠️ `ERR ({e})`"
+
 
 def read_changelog():
     if not CHANGELOG.exists():
@@ -122,7 +132,11 @@ def read_changelog():
             break
     if current:
         entries.append(current)
-    return [f"### {e['date']}\n" + "\n".join([f"- {i}" for i in e['items']]) for e in entries]
+    return [
+        f"### {e['date']}\n" + "\n".join([f"- {i}" for i in e["items"]])
+        for e in entries
+    ]
+
 
 # -------------------------------
 # 3. 데이터 수집
@@ -131,39 +145,47 @@ print("SOTP v2.1 (개선 버전) 자동 생성 중...")
 
 # 3-1. 탭 목록
 tabs = []
+# Ensure the TABS attribute is correctly loaded from the qt_Tab_configs.py module
 try:
     import importlib.util
+
     spec = importlib.util.spec_from_file_location("configs", ROOT / "qt_Tab_configs.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    for t in getattr(mod, "TABS", []):
-        tabs.append({
+    tabs = [
+        {
             "name": t.get("tab_name", "Unknown"),
             "file": t.get("file", "N/A"),
             "group": t.get("group", "기타"),
-            "icon": t.get("icon", "")
-        })
+            "icon": t.get("icon", ""),
+        }
+        for t in getattr(mod, "TABS", [])
+    ]
 except Exception as e:
     tabs = [{"name": f"ERROR: {e}", "file": "", "group": "", "icon": ""}]
 
 # -------------------
 # 3-2. DB 상태 (✅ [개선] 핵심 테이블 위주로 변경)
 # -------------------
-nlk_status = get_db_stats(DB_NLK, ['concepts', 'literal_props', 'literal_props_fts', 'uri_props'])
-kdc_status = get_db_stats(DB_KDC, ['mapping_data', 'mapping_data_fts'])
-dewey_status = get_db_stats(DB_DEWEY, ['dewey_cache', 'ddc_keyword_fts'])
-glossary_status = get_db_stats(DB_GLOSSARY, ['settings', 'glossary'])
+nlk_status = get_db_stats(
+    DB_NLK, ["concepts", "literal_props", "literal_props_fts", "uri_props"]
+)
+kdc_status = get_db_stats(DB_KDC, ["mapping_data", "mapping_data_fts"])
+dewey_status = get_db_stats(DB_DEWEY, ["dewey_cache", "ddc_keyword_fts"])
+glossary_status = get_db_stats(DB_GLOSSARY, ["settings", "glossary"])
 # -------------------
 
 # -------------------
 # 3-3. 최근 변경 (✅ [개선] git_log 파싱 방식 변경)
 # -------------------
 changelog = read_changelog()
-git_log_lines = get_git_log(5) # This now returns formatted lines
+git_log_lines = get_git_log(5)  # This now returns formatted lines
 # git_log_lines 리스트를 하나의 문자열로 결합
 git_log_str = "\n".join(git_log_lines)
 # changelog가 있으면 changelog를, 없으면 git_log를 사용
-change_log_md = "\n\n".join(changelog[:5]) if changelog else f"```bash\n{git_log_str}\n```"
+change_log_md = (
+    "\n\n".join(changelog[:5]) if changelog else f"```bash\n{git_log_str}\n```"
+)
 # -------------------
 
 # 3-4. 상태
@@ -181,7 +203,7 @@ for t in tabs:
 # 5. Markdown 생성
 # -------------------------------
 md = f"""# SOTP – Status of the Project (자동 생성)
-> **생성 시각**: {timestamp}  
+> **생성 시각**: {timestamp}
 > **상태**: {status_emoji} **All Green** > **AI 전용 초고속 컨텍스트 문서** | 30초 파악 완료
 
 ---
@@ -204,10 +226,14 @@ md = f"""# SOTP – Status of the Project (자동 생성)
 |------|----|------|-------|
 """
 
+# Adjust Markdown generation to fit within line limits
 for group, items in sorted(group_map.items()):
     for i, t in enumerate(items):
-        prefix = "└─" if i == len(items)-1 else "├─"
-        md += f"| **{group}** | {prefix} `{t['name']}` | `{t['file']}` | {t['icon']} |\n"
+        prefix = "└─" if i == len(items) - 1 else "├─"
+        md += (
+            f"| **{group}** | {prefix} `{t['name']}` | "
+            f"`{t['file']}` | {t['icon']} |\n"
+        )
 
 md += f"""
 
@@ -230,7 +256,60 @@ md += f"""
 
 ---
 
-> **자동 생성 완료** | `generate_sotp.py` 실행  
+## 5. 키 의존성 맵 (Key Dependencies Map)
+
+### UI 계층 의존성
+```
+qt_main_app.py
+├── qt_Tab_configs.py (탭 메타데이터)
+├── qt_TabView_*.py (개별 탭 구현)
+│   └── qt_base_tab.py (BaseSearchTab)
+│       ├── qt_utils.py (SearchThread, 유틸리티)
+│       ├── qt_proxy_models.py (정렬/필터)
+│       ├── qt_widget_events.py (컬럼 저장)
+│       ├── view_displays.py (상세 뷰)
+│       ├── qt_custom_widgets.py (커스텀 위젯)
+│       └── qt_TabView_Gemini.py (Gemini 탭)
+│       └── qt_TabView_Settings.py (설정 탭)
+│       └── qt_TabView_MARC_Extractor.py (MARC 추출 탭)
+│       └── qt_TabView_NDL.py (NDL 탭)
+│       └── qt_TabView_Western.py (Western 탭)
+│       └── qt_TabView_AIFeed.py (AI 피드 탭)
+├── qt_layout_settings_manager.py (레이아웃 저장)
+├── qt_shortcuts.py (단축키)
+├── qt_context_menus.py (컨텍스트 메뉴)
+├── qt_styles.py (스타일시트)
+└── extension_api_server.py (Flask API, 선택적)
+```
+
+### 검색 계층 의존성
+```
+search_query_manager.py (SearchManager 파사드)
+├── search_common_manager.py (공통 기능)
+├── search_dewey_manager.py (DDC 특화)
+│   └── Search_Dewey.py (WorldCat API)
+├── search_ksh_manager.py (KSH 특화)
+│   ├── Search_KSH_Lite.py (웹 스크레이핑)
+│   └── Search_KSH_Local.py (로컬 DB)
+└── search_orchestrator.py (통합 검색)
+    ├── Search_BNE.py, Search_BNF.py, ...
+    ├── Search_CiNii.py, Search_NDL.py
+    └── Search_Harvard.py, Search_MIT.py, ...
+```
+
+### 데이터 계층 의존성
+```
+database_manager.py (DatabaseManager v2.2.0)
+├── nlk_concepts.sqlite (KSH 개념, FTS5)
+├── kdc_ddc_mapping.db (KDC↔DDC)
+├── dewey_cache.db (API 캐시)
+├── glossary.db (UI 설정)
+└── FAISS 벡터 인덱스 (임베딩 검색)
+```
+
+---
+
+> **자동 생성 완료** | `generate_sotp.py` 실행
 > **수정 금지** – 자동 갱신 전용
 """
 
@@ -241,8 +320,3 @@ OUTPUT.write_text(md, encoding="utf-8")
 print(f"생성 완료 → {OUTPUT}")
 print("\n미리보기:")
 print("\n".join(md.splitlines()[:20]))
-
-# -------------------
-# ✅ [제거] SOTP 생성과 관련 없는 함수 제거
-# def update_changelog_from_git(): ...
-# -------------------

@@ -1,12 +1,13 @@
 """
 파일명: qt_dewey_logic.py
 설명: Dewey 탭의 UI 업데이트, 네비게이션, 검색 로직을 담당
-버전: v4.3.1
-수정일: 2025-10-27 - API 상태 라벨 업데이트 로직 추가
+버전: v4.3.2
+수정일: 2025-10-28 - HTML 뷰어 지원을 위한 current_dataframe 업데이트 추가
 """
 
 import re
 import webbrowser
+import pandas as pd  # ✅ [추가] HTML 뷰어를 위한 DataFrame 처리
 from PySide6.QtWidgets import (
     QApplication,
     QLineEdit,
@@ -704,7 +705,9 @@ def _cancel_ksh_search(tab):
 def _on_ksh_search_completed(tab, df_results):
     tab.ksh_model.clear_data()
 
+    # ✅ [추가] HTML 뷰어/추출 기능을 위해 current_dataframe 업데이트
     if df_results is not None and not df_results.empty:
+        tab.current_dataframe = df_results.copy()
         tab.app_instance.log_message(
             f"Dewey 탭: KSH 검색 완료 ({len(df_results)}개 결과)", "INFO"
         )
@@ -720,6 +723,7 @@ def _on_ksh_search_completed(tab, df_results):
         )
         focus_on_first_table_view_item(tab.ksh_table)
     else:
+        tab.current_dataframe = pd.DataFrame()
         tab.app_instance.log_message("Dewey 탭: KSH 검색 결과가 없습니다.", "INFO")
 
     # 🔥 [핵심 추가] 애니메이션으로 부드럽게 100%로 채우기

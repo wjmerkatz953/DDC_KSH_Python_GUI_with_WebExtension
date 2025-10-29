@@ -1,11 +1,17 @@
 ﻿# -*- coding: utf-8 -*-
 # 파일명: qt_TabView_KSH_Local.py
 # 설명: KSH Local DB 검색 탭 (상단: 개념 DB, 하단: 서지 DB)
-# 버전: 2.2.0 - QSplitter 자동 저장/복구 기능 추가
+# 버전: 2.2.1 - HTML 뷰어 지원을 위한 DataFrame 저장
 # 생성일: 2025-09-30
-# 수정일: 2025-10-18
+# 수정일: 2025-10-28
 #
 # 변경 이력:
+# v2.2.1 (2025-10-28)
+# - [기능 추가] HTML 뷰어 지원을 위한 DataFrame 저장
+#   : on_search_completed()에서 current_dataframe/biblio_dataframe 업데이트
+#   : _on_title_search_completed()에서 biblio_dataframe 업데이트
+#   : _on_biblio_search_completed()에서 biblio_dataframe 업데이트
+#
 # v2.2.0 (2025-10-18)
 # - [기능 추가] QSplitter 자동 저장/복구 기능 추가
 #   : self.results_splitter가 이미 인스턴스 변수로 정의되어 있어 추가 수정 불필요
@@ -408,6 +414,12 @@ class QtKSHLocalSearchTab(BaseSearchTab):
                     None,
                 )
 
+            # ✅ [핵심 추가] HTML 뷰어/추출 기능을 위해 current_dataframe 업데이트
+            # 상단 개념 DB를 기본으로 설정 (나중에 포커스된 테이블로 자동 전환 가능)
+            self.current_dataframe = df_concepts.copy() if not df_concepts.empty else pd.DataFrame()
+            # ✅ [추가] 하단 서지 DB도 별도 변수에 저장
+            self.biblio_dataframe = df_biblio.copy() if not df_biblio.empty else pd.DataFrame()
+
             # 상단 개념 DB 테이블 업데이트
             self.table_model.clear_data()
             if not df_concepts.empty:
@@ -587,6 +599,11 @@ class QtKSHLocalSearchTab(BaseSearchTab):
         self.animation.setEasingCurve(QEasingCurve.InOutCubic)
         self.animation.start()
 
+        # ✅ [추가] HTML 뷰어/추출 기능을 위해 biblio_dataframe 업데이트
+        self.biblio_dataframe = df_biblio.copy() if df_biblio is not None and not df_biblio.empty else pd.DataFrame()
+        # ✅ [추가] 제목 검색 시 상단은 비움
+        self.current_dataframe = pd.DataFrame()
+
         # 하단 서지 테이블만 업데이트
         self.biblio_model.clear_data()
         if df_biblio is not None and not df_biblio.empty:
@@ -689,6 +706,9 @@ class QtKSHLocalSearchTab(BaseSearchTab):
         self.biblio_search_thread.start()
 
     def _on_biblio_search_completed(self, df_biblio):
+        # ✅ [추가] HTML 뷰어/추출 기능을 위해 biblio_dataframe 업데이트
+        self.biblio_dataframe = df_biblio.copy() if df_biblio is not None and not df_biblio.empty else pd.DataFrame()
+
         self.biblio_model.clear_data()
         if df_biblio is not None and not df_biblio.empty:
             records = df_biblio.to_dict("records")

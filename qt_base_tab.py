@@ -1,11 +1,17 @@
 ﻿# -*- coding: utf-8 -*-
 # 파일명: qt_base_tab.py
 # 설명: 모든 검색 탭의 공통 기능과 UI를 정의하는 부모 클래스 (모델/뷰 아키텍처)
-# 버전: 3.0.1 - 상세 정보 표시 버그 수정
+# 버전: 3.0.2 - HTML 뷰어 자동 테이블 감지 기능 추가
 # 생성일: 2025-09-25
-# 수정일: 2025-10-02
+# 수정일: 2025-10-28
 #
 # 변경 이력:
+# v3.0.2 (2025-10-28)
+# - [기능 추가] _get_active_table_data() 메서드 추가 - 포커스/선택된 테이블 자동 감지
+# - [기능 추가] _get_dataframe_from_model() 메서드 추가 - 모델에서 DataFrame 추출
+# - [기능 개선] show_html_viewer() 메서드 수정 - 여러 테이블 중 활성 테이블을 자동 선택
+# - [효과] Gemini/KSH Local 탭 등 2개 이상의 테이블을 가진 탭에서 HTML 뷰어 정상 작동
+#
 # v3.0.1 (2025-10-02)
 # - [버그 수정] _update_detail_view 메서드에서 주석 처리된 content_lines.append() 활성화 (라인 1517)
 #   : 선택 행 상세 정보 위젯에 2개 컬럼만 표시되던 문제 해결
@@ -1145,22 +1151,120 @@ class BaseSearchTab(QWidget):
                     "❌ 필터 기능을 찾을 수 없습니다.", "ERROR"
                 )
 
-    def show_html_viewer(self):
-        """✅ [수정] HTML로 보기 = 드롭다운 HTML 뷰어"""
-        try:
-            if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
+    def _get_active_table_data(self):
+        """
+        ✅ [신규 메서드] 포커스/선택된 테이블의 데이터를 자동으로 감지합니다.
 
+        우선순위:
+        1. 포커스된 테이블 (현재 커서가 있는 테이블)
+        2. 선택된 행이 있는 테이블
+        3. 기본 테이블 (self.table_view)
+
+        Returns:
+            tuple: (dataframe, column_keys, column_headers, table_name)
+        """
+        from PySide6.QtWidgets import QApplication
+
+        # 1. 포커스된 위젯 확인
+        focused_widget = QApplication.focusWidget()
+
+        # ✅ [KSH Local 탭] 하단 서지 테이블이 포커스되었거나 선택된 경우
+        if hasattr(self, 'biblio_table') and hasattr(self, 'biblio_dataframe'):
+            # 포커스 체크
+            if focused_widget == self.biblio_table or self.biblio_table.hasFocus():
+                if not self.biblio_dataframe.empty:
+                    return (
+                        self.biblio_dataframe,
+                        self.biblio_keys,
+                        self.biblio_headers,
+                        "서지 DB"
+                    )
+            # 선택된 행이 있는지 체크
+            elif self.biblio_table.selectionModel() and self.biblio_table.selectionModel().hasSelection():
+                if not self.biblio_dataframe.empty:
+                    return (
+                        self.biblio_dataframe,
+                        self.biblio_keys,
+                        self.biblio_headers,
+                        "서지 DB"
+                    )
+
+        # ✅ [Gemini 탭] 중간 결과 테이블 체크
+        if hasattr(self, 'inter_table') and hasattr(self, 'intermediate_dataframe'):
+            # 포커스 체크
+            if focused_widget == self.inter_table or self.inter_table.hasFocus():
+                if not self.intermediate_dataframe.empty:
+                    return (
+                        self.intermediate_dataframe,
+                        self.intermediate_column_keys,
+                        self.intermediate_column_headers,
+                        "계층적 검색 결과"
+                    )
+            # 선택된 행이 있는지 체크
+            elif self.inter_table.selectionModel() and self.inter_table.selectionModel().hasSelection():
+                if not self.intermediate_dataframe.empty:
+                    return (
+                        self.intermediate_dataframe,
+                        self.intermediate_column_keys,
+                        self.intermediate_column_headers,
+                        "계층적 검색 결과"
+                    )
+
+        # 2. 기본 테이블 (상단 또는 메인 테이블)
+        if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
+            table_name = "개념 DB" if hasattr(self, 'biblio_table') else "검색 결과"
+            return (
+                self.current_dataframe,
+                self.column_keys,
+                self.column_headers,
+                table_name
+            )
+
+        # 데이터가 없는 경우
+        return (None, None, None, None)
+
+    def _get_dataframe_from_model(self, model):
+        """모델에서 DataFrame을 추출합니다."""
+        try:
+            row_count = model.rowCount()
+            if row_count == 0:
+                return pd.DataFrame()
+
+            col_count = model.columnCount()
+            data = []
+            for row in range(row_count):
+                row_data = {}
+                for col in range(col_count):
+                    header = model.headerData(col, Qt.Horizontal, Qt.DisplayRole)
+                    value = model.data(model.index(row, col), Qt.DisplayRole)
+                    row_data[header] = value
+                data.append(row_data)
+
+            return pd.DataFrame(data)
+        except Exception as e:
+            self.app_instance.log_message(
+                f"❌ 모델에서 DataFrame 추출 실패: {e}", "ERROR"
+            )
+            return pd.DataFrame()
+
+    def show_html_viewer(self):
+        """✅ [수정] HTML로 보기 = 드롭다운 HTML 뷰어 (포커스/선택된 테이블 자동 감지)"""
+        try:
+            # ✅ [핵심] 포커스/선택된 테이블의 데이터 자동 감지
+            df, col_keys, col_headers, table_name = self._get_active_table_data()
+
+            if df is not None and not df.empty:
                 show_in_dropdown_html_viewer(
                     app_instance=self.app_instance,
-                    dataframe=self.current_dataframe,
-                    title=f"{self.tab_name} 검색 결과",
-                    columns_to_display=self.column_keys,
-                    display_names=self.column_headers,
+                    dataframe=df,
+                    title=f"{self.tab_name} - {table_name}",
+                    columns_to_display=col_keys,
+                    display_names=col_headers,
                     link_column_name="상세 링크",
                 )
 
                 self.app_instance.log_message(
-                    "🌐 HTML 뷰어에서 데이터를 표시했습니다.", "INFO"
+                    f"🌐 HTML 뷰어에서 '{table_name}' 데이터를 표시했습니다.", "INFO"
                 )
 
             else:
