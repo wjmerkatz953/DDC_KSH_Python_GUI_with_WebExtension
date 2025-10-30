@@ -1,11 +1,22 @@
 ﻿# -*- coding: utf-8 -*-
 # 파일명: qt_base_tab.py
 # 설명: 모든 검색 탭의 공통 기능과 UI를 정의하는 부모 클래스 (모델/뷰 아키텍처)
-# 버전: 3.0.3 - HTML 뷰어 다중 테이블 지원 개선
+# 버전: 3.0.4 - Find 기능 UX 개선
 # 생성일: 2025-09-25
-# 수정일: 2025-10-29
+# 수정일: 2025-10-30
 #
 # 변경 이력:
+# v3.0.4 (2025-10-30)
+# - [기능 개선] Find 입력창을 SelectAllLineEdit로 변경
+#   : Ctrl+F 또는 클릭 시 기존 검색어 자동 전체 선택
+#   : 새 검색어 입력 시 기존 텍스트 자동 대체
+# - [기능 개선] Find 하이라이트 시각화 강화
+#   : selectionModel().select() 추가로 검색된 셀 하이라이트 표시
+#   : Find 검색 시 ACCENT_GREEN 색상 사용 (일반 선택과 구분)
+#   : _reset_table_selection_color() 메서드 추가 (테이블 클릭 시 원래 색상 복구)
+# - [코드 정리] 중복된 QLineEdit import 제거
+# - [효과] Find 기능의 사용성과 시각적 피드백 대폭 향상
+#
 # v3.0.3 (2025-10-29)
 # - [기능 개선] _get_active_table_data() 메서드 우선순위 재설계
 #   : last_clicked_table 속성을 최우선으로 체크 (Gemini/KSH Local 탭 전용)
@@ -34,7 +45,6 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QGroupBox,
     QCheckBox,
-    QLineEdit,
     QPushButton,
     QProgressBar,
     QTableView,  # ✅ QTableWidget → QTableView 변경
@@ -43,7 +53,6 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QAbstractItemView,
     QHeaderView,
-    QLineEdit,
     QApplication,  # ✅ 클립보드 사용을 위해 추가
 )
 from PySide6.QtGui import QStandardItemModel, QStandardItem
@@ -524,7 +533,7 @@ class BaseSearchTab(QWidget):
         find_layout.setContentsMargins(0, 0, 0, 0)
 
         find_layout.addWidget(QLabel("Find:"))
-        self.find_entry = QLineEdit()
+        self.find_entry = SelectAllLineEdit()  # ✅ QLineEdit → SelectAllLineEdit 변경
         find_layout.addWidget(self.find_entry)  # Stretch factor는 부모가 관리
 
         self.find_prev_button = QPushButton("▲")
@@ -672,6 +681,9 @@ class BaseSearchTab(QWidget):
     def _on_table_item_clicked(self, index: QModelIndex):
         """✅ [모델/뷰 전환] 테이블 항목 클릭 시 컬럼 인덱스 저장"""
         if index.isValid():
+            # ✅ [추가] Find 하이라이트 색상 초기화 (원래 색상으로 복구)
+            self._reset_table_selection_color()
+
             # ✅ 클릭된 컬럼 저장
             self.table_view._last_clicked_column = index.column()
 
@@ -1041,6 +1053,11 @@ class BaseSearchTab(QWidget):
     # === 편의 기능들 ===
 
     # ✅ [완전 복원] Find 관련 메서드들
+
+    def _reset_table_selection_color(self):
+        """테이블 선택 색상을 원래대로 복구"""
+        self.table_view.setStyleSheet("")  # 스타일시트 초기화하여 전역 스타일 적용
+
     def find_in_results(self):
         """Enter 키로 다음 찾기"""
         self.find_next()
@@ -1068,6 +1085,15 @@ class BaseSearchTab(QWidget):
         if not hasattr(self, "table_view") or not self.table_view.model():
             return
 
+        # ✅ [추가] Find 전용 하이라이트 색상 적용
+        from ui_constants import UI_CONSTANTS as U
+        self.table_view.setStyleSheet(f"""
+            QTableView::item:selected {{
+                background-color: {U.ACCENT_GREEN};
+                color: {U.TEXT_BUTTON};
+            }}
+        """)
+
         model = self.table_view.model()
         current_selection = self.table_view.currentIndex()
 
@@ -1089,7 +1115,12 @@ class BaseSearchTab(QWidget):
                     index = model.index(row, col)
                     cell_text = str(model.data(index, Qt.DisplayRole) or "").lower()
                     if search_lower in cell_text:
+                        # ✅ [수정] 하이라이트를 위해 선택 모델 사용
                         self.table_view.setCurrentIndex(index)
+                        self.table_view.selectionModel().select(
+                            index,
+                            self.table_view.selectionModel().ClearAndSelect
+                        )
                         self.table_view.scrollTo(index)
                         found = True
                         break
@@ -1104,7 +1135,12 @@ class BaseSearchTab(QWidget):
                         index = model.index(row, col)
                         cell_text = str(model.data(index, Qt.DisplayRole) or "").lower()
                         if search_lower in cell_text:
+                            # ✅ [수정] 하이라이트를 위해 선택 모델 사용
                             self.table_view.setCurrentIndex(index)
+                            self.table_view.selectionModel().select(
+                                index,
+                                self.table_view.selectionModel().ClearAndSelect
+                            )
                             self.table_view.scrollTo(index)
                             found = True
                             break
@@ -1119,7 +1155,12 @@ class BaseSearchTab(QWidget):
                     index = model.index(row, col)
                     cell_text = str(model.data(index, Qt.DisplayRole) or "").lower()
                     if search_lower in cell_text:
+                        # ✅ [수정] 하이라이트를 위해 선택 모델 사용
                         self.table_view.setCurrentIndex(index)
+                        self.table_view.selectionModel().select(
+                            index,
+                            self.table_view.selectionModel().ClearAndSelect
+                        )
                         self.table_view.scrollTo(index)
                         found = True
                         break
@@ -1134,7 +1175,12 @@ class BaseSearchTab(QWidget):
                         index = model.index(row, col)
                         cell_text = str(model.data(index, Qt.DisplayRole) or "").lower()
                         if search_lower in cell_text:
+                            # ✅ [수정] 하이라이트를 위해 선택 모델 사용
                             self.table_view.setCurrentIndex(index)
+                            self.table_view.selectionModel().select(
+                                index,
+                                self.table_view.selectionModel().ClearAndSelect
+                            )
                             self.table_view.scrollTo(index)
                             found = True
                             break
