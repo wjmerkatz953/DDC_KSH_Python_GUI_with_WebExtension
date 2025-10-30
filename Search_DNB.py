@@ -7,17 +7,17 @@
 Search_DNB.py - 독일 국립도서관(DNB) SRU 카탈로그를 검색하는 로직을 포함합니다.
 Google Apps Script 버전의 로직을 Python으로 포팅했으며, Tab_LC.py와 호환되는 형식으로 결과를 반환합니다.
 """
-
-# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
-from ssl_cert_utils import configure_ssl_certificates
-configure_ssl_certificates()
-
 import requests
 import xml.etree.ElementTree as ET
 import re
 from concurrent.futures import ThreadPoolExecutor
 from qt_api_clients import translate_text
 from qt_api_clients import translate_text_batch_async
+
+# ✅ [추가] PyInstaller 환경에서 SSL 인증서 경로 설정
+from ssl_cert_utils import configure_ssl_certificates
+
+configure_ssl_certificates()
 
 
 # Search_DNB.py 파일 상단의 임포트 부분 다음에 추가
@@ -183,7 +183,7 @@ def search_dnb_catalog(
     author_query=None,
     isbn_query=None,
     ddc_query=None,
-    year_query=None,  # ← 추가!    
+    year_query=None,  # ← 추가!
     app_instance=None,
     db_manager=None,
 ):
@@ -199,7 +199,7 @@ def search_dnb_catalog(
     if ddc_query:
         cql_parts.append(f'dnb.ddc="{ddc_query}"')
     if year_query:
-        cql_parts.append(f'dnb.jhr="{year_query}"')        
+        cql_parts.append(f'dnb.jhr="{year_query}"')
 
     if not cql_parts:
         if app_instance:
@@ -226,7 +226,7 @@ def search_dnb_catalog(
         response = requests.get(
             base_url,
             params=params,
-            timeout=15,
+            timeout=5,
             headers={"User-Agent": "LibraryTool/1.0"},
         )
         response.raise_for_status()
@@ -369,9 +369,7 @@ def search_dnb_catalog(
 
         all_results.sort(
             key=lambda x: (
-                int(x.get("연도", 0))
-                if str(x.get("연도", 0)).isdigit()
-                else 0
+                int(x.get("연도", 0)) if str(x.get("연도", 0)).isdigit() else 0
             ),
             reverse=True,
         )

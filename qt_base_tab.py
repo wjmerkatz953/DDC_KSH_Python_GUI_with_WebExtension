@@ -48,7 +48,7 @@
 
 import re
 import pandas as pd
-from functools import partial # ✅ [수정] partial 함수를 임포트합니다.
+from functools import partial  # ✅ [수정] partial 함수를 임포트합니다.
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -318,6 +318,7 @@ class BaseMatchHighlightDelegate(QStyledItemDelegate):
 
         # URL 링크 색상
         from ui_constants import UI_CONSTANTS
+
         self.link_color = QColor(UI_CONSTANTS.ACCENT_BLUE)
 
     def set_search_text(self, text):
@@ -358,11 +359,16 @@ class BaseMatchHighlightDelegate(QStyledItemDelegate):
         """URL 클릭 처리"""
         from PySide6.QtCore import QEvent, Qt
 
-        if event.type() == QEvent.MouseButtonRelease and event.button() == Qt.LeftButton:
+        if (
+            event.type() == QEvent.MouseButtonRelease
+            and event.button() == Qt.LeftButton
+        ):
             data = str(index.data(Qt.DisplayRole) or "").strip()
 
             # 컬럼 이름 가져오기
-            column_name = model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole) or ""
+            column_name = (
+                model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole) or ""
+            )
 
             # 순수한 URL 추출
             pure_url = self._extract_pure_url(data, column_name)
@@ -449,8 +455,10 @@ class BaseSearchTab(QWidget):
 
         # ✅ [수정] 기본 매치 하이라이트 델리게이트 설정 (URL 링크 기능 포함)
         # (서브클래스에서 이미 color_delegate를 설정했다면 스킵됨)
-        if not hasattr(self, 'color_delegate'):
-            self.color_delegate = BaseMatchHighlightDelegate(self.table_view, self.app_instance)
+        if not hasattr(self, "color_delegate"):
+            self.color_delegate = BaseMatchHighlightDelegate(
+                self.table_view, self.app_instance
+            )
             self.table_view.setItemDelegate(self.color_delegate)
 
     def setup_ui(self):
@@ -704,9 +712,11 @@ class BaseSearchTab(QWidget):
         # [핵심 추가] 테이블 뷰의 현재 항목 변경 시그널을 상세 정보 업데이트 메서드에 연결
         if self.table_view and self.table_view.selectionModel():
             # ✅ partial을 사용해 일반화된 함수에 현재 탭의 기본 모델을 전달
-            handler = partial(self._update_detail_view,
-                              proxy_model=self.proxy_model,
-                              table_model=self.table_model)
+            handler = partial(
+                self._update_detail_view,
+                proxy_model=self.proxy_model,
+                table_model=self.table_model,
+            )
             self.table_view.selectionModel().currentChanged.connect(handler)
 
     # ✅ [신규 추가] MARC 추출 데이터를 수신하는 표준 메서드
@@ -772,7 +782,7 @@ class BaseSearchTab(QWidget):
     def _setup_table_delegate(self):
         """✅ [신규] 테이블 델리게이트 설정 (서브클래스에서 오버라이드 가능)"""
         # ✅ [수정] 기본 매치 하이라이트 델리게이트 사용 (color_delegate 속성이 없는 경우)
-        if not hasattr(self, 'color_delegate'):
+        if not hasattr(self, "color_delegate"):
             self.color_delegate = BaseMatchHighlightDelegate(self.table_view)
             self.table_view.setItemDelegate(self.color_delegate)
 
@@ -1181,17 +1191,19 @@ class BaseSearchTab(QWidget):
         self._update_find_match_counter(text.strip())
 
         # ✅ [추가] 델리게이트에 검색어 전달 (매치 하이라이트용)
-        if hasattr(self, 'color_delegate') and hasattr(self.color_delegate, 'set_search_text'):
+        if hasattr(self, "color_delegate") and hasattr(
+            self.color_delegate, "set_search_text"
+        ):
             self.color_delegate.set_search_text(text.strip())
             # 테이블 뷰 다시 그리기
-            if hasattr(self, 'table_view'):
+            if hasattr(self, "table_view"):
                 self.table_view.viewport().update()
 
     def _update_find_match_counter(self, search_text):
         """Find 검색어에 매치되는 셀의 개수를 세고 상태 표시줄에 표시"""
         if not search_text:
             # 검색어가 없으면 기본 상태로
-            if hasattr(self, 'status_label'):
+            if hasattr(self, "status_label"):
                 self.status_label.setText("준비 완료")
             return
 
@@ -1215,17 +1227,25 @@ class BaseSearchTab(QWidget):
                 if search_lower in cell_text:
                     total_matches += 1
                     # 현재 선택된 셀이 매치되는 경우 현재 위치 기록
-                    if current_index.isValid() and row == current_index.row() and col == current_index.column():
+                    if (
+                        current_index.isValid()
+                        and row == current_index.row()
+                        and col == current_index.column()
+                    ):
                         current_match = total_matches
 
         # 상태 표시줄 업데이트
-        if hasattr(self, 'status_label'):
+        if hasattr(self, "status_label"):
             if total_matches == 0:
                 self.status_label.setText(f"'{search_text}' - 매치 없음")
             elif current_match > 0:
-                self.status_label.setText(f"'{search_text}' - {current_match}/{total_matches}")
+                self.status_label.setText(
+                    f"'{search_text}' - {current_match}/{total_matches}"
+                )
             else:
-                self.status_label.setText(f"'{search_text}' - 총 {total_matches}개 매치")
+                self.status_label.setText(
+                    f"'{search_text}' - 총 {total_matches}개 매치"
+                )
 
     def find_in_results(self):
         """Enter 키로 다음 찾기"""
@@ -1278,8 +1298,7 @@ class BaseSearchTab(QWidget):
                         # ✅ [수정] 하이라이트를 위해 선택 모델 사용
                         self.table_view.setCurrentIndex(index)
                         self.table_view.selectionModel().select(
-                            index,
-                            QItemSelectionModel.ClearAndSelect
+                            index, QItemSelectionModel.ClearAndSelect
                         )
                         self.table_view.scrollTo(index)
                         found = True
@@ -1298,8 +1317,7 @@ class BaseSearchTab(QWidget):
                             # ✅ [수정] 하이라이트를 위해 선택 모델 사용
                             self.table_view.setCurrentIndex(index)
                             self.table_view.selectionModel().select(
-                                index,
-                                self.table_view.selectionModel().ClearAndSelect
+                                index, QItemSelectionModel.ClearAndSelect
                             )
                             self.table_view.scrollTo(index)
                             found = True
@@ -1318,8 +1336,7 @@ class BaseSearchTab(QWidget):
                         # ✅ [수정] 하이라이트를 위해 선택 모델 사용
                         self.table_view.setCurrentIndex(index)
                         self.table_view.selectionModel().select(
-                            index,
-                            QItemSelectionModel.ClearAndSelect
+                            index, QItemSelectionModel.ClearAndSelect
                         )
                         self.table_view.scrollTo(index)
                         found = True
@@ -1338,8 +1355,7 @@ class BaseSearchTab(QWidget):
                             # ✅ [수정] 하이라이트를 위해 선택 모델 사용
                             self.table_view.setCurrentIndex(index)
                             self.table_view.selectionModel().select(
-                                index,
-                                self.table_view.selectionModel().ClearAndSelect
+                                index, QItemSelectionModel.ClearAndSelect
                             )
                             self.table_view.scrollTo(index)
                             found = True
@@ -1383,23 +1399,28 @@ class BaseSearchTab(QWidget):
         from PySide6.QtWidgets import QApplication
 
         # ✅ [최우선] last_clicked_table 속성 체크 (Gemini/KSH Local 탭 전용)
-        if hasattr(self, 'last_clicked_table') and self.last_clicked_table:
+        if hasattr(self, "last_clicked_table") and self.last_clicked_table:
             # Gemini 탭: 중간 결과 테이블이 마지막 클릭
             if self.last_clicked_table == "inter_table":
-                if hasattr(self, 'inter_table') and hasattr(self, 'intermediate_dataframe'):
+                if hasattr(self, "inter_table") and hasattr(
+                    self, "intermediate_dataframe"
+                ):
                     if not self.intermediate_dataframe.empty:
                         return (
                             self.intermediate_dataframe,
                             self.intermediate_column_keys,
                             self.intermediate_column_headers,
-                            "계층적 검색 결과"
+                            "계층적 검색 결과",
                         )
             # Gemini/KSH Local 탭: 메인 테이블이 마지막 클릭
             elif self.last_clicked_table == "table_view":
-                if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
-                    if hasattr(self, 'inter_table'):
+                if (
+                    hasattr(self, "current_dataframe")
+                    and not self.current_dataframe.empty
+                ):
+                    if hasattr(self, "inter_table"):
                         table_name = "DDC 추천 결과"
-                    elif hasattr(self, 'biblio_table'):
+                    elif hasattr(self, "biblio_table"):
                         table_name = "개념 DB"
                     else:
                         table_name = "검색 결과"
@@ -1407,29 +1428,31 @@ class BaseSearchTab(QWidget):
                         self.current_dataframe,
                         self.column_keys,
                         self.column_headers,
-                        table_name
+                        table_name,
                     )
             # KSH Local 탭: 서지 테이블이 마지막 클릭
             elif self.last_clicked_table == "biblio_table":
-                if hasattr(self, 'biblio_table') and hasattr(self, 'biblio_dataframe'):
+                if hasattr(self, "biblio_table") and hasattr(self, "biblio_dataframe"):
                     if not self.biblio_dataframe.empty:
                         return (
                             self.biblio_dataframe,
                             self.biblio_keys,
                             self.biblio_headers,
-                            "서지 DB"
+                            "서지 DB",
                         )
 
         # 1. 포커스된 위젯 확인 (차순위)
         focused_widget = QApplication.focusWidget()
 
         # ✅ [우선순위 2] 메인 테이블(table_view)이 포커스된 경우
-        if hasattr(self, 'table_view') and (focused_widget == self.table_view or self.table_view.hasFocus()):
+        if hasattr(self, "table_view") and (
+            focused_widget == self.table_view or self.table_view.hasFocus()
+        ):
             if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
                 # Gemini 탭의 경우 "DDC 추천 결과", KSH Local은 "개념 DB", 기타는 "검색 결과"
-                if hasattr(self, 'inter_table'):
+                if hasattr(self, "inter_table"):
                     table_name = "DDC 추천 결과"
-                elif hasattr(self, 'biblio_table'):
+                elif hasattr(self, "biblio_table"):
                     table_name = "개념 DB"
                 else:
                     table_name = "검색 결과"
@@ -1437,38 +1460,42 @@ class BaseSearchTab(QWidget):
                     self.current_dataframe,
                     self.column_keys,
                     self.column_headers,
-                    table_name
+                    table_name,
                 )
 
         # ✅ [우선순위 2] KSH Local 탭: 하단 서지 테이블이 포커스된 경우
-        if hasattr(self, 'biblio_table') and hasattr(self, 'biblio_dataframe'):
+        if hasattr(self, "biblio_table") and hasattr(self, "biblio_dataframe"):
             if focused_widget == self.biblio_table or self.biblio_table.hasFocus():
                 if not self.biblio_dataframe.empty:
                     return (
                         self.biblio_dataframe,
                         self.biblio_keys,
                         self.biblio_headers,
-                        "서지 DB"
+                        "서지 DB",
                     )
 
         # ✅ [우선순위 3] Gemini 탭: 중간 결과 테이블이 포커스된 경우
-        if hasattr(self, 'inter_table') and hasattr(self, 'intermediate_dataframe'):
+        if hasattr(self, "inter_table") and hasattr(self, "intermediate_dataframe"):
             if focused_widget == self.inter_table or self.inter_table.hasFocus():
                 if not self.intermediate_dataframe.empty:
                     return (
                         self.intermediate_dataframe,
                         self.intermediate_column_keys,
                         self.intermediate_column_headers,
-                        "계층적 검색 결과"
+                        "계층적 검색 결과",
                     )
 
         # ✅ [우선순위 4] 포커스가 명확하지 않을 때: 선택된 행이 있는 테이블 체크
         # 메인 테이블 우선 체크 (Gemini의 최종 결과, KSH Local의 개념 DB)
-        if hasattr(self, 'table_view') and self.table_view.selectionModel() and self.table_view.selectionModel().hasSelection():
+        if (
+            hasattr(self, "table_view")
+            and self.table_view.selectionModel()
+            and self.table_view.selectionModel().hasSelection()
+        ):
             if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
-                if hasattr(self, 'inter_table'):
+                if hasattr(self, "inter_table"):
                     table_name = "DDC 추천 결과"
-                elif hasattr(self, 'biblio_table'):
+                elif hasattr(self, "biblio_table"):
                     table_name = "개념 DB"
                 else:
                     table_name = "검색 결과"
@@ -1476,36 +1503,42 @@ class BaseSearchTab(QWidget):
                     self.current_dataframe,
                     self.column_keys,
                     self.column_headers,
-                    table_name
+                    table_name,
                 )
 
         # KSH Local 탭: 서지 테이블에 선택된 행이 있는 경우
-        if hasattr(self, 'biblio_table') and hasattr(self, 'biblio_dataframe'):
-            if self.biblio_table.selectionModel() and self.biblio_table.selectionModel().hasSelection():
+        if hasattr(self, "biblio_table") and hasattr(self, "biblio_dataframe"):
+            if (
+                self.biblio_table.selectionModel()
+                and self.biblio_table.selectionModel().hasSelection()
+            ):
                 if not self.biblio_dataframe.empty:
                     return (
                         self.biblio_dataframe,
                         self.biblio_keys,
                         self.biblio_headers,
-                        "서지 DB"
+                        "서지 DB",
                     )
 
         # Gemini 탭: 중간 결과 테이블에 선택된 행이 있는 경우
-        if hasattr(self, 'inter_table') and hasattr(self, 'intermediate_dataframe'):
-            if self.inter_table.selectionModel() and self.inter_table.selectionModel().hasSelection():
+        if hasattr(self, "inter_table") and hasattr(self, "intermediate_dataframe"):
+            if (
+                self.inter_table.selectionModel()
+                and self.inter_table.selectionModel().hasSelection()
+            ):
                 if not self.intermediate_dataframe.empty:
                     return (
                         self.intermediate_dataframe,
                         self.intermediate_column_keys,
                         self.intermediate_column_headers,
-                        "계층적 검색 결과"
+                        "계층적 검색 결과",
                     )
 
         # ✅ [우선순위 5] 기본 테이블 (선택이나 포커스가 없을 때)
         if hasattr(self, "current_dataframe") and not self.current_dataframe.empty:
-            if hasattr(self, 'inter_table'):
+            if hasattr(self, "inter_table"):
                 table_name = "DDC 추천 결과"
-            elif hasattr(self, 'biblio_table'):
+            elif hasattr(self, "biblio_table"):
                 table_name = "개념 DB"
             else:
                 table_name = "검색 결과"
@@ -1513,7 +1546,7 @@ class BaseSearchTab(QWidget):
                 self.current_dataframe,
                 self.column_keys,
                 self.column_headers,
-                table_name
+                table_name,
             )
 
         # 데이터가 없는 경우
@@ -1879,7 +1912,7 @@ class BaseSearchTab(QWidget):
         if not row_data:
             return
 
-        model = table_model # 인자로 받은 table_model 사용
+        model = table_model  # 인자로 받은 table_model 사용
         row = source_index.row()
 
         # ✅ [수정] 포맷팅 로직 적용 시작
