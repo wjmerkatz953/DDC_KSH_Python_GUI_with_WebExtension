@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # 파일명: qt_TabView_NDL.py
 # 설명: NDL + CiNii 통합 검색 탭 (BaseSearchTab 상속 구조 완벽 적용)
-# 버전: 2.0.1
+# 버전: 2.0.2
 # 생성일: 2025-09-29
-# 수정일: 2025-10-27 - 델리게이트 테마 대응 및 refresh_theme() 추가
+# 수정일: 2025-10-30 - 출처별 색상 복원 (10월 27일 패턴) + Find 매치 하이라이트 기능 추가
 
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QStyledItemDelegate

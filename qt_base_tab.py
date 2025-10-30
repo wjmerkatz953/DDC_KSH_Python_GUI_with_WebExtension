@@ -1,21 +1,23 @@
 ﻿# -*- coding: utf-8 -*-
 # 파일명: qt_base_tab.py
 # 설명: 모든 검색 탭의 공통 기능과 UI를 정의하는 부모 클래스 (모델/뷰 아키텍처)
-# 버전: 3.0.5 - Find 기능 하이라이트 개선
+# 버전: 3.0.6 - Find 매치 하이라이트 + BaseMatchHighlightDelegate 추가
 # 생성일: 2025-09-25
 # 수정일: 2025-10-30
 #
 # 변경 이력:
-# v3.0.5 (2025-10-30)
-# - [기능 개선] Find 검색어 매치 셀 하이라이트 기능 구현
-#   : SearchHighlightDelegate 클래스 추가 (URLHoverDelegate 기능 통합)
+# v3.0.6 (2025-10-30)
+# - [기능 추가] BaseMatchHighlightDelegate 클래스 추가
+#   : 델리게이트가 없는 탭(KSH Local, NLK 등)에 매치 하이라이트 제공
+#   : URL 링크 기능 통합 (파란색 표시, 클릭 시 브라우저 열기, KSH 마크업 제거)
+#   : UrlLinkDelegate 기능을 모두 포함하여 통합
+# - [기능 개선] Find 매치 하이라이트 구현
 #   : 검색어와 매치되는 모든 셀을 ACCENT_RED 배경으로 표시
-#   : 현재 선택된 셀은 기본 선택 색상(파란색) 유지
-#   : 검색어 입력 시 실시간으로 하이라이트 업데이트 (textChanged 이벤트)
-#   : 검색어 제거 시 하이라이트 자동 제거
-# - [기능 개선] _on_find_text_changed() 메서드 추가
-#   : Find 입력창 텍스트 변경 시 하이라이트 실시간 업데이트
-# - [효과] Find 기능의 시각적 피드백 대폭 향상, 검색 결과를 한눈에 파악 가능
+#   : 선택된 매치 셀은 HIGHLIGHT_SELECTED 배경으로 표시 (F3 네비게이션 구분)
+#   : painter.fillRect() + painter.drawText() 직접 렌더링으로 stylesheet 영향 회피
+# - [기능 개선] _on_find_text_changed() 메서드에서 델리게이트에 검색어 전달
+#   : Find 입력창 변경 시 실시간 하이라이트 업데이트 (viewport().update())
+# - [효과] 모든 탭에서 Find 매치 하이라이트 + URL 링크 기능 정상 작동
 #
 # v3.0.4 (2025-10-30)
 # - [기능 개선] Find 입력창을 SelectAllLineEdit로 변경

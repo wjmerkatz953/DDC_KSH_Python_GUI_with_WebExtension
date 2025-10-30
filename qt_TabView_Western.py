@@ -1,8 +1,8 @@
 # 파일명: qt_TabView_Western.py
 # -*- coding: utf-8 -*-
 # 설명: Western 통합 검색 UI 탭 (BaseSearchTab 상속)
-# 버전: v1.0.1
-# 수정일: 2025-10-27 - 델리게이트 테마 대응, Google Books API 설정 기능 추가
+# 버전: v1.0.2
+# 수정일: 2025-10-30 - 출처별 색상 복원 (10월 27일 패턴) + Find 매치 하이라이트 기능 추가
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPalette

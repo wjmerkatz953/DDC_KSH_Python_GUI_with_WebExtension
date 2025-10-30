@@ -1,5 +1,72 @@
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-10-30 (세션 2): 델리게이트 색상 및 Find 매치 하이라이트 구현
+
+- **델리게이트 색상 문제 해결** (`qt_styles.py` v3.0.5)
+  - **문제**: Western/Global/NDL 탭의 출처별 색상(LC, Harvard, MIT 등)이 10월 28일 이후 작동 중단
+    - **근본 원인**: `qt_styles.py`의 `QTableView::item { color: {U.TEXT_DEFAULT}; }` 속성이 델리게이트의 `option.palette.setColor()` 설정을 무시
+    - **증상**: 모든 텍스트가 기본 색상으로 표시되어 출처별 구분 불가
+  - **해결**: `QTableView::item`에서 `color` 속성 제거
+    - stylesheet의 `color` 속성이 델리게이트의 palette 설정보다 우선순위가 높아서 발생한 문제
+    - 델리게이트가 텍스트 색상을 제어할 수 있도록 stylesheet에서 색상 강제 지정 제거
+  - **효과**: 출처별 색상이 정상적으로 표시됨 (10월 27일 버전으로 복원)
+
+- **10월 27일 델리게이트 패턴 복원** (`qt_TabView_Western.py` v1.0.2, `qt_TabView_Global.py` v1.0.2, `qt_TabView_NDL.py` v2.0.2)
+  - **전략**: 작동하던 10월 27일 버전의 단순한 패턴 사용
+    - `option.palette.setColor()` + `super().paint()` 조합
+    - 복잡한 custom painting 방식 제거
+  - **Western 탭**: 10개 출처 색상 (LC, Harvard, MIT, Princeton, UPenn, Cornell, DNB, BNF, BNE, Google)
+  - **Global 탭**: 13개 출처 색상 (Western + NDL, CiNii, NLK)
+  - **NDL 탭**: 2개 출처 색상 (NDL, CiNii)
+  - **테마 대응**: `UI_CONSTANTS` 동적 로딩으로 Dark/Light 테마 자동 전환
+
+- **Find 매치 하이라이트 기능 구현** (모든 탭)
+  - **문제**: Find 기능으로 검색할 때 매치되는 셀들을 시각적으로 구분하기 어려움
+    - 이전 세션에서 빨간색 하이라이트 시도했으나 stylesheet 문제로 실패
+  - **해결**: 델리게이트 기반 매치 하이라이트 구현
+    - **Western/Global/NDL 탭**: 기존 출처 색상 델리게이트에 매치 하이라이트 추가
+    - **다른 모든 탭**: `BaseMatchHighlightDelegate` 생성 및 자동 적용
+  - **구현 방식**:
+    - `paint()` 메서드에서 검색어 매치 확인
+    - 매치되는 셀: `painter.fillRect()`로 빨간색 배경 직접 그리기 (ACCENT_RED)
+    - 선택된 매치 셀: 파란색 배경 (HIGHLIGHT_SELECTED) - F3 네비게이션 시 구분 가능
+    - 선택되지 않은 매치 셀: 빨간색 배경 + 흰색 텍스트
+    - `super().paint()` 호출하지 않아 stylesheet 영향 회피
+  - **실시간 업데이트**: `_on_find_text_changed()` 메서드 수정
+    - Find 입력창 변경 시 델리게이트에 검색어 전달
+    - `viewport().update()` 호출로 테이블 다시 그리기
+  - **효과**:
+    - 검색어와 매치되는 모든 셀이 빨간색으로 강조됨
+    - F3으로 이동하면 현재 선택된 셀은 파란색으로 구분됨
+    - 검색어 입력과 동시에 하이라이트 실시간 업데이트
+
+- **BaseMatchHighlightDelegate 구현** (`qt_base_tab.py` v3.0.6)
+  - **목적**: 델리게이트가 없는 탭(KSH Local, NLK 등)에 매치 하이라이트 제공
+  - **통합 기능**:
+    - ✅ 매치 하이라이트 (빨간색 배경)
+    - ✅ 선택 셀 구분 (파란색 배경)
+    - ✅ URL 파란색 표시 (ACCENT_BLUE)
+    - ✅ URL 클릭 시 브라우저 열기
+    - ✅ KSH 마크업 태그 제거 및 순수 URL 추출
+  - **자동 적용**: `BaseSearchTab.__init__`에서 `color_delegate` 속성이 없으면 자동 설정
+  - **UrlLinkDelegate 대체**: 기존 UrlLinkDelegate 기능을 모두 포함하여 통합
+
+- **브랜치 전략**:
+  - `feature-match-highlight` 브랜치에서 안전하게 실험
+  - 성공 후 `main` 브랜치에 머지 및 GitHub 푸시
+
+- **수정 파일**:
+  - `qt_styles.py` v3.0.5 (QTableView::item color 속성 제거)
+  - `qt_TabView_Western.py` v1.0.2 (출처 색상 복원 + 매치 하이라이트)
+  - `qt_TabView_Global.py` v1.0.2 (출처 색상 복원 + 매치 하이라이트)
+  - `qt_TabView_NDL.py` v2.0.2 (출처 색상 복원 + 매치 하이라이트)
+  - `qt_base_tab.py` v3.0.6 (BaseMatchHighlightDelegate 추가)
+
+- **기술적 인사이트**:
+  - Qt stylesheet의 `color` 속성은 델리게이트의 `option.palette.setColor()`보다 우선순위가 높음
+  - stylesheet가 배경색을 덮어쓰는 경우 `super().paint()` 대신 직접 `painter.fillRect()` + `painter.drawText()` 사용
+  - 델리게이트 기반 UI 렌더링 시 stylesheet의 전역 설정이 예상치 못한 문제를 일으킬 수 있음
+
 ### 2025-10-30 (세션 1): Find 기능 UX 개선
 
 - **Find 입력창 자동 전체 선택 기능 추가** (`qt_base_tab.py` v3.0.4)

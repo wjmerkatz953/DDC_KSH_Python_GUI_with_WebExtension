@@ -1,6 +1,6 @@
 # 파일명: qt_TabView_Global.py
 # -*- coding: utf-8 -*-
-# 버전: v1.0.1 (2025-10-27) - 델리게이트 테마 대응 추가, refresh_theme() 메서드 추가
+# 버전: v1.0.2 (2025-10-30) - 출처별 색상 복원 (10월 27일 패턴) + Find 매치 하이라이트 기능 추가
 # 설명: Global 통합 검색 UI 탭 (BaseSearchTab 상속)
 
 from PySide6.QtGui import QColor, QPalette

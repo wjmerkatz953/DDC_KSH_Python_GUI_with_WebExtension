@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 qt_styles.py - Qt 스타일시트 정의
-버전: 3.0.4
+버전: 3.0.5
 생성일: 2025-09-23
-수정일: 2025-10-28
-- MARC_Gemini_Input 위젯에 :focus 스타일 추가
-- 트리메뉴 모드에서 스타일시트가 제대로 적용되도록 개선
+수정일: 2025-10-30
+- QTableView::item의 color 속성 제거하여 델리게이트가 텍스트 색상 제어 가능하도록 수정
+  (델리게이트 기반 출처별 색상 및 매치 하이라이트 기능 정상화)
 """
 from PySide6.QtWidgets import QGraphicsDropShadowEffect, QPushButton, QWidget
 from PySide6.QtGui import QColor
