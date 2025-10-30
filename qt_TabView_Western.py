@@ -12,39 +12,70 @@ from ui_constants import U
 
 
 class WesternSourceColorDelegate(QStyledItemDelegate):
-    """✅ 출처별로 행의 텍스트 색상을 다르게 표시하는 델리게이트 (테마 대응)"""
+    """✅ 출처별로 행의 텍스트 색상을 다르게 표시하는 델리게이트 (테마 대응 + 매치 하이라이트)"""
 
     def __init__(self, parent=None, app_instance=None):
         super().__init__(parent)
         self.app_instance = app_instance
+        self.search_text = ""  # ✅ [추가] Find 검색어 저장
+
+    def set_search_text(self, text):
+        """✅ [추가] Find 검색어 설정"""
+        self.search_text = text.lower() if text else ""
 
     def paint(self, painter, option, index):
-        """✅ [10월 27일 작동 방식] palette.setColor + super().paint() 호출"""
+        """✅ [10월 27일 작동 방식] palette.setColor + super().paint() 호출 + 매치 하이라이트"""
+        from PySide6.QtCore import Qt
+        from PySide6.QtWidgets import QStyle
         # ✅ [핵심] 매번 최신 UI_CONSTANTS 가져오기 (테마 변경 대응)
         from ui_constants import UI_CONSTANTS as U_CURRENT
 
-        # 현재 행의 첫 번째 컬럼(출처)에서 값 가져오기
-        source = index.siblingAtColumn(0).data(0)
+        # 현재 셀 텍스트 가져오기
+        cell_text = str(index.data(0) or "")
 
-        # 출처별 색상 매핑 (테마 변경 시마다 최신 UI 상수 사용)
-        color_map = {
-            "LC": QColor(U_CURRENT.SOURCE_LC),
-            "Harvard": QColor(U_CURRENT.SOURCE_HARVARD),
-            "MIT": QColor(U_CURRENT.SOURCE_MIT),
-            "Princeton": QColor(U_CURRENT.SOURCE_PRINCETON),
-            "UPenn": QColor(U_CURRENT.SOURCE_UPENN),
-            "Cornell": QColor(U_CURRENT.SOURCE_CORNELL),
-            "DNB": QColor(U_CURRENT.SOURCE_DNB),
-            "BNF": QColor(U_CURRENT.SOURCE_BNF),
-            "BNE": QColor(U_CURRENT.SOURCE_BNE),
-            "Google": QColor(U_CURRENT.SOURCE_GOOGLE),
-        }
+        # 선택 여부 확인
+        is_selected = option.state & QStyle.StateFlag.State_Selected
 
-        # ✅ [10월 27일 방식] 출처에 해당하는 색상이 있으면 사용, 없으면 기본 텍스트 색상
-        text_color = color_map.get(source, QColor(U_CURRENT.TEXT_DEFAULT))
-        option.palette.setColor(QPalette.ColorRole.Text, text_color)
+        # ✅ [추가] 매치 하이라이트: Find 검색어와 매치되면 빨간색 배경
+        if self.search_text and self.search_text in cell_text.lower():
+            # 직접 배경과 텍스트 그리기
+            painter.save()
 
-        super().paint(painter, option, index)
+            if is_selected:
+                # 선택된 셀: 기본 선택 색상 사용 (구분 가능하도록)
+                painter.fillRect(option.rect, QColor(U_CURRENT.HIGHLIGHT_SELECTED))
+                painter.setPen(QColor(U_CURRENT.TEXT_BUTTON))
+            else:
+                # 선택되지 않은 매치 셀: 빨간색 배경
+                painter.fillRect(option.rect, QColor(U_CURRENT.ACCENT_RED))
+                painter.setPen(QColor("#FFFFFF"))
+
+            text_rect = option.rect.adjusted(4, 0, -4, 0)
+            painter.drawText(text_rect, Qt.AlignLeft | Qt.AlignVCenter, cell_text)
+            painter.restore()
+        else:
+            # 출처별 색상 적용
+            source = index.siblingAtColumn(0).data(0)
+
+            # 출처별 색상 매핑 (테마 변경 시마다 최신 UI 상수 사용)
+            color_map = {
+                "LC": QColor(U_CURRENT.SOURCE_LC),
+                "Harvard": QColor(U_CURRENT.SOURCE_HARVARD),
+                "MIT": QColor(U_CURRENT.SOURCE_MIT),
+                "Princeton": QColor(U_CURRENT.SOURCE_PRINCETON),
+                "UPenn": QColor(U_CURRENT.SOURCE_UPENN),
+                "Cornell": QColor(U_CURRENT.SOURCE_CORNELL),
+                "DNB": QColor(U_CURRENT.SOURCE_DNB),
+                "BNF": QColor(U_CURRENT.SOURCE_BNF),
+                "BNE": QColor(U_CURRENT.SOURCE_BNE),
+                "Google": QColor(U_CURRENT.SOURCE_GOOGLE),
+            }
+
+            # ✅ [10월 27일 방식] 출처에 해당하는 색상이 있으면 사용, 없으면 기본 텍스트 색상
+            text_color = color_map.get(source, QColor(U_CURRENT.TEXT_DEFAULT))
+            option.palette.setColor(QPalette.ColorRole.Text, text_color)
+
+            super().paint(painter, option, index)
 
     # -------------------
     # ✅ [핵심 추가] URL 클릭 처리

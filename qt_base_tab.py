@@ -306,6 +306,114 @@ def load_dataframe_to_model(model, dataframe, column_mapping=None):
     model.add_multiple_rows(data_list)
 
 
+class BaseMatchHighlightDelegate(QStyledItemDelegate):
+    """✅ 기본 매치 하이라이트 델리게이트 (URL 링크 기능 포함)"""
+
+    def __init__(self, parent=None, app_instance=None):
+        super().__init__(parent)
+        self.app_instance = app_instance
+        self.search_text = ""
+
+        # URL 링크 색상
+        from ui_constants import UI_CONSTANTS
+        self.link_color = QColor(UI_CONSTANTS.ACCENT_BLUE)
+
+    def set_search_text(self, text):
+        """Find 검색어 설정"""
+        self.search_text = text.lower() if text else ""
+
+    def paint(self, painter, option, index):
+        """매치 하이라이트 + URL 링크 색상 + 기본 렌더링"""
+        from PySide6.QtCore import Qt
+        from PySide6.QtWidgets import QStyle
+        from ui_constants import UI_CONSTANTS as U_CURRENT
+
+        cell_text = str(index.data(0) or "")
+        is_selected = option.state & QStyle.StateFlag.State_Selected
+
+        # 매치 하이라이트 (최우선)
+        if self.search_text and self.search_text in cell_text.lower():
+            painter.save()
+
+            if is_selected:
+                painter.fillRect(option.rect, QColor(U_CURRENT.HIGHLIGHT_SELECTED))
+                painter.setPen(QColor(U_CURRENT.TEXT_BUTTON))
+            else:
+                painter.fillRect(option.rect, QColor(U_CURRENT.ACCENT_RED))
+                painter.setPen(QColor("#FFFFFF"))
+
+            text_rect = option.rect.adjusted(4, 0, -4, 0)
+            painter.drawText(text_rect, Qt.AlignLeft | Qt.AlignVCenter, cell_text)
+            painter.restore()
+        else:
+            # URL이면 파란색으로 표시
+            if self.is_url_text(cell_text):
+                option.palette.setColor(QPalette.ColorRole.Text, self.link_color)
+
+            super().paint(painter, option, index)
+
+    def editorEvent(self, event, model, option, index):
+        """URL 클릭 처리"""
+        from PySide6.QtCore import QEvent, Qt
+
+        if event.type() == QEvent.MouseButtonRelease and event.button() == Qt.LeftButton:
+            data = str(index.data(Qt.DisplayRole) or "").strip()
+
+            # 컬럼 이름 가져오기
+            column_name = model.headerData(index.column(), Qt.Horizontal, Qt.DisplayRole) or ""
+
+            # 순수한 URL 추출
+            pure_url = self._extract_pure_url(data, column_name)
+
+            if self.is_url_text(pure_url):
+                open_url_safely(pure_url, self.app_instance)
+                return True
+        return False
+
+    def _extract_pure_url(self, data, column_name):
+        """데이터와 컬럼 이름을 기반으로 URL을 추출"""
+        # KSH 마크업/HTML 태그 제거
+        clean_data = re.sub(r"▼[a-zA-Z0-9].*?▲", "", data)
+        clean_data = re.sub(r"<[^>]+>", "", clean_data).strip().rstrip(".")
+
+        # URL 패턴 추출
+        match = re.search(r'(https?://[^\s<>"]+|www\.[^\s<>"]+)', clean_data)
+
+        if "링크" in column_name or "URL" in column_name:
+            if match:
+                return match.group(0).strip()
+            return ""
+        else:
+            if match:
+                return match.group(0).strip()
+            return clean_data
+
+    def is_url_text(self, text):
+        """URL 패턴 확인"""
+        if not text or len(text) < 4:
+            return False
+
+        text_lower = text.lower()
+
+        url_patterns = [
+            r"^https?://",
+            r"^www\.",
+            r"\.com\b",
+            r"\.org\b",
+            r"\.net\b",
+            r"\.edu\b",
+            r"\.gov\b",
+            r"\.co\.kr\b",
+            r"\.kr\b",
+            r"ncid/[A-Za-z0-9]+$",
+        ]
+
+        for pattern in url_patterns:
+            if re.search(pattern, text_lower):
+                return True
+        return False
+
+
 class BaseSearchTab(QWidget):
     def __init__(self, config, app_instance):
         super().__init__()
@@ -337,14 +445,11 @@ class BaseSearchTab(QWidget):
         self.setup_connections()
         setup_shortcuts(self, self.app_instance)
 
-        # ✅ [핵심 수정] UrlLinkDelegate의 생성자 호출 방식을 수정하여
-        # Qt가 인식하는 parent 인자만 QStyledItemDelegate.__init__으로 전달되도록 합니다.
-        self.table_view.setItemDelegate(
-            UrlLinkDelegate(
-                parent=self.table_view,
-                app_instance=self.app_instance,  # <--- UrlLinkDelegate 내부에서만 사용됩니다.
-            )
-        )
+        # ✅ [수정] 기본 매치 하이라이트 델리게이트 설정 (URL 링크 기능 포함)
+        # (서브클래스에서 이미 color_delegate를 설정했다면 스킵됨)
+        if not hasattr(self, 'color_delegate'):
+            self.color_delegate = BaseMatchHighlightDelegate(self.table_view, self.app_instance)
+            self.table_view.setItemDelegate(self.color_delegate)
 
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
@@ -664,10 +769,10 @@ class BaseSearchTab(QWidget):
 
     def _setup_table_delegate(self):
         """✅ [신규] 테이블 델리게이트 설정 (서브클래스에서 오버라이드 가능)"""
-        from qt_custom_widgets import URLHoverDelegate
-        self.table_view.setItemDelegate(
-            URLHoverDelegate(self.table_view, self.app_instance)
-        )
+        # ✅ [수정] 기본 매치 하이라이트 델리게이트 사용 (color_delegate 속성이 없는 경우)
+        if not hasattr(self, 'color_delegate'):
+            self.color_delegate = BaseMatchHighlightDelegate(self.table_view)
+            self.table_view.setItemDelegate(self.color_delegate)
 
     def setup_table_view_selection(self):
         """✅ [최종] 끊김 없는 부드러운 컬럼 리사이즈"""
@@ -1069,9 +1174,16 @@ class BaseSearchTab(QWidget):
     # ✅ [완전 복원] Find 관련 메서드들
 
     def _on_find_text_changed(self, text):
-        """✅ [신규] Find 입력창의 텍스트가 변경될 때마다 호출 - 매치 카운터 업데이트"""
+        """✅ [신규] Find 입력창의 텍스트가 변경될 때마다 호출 - 매치 카운터 업데이트 + 델리게이트 하이라이트"""
         # 매치 카운터 업데이트
         self._update_find_match_counter(text.strip())
+
+        # ✅ [추가] 델리게이트에 검색어 전달 (매치 하이라이트용)
+        if hasattr(self, 'color_delegate') and hasattr(self.color_delegate, 'set_search_text'):
+            self.color_delegate.set_search_text(text.strip())
+            # 테이블 뷰 다시 그리기
+            if hasattr(self, 'table_view'):
+                self.table_view.viewport().update()
 
     def _update_find_match_counter(self, search_text):
         """Find 검색어에 매치되는 셀의 개수를 세고 상태 표시줄에 표시"""
