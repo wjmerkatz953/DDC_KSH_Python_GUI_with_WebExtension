@@ -1,5 +1,11 @@
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+- **2025-10-31: `QItemSelectionModel.ClearAndSelect` 사용법 수정** (`qt_base_tab.py` v3.0.7)
+  - **문제**: `qt_base_tab.py` (line 1320)에서 `self.table_view.selectionModel().ClearAndSelect`를 사용했으나, `selectionModel()`이 반환하는 `QItemSelectionModel` 인스턴스에는 `ClearAndSelect` 속성이 없음. `ClearAndSelect`는 선택 플래그(enum)이므로 클래스 레벨에서 접근해야 함.
+  - **해결**: `QItemSelectionModel.ClearAndSelect` (또는 `QItemSelectionModel.SelectionFlag.ClearAndSelect`)로 수정하여 올바른 선택 플래그를 사용하도록 변경.
+  - **효과**: `AttributeError` 발생 방지 및 선택 모델의 `clearAndSelect` 기능 정상 작동.
+
+
 ### 2025-10-30 (세션 2): 델리게이트 색상 및 Find 매치 하이라이트 구현
 
 - **델리게이트 색상 문제 해결** (`qt_styles.py` v3.0.5)
@@ -50,6 +56,10 @@
     - ✅ KSH 마크업 태그 제거 및 순수 URL 추출
   - **자동 적용**: `BaseSearchTab.__init__`에서 `color_delegate` 속성이 없으면 자동 설정
   - **UrlLinkDelegate 대체**: 기존 UrlLinkDelegate 기능을 모두 포함하여 통합
+- **Hotfix: Find navigation crash** (qt_base_tab.py v3.0.6)
+  - Replaced selectionModel().ClearAndSelect with the class-level QItemSelectionModel.ClearAndSelect flag to eliminate the AttributeError during find navigation
+  - Prevents F3/Shift+F3 lookups from crashing when selecting the next or previous match
+
 
 - **브랜치 전략**:
   - `feature-match-highlight` 브랜치에서 안전하게 실험
