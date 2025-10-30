@@ -301,7 +301,7 @@ def get_app_stylesheet():
     QTableView::item {{
         padding: 4px;
         border: none;
-        color: {U.TEXT_DEFAULT};
+        /* ✅ [수정] color 제거 - 델리게이트가 텍스트 색상을 제어할 수 있도록 함 */
         background-color: {U.BACKGROUND_PRIMARY};
     }}
 

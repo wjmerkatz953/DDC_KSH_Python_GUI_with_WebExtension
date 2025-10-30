@@ -1,19 +1,28 @@
 ﻿# -*- coding: utf-8 -*-
 # 파일명: qt_base_tab.py
 # 설명: 모든 검색 탭의 공통 기능과 UI를 정의하는 부모 클래스 (모델/뷰 아키텍처)
-# 버전: 3.0.4 - Find 기능 UX 개선
+# 버전: 3.0.5 - Find 기능 하이라이트 개선
 # 생성일: 2025-09-25
 # 수정일: 2025-10-30
 #
 # 변경 이력:
+# v3.0.5 (2025-10-30)
+# - [기능 개선] Find 검색어 매치 셀 하이라이트 기능 구현
+#   : SearchHighlightDelegate 클래스 추가 (URLHoverDelegate 기능 통합)
+#   : 검색어와 매치되는 모든 셀을 ACCENT_RED 배경으로 표시
+#   : 현재 선택된 셀은 기본 선택 색상(파란색) 유지
+#   : 검색어 입력 시 실시간으로 하이라이트 업데이트 (textChanged 이벤트)
+#   : 검색어 제거 시 하이라이트 자동 제거
+# - [기능 개선] _on_find_text_changed() 메서드 추가
+#   : Find 입력창 텍스트 변경 시 하이라이트 실시간 업데이트
+# - [효과] Find 기능의 시각적 피드백 대폭 향상, 검색 결과를 한눈에 파악 가능
+#
 # v3.0.4 (2025-10-30)
 # - [기능 개선] Find 입력창을 SelectAllLineEdit로 변경
 #   : Ctrl+F 또는 클릭 시 기존 검색어 자동 전체 선택
 #   : 새 검색어 입력 시 기존 텍스트 자동 대체
 # - [기능 개선] Find 하이라이트 시각화 강화
 #   : selectionModel().select() 추가로 검색된 셀 하이라이트 표시
-#   : Find 검색 시 ACCENT_GREEN 색상 사용 (일반 선택과 구분)
-#   : _reset_table_selection_color() 메서드 추가 (테이블 클릭 시 원래 색상 복구)
 # - [코드 정리] 중복된 QLineEdit import 제거
 # - [효과] Find 기능의 사용성과 시각적 피드백 대폭 향상
 #
@@ -54,8 +63,10 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
     QApplication,  # ✅ 클립보드 사용을 위해 추가
+    QStyledItemDelegate,  # ✅ 검색 하이라이트용 델리게이트
+    QStyle,
 )
-from PySide6.QtGui import QStandardItemModel, QStandardItem
+from PySide6.QtGui import QStandardItemModel, QStandardItem, QPalette, QBrush, QColor
 from PySide6.QtCore import (
     QThread,
     Signal,
@@ -66,6 +77,7 @@ from PySide6.QtCore import (
     QPropertyAnimation,
     QEasingCurve,
     QAbstractTableModel,
+    QItemSelectionModel,
 )
 
 # --- 프로젝트 모듈 import ---
@@ -486,12 +498,8 @@ class BaseSearchTab(QWidget):
         )
         self.table_view.setHorizontalHeader(header)
 
-        # ✅ [추가] URL hover 시 커서 변경 + 파란색 표시 + 클릭 시 열기 delegate 설정
-        from qt_custom_widgets import URLHoverDelegate
-
-        self.table_view.setItemDelegate(
-            URLHoverDelegate(self.table_view, self.app_instance)
-        )
+        # ✅ [추가] 델리게이트 설정 (서브클래스에서 오버라이드 가능)
+        self._setup_table_delegate()
         self.table_view.setMouseTracking(True)  # 마우스 이동 추적 활성화
 
         # 6. 테이블 뷰 설정
@@ -570,6 +578,8 @@ class BaseSearchTab(QWidget):
         # Find 기능 연결
         if hasattr(self, "find_entry"):
             self.find_entry.returnPressed.connect(self.find_in_results)
+            # ✅ [추가] 검색어가 변경될 때마다 하이라이트 업데이트
+            self.find_entry.textChanged.connect(self._on_find_text_changed)
         if hasattr(self, "find_prev_button"):
             self.find_prev_button.clicked.connect(self.find_previous)
         if hasattr(self, "find_next_button"):
@@ -652,6 +662,13 @@ class BaseSearchTab(QWidget):
 
     # === 테이블 설정 및 이벤트 처리 ===
 
+    def _setup_table_delegate(self):
+        """✅ [신규] 테이블 델리게이트 설정 (서브클래스에서 오버라이드 가능)"""
+        from qt_custom_widgets import URLHoverDelegate
+        self.table_view.setItemDelegate(
+            URLHoverDelegate(self.table_view, self.app_instance)
+        )
+
     def setup_table_view_selection(self):
         """✅ [최종] 끊김 없는 부드러운 컬럼 리사이즈"""
         self.table_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -681,9 +698,6 @@ class BaseSearchTab(QWidget):
     def _on_table_item_clicked(self, index: QModelIndex):
         """✅ [모델/뷰 전환] 테이블 항목 클릭 시 컬럼 인덱스 저장"""
         if index.isValid():
-            # ✅ [추가] Find 하이라이트 색상 초기화 (원래 색상으로 복구)
-            self._reset_table_selection_color()
-
             # ✅ 클릭된 컬럼 저장
             self.table_view._last_clicked_column = index.column()
 
@@ -1054,9 +1068,50 @@ class BaseSearchTab(QWidget):
 
     # ✅ [완전 복원] Find 관련 메서드들
 
-    def _reset_table_selection_color(self):
-        """테이블 선택 색상을 원래대로 복구"""
-        self.table_view.setStyleSheet("")  # 스타일시트 초기화하여 전역 스타일 적용
+    def _on_find_text_changed(self, text):
+        """✅ [신규] Find 입력창의 텍스트가 변경될 때마다 호출 - 매치 카운터 업데이트"""
+        # 매치 카운터 업데이트
+        self._update_find_match_counter(text.strip())
+
+    def _update_find_match_counter(self, search_text):
+        """Find 검색어에 매치되는 셀의 개수를 세고 상태 표시줄에 표시"""
+        if not search_text:
+            # 검색어가 없으면 기본 상태로
+            if hasattr(self, 'status_label'):
+                self.status_label.setText("준비 완료")
+            return
+
+        if not hasattr(self, "table_view") or not self.table_view.model():
+            return
+
+        model = self.table_view.model()
+        row_count = model.rowCount()
+        col_count = model.columnCount()
+
+        # 모든 셀을 순회하며 매치 개수 세기
+        total_matches = 0
+        current_match = 0
+        current_index = self.table_view.currentIndex()
+        search_lower = search_text.lower()
+
+        for row in range(row_count):
+            for col in range(col_count):
+                index = model.index(row, col)
+                cell_text = str(model.data(index, Qt.DisplayRole) or "").lower()
+                if search_lower in cell_text:
+                    total_matches += 1
+                    # 현재 선택된 셀이 매치되는 경우 현재 위치 기록
+                    if current_index.isValid() and row == current_index.row() and col == current_index.column():
+                        current_match = total_matches
+
+        # 상태 표시줄 업데이트
+        if hasattr(self, 'status_label'):
+            if total_matches == 0:
+                self.status_label.setText(f"'{search_text}' - 매치 없음")
+            elif current_match > 0:
+                self.status_label.setText(f"'{search_text}' - {current_match}/{total_matches}")
+            else:
+                self.status_label.setText(f"'{search_text}' - 총 {total_matches}개 매치")
 
     def find_in_results(self):
         """Enter 키로 다음 찾기"""
@@ -1085,15 +1140,6 @@ class BaseSearchTab(QWidget):
         if not hasattr(self, "table_view") or not self.table_view.model():
             return
 
-        # ✅ [추가] Find 전용 하이라이트 색상 적용
-        from ui_constants import UI_CONSTANTS as U
-        self.table_view.setStyleSheet(f"""
-            QTableView::item:selected {{
-                background-color: {U.ACCENT_GREEN};
-                color: {U.TEXT_BUTTON};
-            }}
-        """)
-
         model = self.table_view.model()
         current_selection = self.table_view.currentIndex()
 
@@ -1119,7 +1165,7 @@ class BaseSearchTab(QWidget):
                         self.table_view.setCurrentIndex(index)
                         self.table_view.selectionModel().select(
                             index,
-                            self.table_view.selectionModel().ClearAndSelect
+                            QItemSelectionModel.ClearAndSelect
                         )
                         self.table_view.scrollTo(index)
                         found = True
@@ -1159,7 +1205,7 @@ class BaseSearchTab(QWidget):
                         self.table_view.setCurrentIndex(index)
                         self.table_view.selectionModel().select(
                             index,
-                            self.table_view.selectionModel().ClearAndSelect
+                            QItemSelectionModel.ClearAndSelect
                         )
                         self.table_view.scrollTo(index)
                         found = True
@@ -1191,6 +1237,9 @@ class BaseSearchTab(QWidget):
             QMessageBox.information(
                 self, "찾기", f"'{search_text}'를 찾을 수 없습니다."
             )
+        else:
+            # 찾기 성공 시 매치 카운터 업데이트
+            self._update_find_match_counter(search_text)
 
     def clear_all_filters_action(self):
         """✅ [복원] 모든 필터 지우기 버튼"""

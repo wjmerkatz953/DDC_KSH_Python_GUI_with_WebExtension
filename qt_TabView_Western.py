@@ -19,8 +19,8 @@ class WesternSourceColorDelegate(QStyledItemDelegate):
         self.app_instance = app_instance
 
     def paint(self, painter, option, index):
-        """✅ [수정] 행의 출처에 따라 텍스트 색상 변경 (테마 대응)"""
-        # ✅ [핵심] 테마 변경 대응: 매번 최신 UI_CONSTANTS 가져오기
+        """✅ [10월 27일 작동 방식] palette.setColor + super().paint() 호출"""
+        # ✅ [핵심] 매번 최신 UI_CONSTANTS 가져오기 (테마 변경 대응)
         from ui_constants import UI_CONSTANTS as U_CURRENT
 
         # 현재 행의 첫 번째 컬럼(출처)에서 값 가져오기
@@ -40,7 +40,7 @@ class WesternSourceColorDelegate(QStyledItemDelegate):
             "Google": QColor(U_CURRENT.SOURCE_GOOGLE),
         }
 
-        # 출처에 해당하는 색상이 있으면 사용, 없으면 기본 텍스트 색상
+        # ✅ [10월 27일 방식] 출처에 해당하는 색상이 있으면 사용, 없으면 기본 텍스트 색상
         text_color = color_map.get(source, QColor(U_CURRENT.TEXT_DEFAULT))
         option.palette.setColor(QPalette.ColorRole.Text, text_color)
 
@@ -75,10 +75,9 @@ class QtWesternSearchTab(BaseSearchTab):
 
     def __init__(self, config, app_instance):
         super().__init__(config, app_instance)
-        # -------------------
-        # ✅ [수정] app_instance 전달
+
+        # ✅ [10월 27일 방식] __init__에서 직접 델리게이트 설정
         self.color_delegate = WesternSourceColorDelegate(self.table_view, app_instance)
-        # -------------------
         self.table_view.setItemDelegate(self.color_delegate)
 
         # ✅ [추가] 초기 API 상태 업데이트

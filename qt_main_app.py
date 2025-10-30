@@ -1065,8 +1065,8 @@ class MainApplicationWindow(QMainWindow):
         current_tab = self.get_current_tab()
 
         # ✅ [모델/뷰 우선] BaseSearchTab 기반 탭 처리
-        if hasattr(current_tab, "find_in_results"):
-            current_tab.find_in_results("forward")
+        if hasattr(current_tab, "find_next"):
+            current_tab.find_next()
             return
 
         # ✅ [디버그] 찾기 기능이 없는 탭
@@ -1080,8 +1080,8 @@ class MainApplicationWindow(QMainWindow):
         current_tab = self.get_current_tab()
 
         # ✅ [모델/뷰 우선] BaseSearchTab 기반 탭 처리
-        if hasattr(current_tab, "find_in_results"):
-            current_tab.find_in_results("backward")
+        if hasattr(current_tab, "find_previous"):
+            current_tab.find_previous()
             return
 
         # ✅ [디버그] 찾기 기능이 없는 탭
