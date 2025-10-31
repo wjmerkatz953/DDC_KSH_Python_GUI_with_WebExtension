@@ -868,7 +868,7 @@ class SearchKshManager(SearchCommonManager):
                     "synonyms": "; ".join(
                         relations.get(concept_id, {}).get("synonyms", [])
                     ),
-                    "ksh_link_url": f"https://lod.nl.go.kr/page/concept/{self._strip_namespace(concept_id)}",
+                    "ksh_link_url": f"https://librarian.nl.go.kr/LI/contents/L20201000000.do?category=&pageNum=1&pageSize=10&kwd=&acControlNo=&controlNo={self._strip_namespace(concept_id)}&sDate=&eDate=&creationYn=",
                     "_sort_priority": priority,
                 }
             )
@@ -1445,7 +1445,7 @@ class SearchKshManager(SearchCommonManager):
                     "matched_term": row["matched_term"],
                     "ksh_code": ksh_code,
                     "language": language,
-                    "ksh_link_url": f"https://librarian.nl.go.kr/LI/contents/L20201000000.do?controlNo={ksh_code}",
+                    "ksh_link_url": f"https://librarian.nl.go.kr/LI/contents/L20201000000.do?category=&pageNum=1&pageSize=10&kwd=&acControlNo=&controlNo={ksh_code}&sDate=&eDate=&creationYn=",
                 }
                 data.append(entry)
 
