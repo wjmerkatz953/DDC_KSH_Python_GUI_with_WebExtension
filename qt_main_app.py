@@ -98,6 +98,7 @@ from qt_TabView_Settings import QtSettingsTab
 from qt_TabView_Python import QtPythonTab
 from qt_context_menus import setup_widget_context_menu
 from qt_TabView_Gemini import QtGeminiTab
+from qt_TabView_Author_Check import QtAuthorCheckTab
 
 
 def ensure_sqlite_db(db_path: str, schema_sql: str | None = None) -> None:
@@ -649,6 +650,7 @@ class MainApplicationWindow(QMainWindow):
                 "PYTHON_TAB": QtPythonTab,
                 "SETTINGS": QtSettingsTab,
                 "GEMINI_DDC_SEARCH": QtGeminiTab,
+                "AUTHOR_CHECK_SEARCH": QtAuthorCheckTab,
             }
             # 중앙 설정(TAB_CONFIGURATIONS)을 순회하며 동적으로 탭 생성
             for key, config in TAB_CONFIGURATIONS.items():

@@ -7,6 +7,7 @@
 # (앞으로 추가될 모든 탭의 검색 함수를 이곳으로 가져옵니다)
 
 from Search_NLK import search_nlk_catalog
+from Search_Author_Check import search_nlk_biblio  # ✅ [추가] nlk_biblio.db 검색 함수
 from search_orchestrator import (
     search_lc_orchestrated,
     search_ndl_cinii_integrated,  # 👈 [수정] 임포트 경로 명확화
@@ -137,6 +138,19 @@ TAB_CONFIGURATIONS = {
             ("상세 링크", "상세 링크"),
         ],
         "search_function": search_nlk_catalog_with_labels,  # ✅ [수정] 래퍼 함수 사용
+    },
+    # ✅ [신규] 저자 확인 탭 설정 (nlk_biblio.db 기반)
+    "AUTHOR_CHECK_SEARCH": {
+        "tab_name": "저자 확인",
+        "tab_key": "author_check",  # ✅ 설정용 키 추가
+        "column_map": [
+            ("제목", "제목"),
+            ("저자", "저자"),
+            ("KAC 코드", "KAC 코드"),
+            ("연도", "연도"),
+            ("상세 링크", "상세 링크"),
+        ],
+        "search_function": search_nlk_biblio,  # ✅ nlk_biblio.db FTS5 검색 함수
     },
     # ✅ [추가] 납본 ID 검색 탭 설정
     "LEGAL_DEPOSIT_SEARCH": {
@@ -495,6 +509,18 @@ TABS = [
         "file": "qt_TabView_AIFeed.py",
         "group": "AI",
         "icon": "🤖",
+    },
+    {
+        "tab_name": "NLK 검색",
+        "file": "qt_TabView_NLK.py",
+        "group": "Integration",
+        "icon": "📖",
+    },
+    {
+        "tab_name": "저자 확인",
+        "file": "qt_TabView_Author_Check.py",
+        "group": "Integration",
+        "icon": "👤",
     },
 ]
 

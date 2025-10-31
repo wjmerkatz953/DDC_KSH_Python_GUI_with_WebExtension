@@ -746,6 +746,7 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
 
     menu.addSeparator()
     act_nlk_search = menu.addAction("🔍 NLK 탭에서 제목 검색")  # ✅ 항상 추가
+    act_author_check_search = menu.addAction("🔍 저자 확인 탭에서 저작물 일괄 검색")  # ✅ 저자 확인 탭 검색 추가
 
     menu.addSeparator()
     act_select_all = menu.addAction("🧲 Select All")
@@ -796,6 +797,27 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
         if target and hasattr(target, "tab_widget"):
             print(f"[DEBUG] NLK 검색 실행: '{selected_text}' → main_window 전달")
             _search_in_nlk_tab(target, selected_text)
+        else:
+            print("[ERROR] ❌ tab_widget을 가진 객체를 찾을 수 없습니다.")
+            if hasattr(app_instance, "log_message"):
+                app_instance.log_message(
+                    "❌ tab_widget을 가진 객체를 찾을 수 없습니다.", "ERROR"
+                )
+
+    elif chosen is act_author_check_search:
+        print("[DEBUG] 🔍 저자 확인 탭에서 저작물 일괄 검색 선택됨")
+        selected_text = tb.textCursor().selectedText()
+
+        if not selected_text:
+            print("[DEBUG] 선택 텍스트 없음 → 경고창 표시")
+            QMessageBox.warning(tb, "선택 오류", "검색할 텍스트를 먼저 선택하세요.")
+            return
+
+        # ✅ tab_widget이 있는 대상 찾기
+        target = getattr(app_instance, "main_window", None)
+        if target and hasattr(target, "tab_widget"):
+            print(f"[DEBUG] 저자 확인 검색 실행: '{selected_text}' → main_window 전달")
+            _search_in_author_check_tab(target, selected_text)
         else:
             print("[ERROR] ❌ tab_widget을 가진 객체를 찾을 수 없습니다.")
             if hasattr(app_instance, "log_message"):
@@ -882,6 +904,100 @@ def _search_in_nlk_tab(app_instance, title_text):
 
     except Exception as e:
         print(f"[ERROR] _search_in_nlk_tab 예외 발생: {e}")
+        import traceback
+
+        traceback.print_exc()
+
+
+def _search_in_author_check_tab(app_instance, title_text):
+    """
+    저자 확인 탭으로 전환하고 제목 검색을 실행합니다.
+
+    ✅ QTextBrowser의 selectedText()가 반환하는 U+2029(paragraph separator)를
+       일반 줄바꿈(\n)으로 변환하여 복수 제목 일괄 검색을 지원합니다.
+
+    Args:
+        app_instance: 메인 앱 인스턴스 또는 탭 인스턴스
+        title_text: 검색할 제목 텍스트 (U+2029로 구분될 수 있음)
+    """
+    print(f"[DEBUG] _search_in_author_check_tab() 호출됨 → '{title_text}'")
+    print(f"[DEBUG] app_instance 타입: {type(app_instance).__name__}")
+
+    # ✅ [핵심 추가] QTextBrowser의 U+2029 paragraph separator를 \n으로 변환
+    # QTextCursor.selectedText()는 줄바꿈을 U+2029로 반환하므로 일반 \n으로 변환 필요
+    normalized_text = title_text.replace("\u2029", "\n")
+    print(f"[DEBUG] 정규화된 텍스트 (U+2029 → \\n): '{normalized_text}'")
+
+    # ✅ app_instance가 실제 IntegratedSearchApp인지, 아니면 탭 인스턴스인지 확인
+    if hasattr(app_instance, "main_window"):
+        # IntegratedSearchApp 인스턴스
+        main_window = app_instance.main_window
+        print(f"[DEBUG] app_instance.main_window 사용")
+    elif hasattr(app_instance, "app_instance") and hasattr(
+        app_instance.app_instance, "main_window"
+    ):
+        # 탭 인스턴스 (app_instance.app_instance.main_window)
+        main_window = app_instance.app_instance.main_window
+        print(f"[DEBUG] app_instance.app_instance.main_window 사용")
+    else:
+        print("[ERROR] ❌ main_window를 찾을 수 없습니다.")
+        return
+
+    try:
+        # ✅ 저자 확인 탭으로 전환
+        main_window.switch_to_tab_by_name("저자 확인")
+
+        # ✅ 저자 확인 탭 가져오기
+        author_check_tab = main_window.get_tab_by_name("저자 확인")
+
+        if author_check_tab is None:
+            print("[ERROR] ❌ 저자 확인 탭을 찾을 수 없습니다.")
+            return
+
+        # 모든 검색 입력 필드 초기화 (input_widgets 딕셔너리 사용)
+        author_check_tab.input_widgets["title"].clear()
+        author_check_tab.input_widgets["author"].clear()
+        author_check_tab.input_widgets["year"].clear()
+
+        # KAC 입력창이 있으면 초기화
+        if hasattr(author_check_tab, "kac_input"):
+            author_check_tab.kac_input.clear()
+
+        # ✅ [수정] 정규화된 텍스트를 제목 입력 필드에 설정 (복수 제목 지원)
+        author_check_tab.input_widgets["title"].setText(normalized_text)
+
+        # 제목 개수 계산 (로그용)
+        title_count = len([t for t in normalized_text.split("\n") if t.strip()])
+        print(f"[DEBUG] 제목 입력 완료: {title_count}개 제목 → input_widgets['title'] 사용")
+
+        # ✅ 타이밍 이슈 해결: GUI 이벤트 처리를 위해 약간의 지연 추가
+        from PySide6.QtCore import QTimer
+
+        print(f"[DEBUG] 검색 실행 준비 완료 → 200ms 후 검색 시작")
+        QTimer.singleShot(200, author_check_tab.start_search)
+
+        # ✅ log_message도 올바른 app_instance에서 호출
+        real_app = None
+        if hasattr(app_instance, "log_message"):
+            real_app = app_instance
+        elif hasattr(app_instance, "app_instance") and hasattr(
+            app_instance.app_instance, "log_message"
+        ):
+            real_app = app_instance.app_instance
+
+        if real_app:
+            # 로그 메시지에 제목 개수 표시
+            if title_count > 1:
+                real_app.log_message(
+                    f"✅ 저자 확인 탭에서 {title_count}개 제목 일괄 검색을 시작합니다.", "INFO"
+                )
+            else:
+                real_app.log_message(
+                    f"✅ 저자 확인 탭에서 '{normalized_text}' 제목 검색을 시작합니다.", "INFO"
+                )
+
+    except Exception as e:
+        print(f"[ERROR] _search_in_author_check_tab 예외 발생: {e}")
         import traceback
 
         traceback.print_exc()

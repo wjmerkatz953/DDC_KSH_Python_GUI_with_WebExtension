@@ -15,7 +15,10 @@ a = Analysis(
         ('loading.jpg', '.'),
         (cacert_file, 'certifi'),  # certifi CA 인증서 포함
     ],
-    hiddenimports=['certifi'],
+    hiddenimports=[
+        'certifi',
+        'hanja',  # ✅ [추가] 한자 변환 라이브러리 (EXE 환경에서 누락 방지)
+    ],
     hookspath=['.'],
     hooksconfig={},
     runtime_hooks=[],

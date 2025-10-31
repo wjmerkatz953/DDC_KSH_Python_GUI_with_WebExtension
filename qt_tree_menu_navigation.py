@@ -101,6 +101,7 @@ class QtTreeMenuNavigation(QWidget):
                 "저자전거 검색",
                 "상세 저작물 정보",
                 "간략 저작물 정보",
+                "저자 확인",  # ✅ [추가] 저자 확인 탭
             ],
             "주제어": [
                 "KSH Hybrid",
