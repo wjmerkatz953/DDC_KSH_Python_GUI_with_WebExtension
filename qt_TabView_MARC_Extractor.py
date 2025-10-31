@@ -355,6 +355,10 @@ class QtMARCExtractorTab(QWidget):
             self.f_fields_table.selectionModel().currentChanged.connect(
                 self._update_detail_view
             )
+
+        # ✅ [추가] 더블클릭 시 셀 상세 정보 표시
+        self.f_fields_table.doubleClicked.connect(self._on_cell_double_clicked)
+
         # ✅ [핵심 추가] Ctrl+C 단축키에 대한 사용자 정의 복사 핸들러 연결
         copy_shortcut = QShortcut(QKeySequence.Copy, self)
         copy_shortcut.activated.connect(self.handle_copy)
@@ -399,6 +403,26 @@ class QtMARCExtractorTab(QWidget):
             copy_to_clipboard_with_feedback(
                 text_to_copy, self.app_instance, parent_widget=self
             )
+
+    def _on_cell_double_clicked(self, index):
+        """✅ [추가] 셀 더블클릭 시 상세 정보 모달 표시"""
+        if not index.isValid():
+            return
+
+        row = index.row()
+        col = index.column()
+
+        # 셀 값과 컬럼 이름 가져오기
+        item = self.f_fields_model.item(row, col)
+        cell_value = item.text() if item else ""
+
+        column_name = self.f_fields_model.headerData(
+            col, Qt.Horizontal, Qt.DisplayRole
+        ) or f"컬럼 {col}"
+
+        # 컨텍스트 메뉴의 show_cell_detail_dialog 함수 사용
+        from qt_context_menus import show_cell_detail_dialog
+        show_cell_detail_dialog(cell_value, column_name, self.app_instance)
 
     def _update_detail_view(self, current, previous):
         """✅ [추가] 선택된 행의 상세 정보를 메인 윈도우의 detail_display에 표시"""

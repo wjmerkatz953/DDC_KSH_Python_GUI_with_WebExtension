@@ -93,13 +93,21 @@ class CustomTextFilterDialog(QDialog):
         self.input_line.returnPressed.connect(self._accept)
 
         # -------------------
-        # ✅ [핵심 수정 5] 부모 윈도우 중앙에 위치시키기
+        # ✅ [핵심 수정 5] 부모 윈도우 중앙에 위치시키기 (멀티 모니터 대응)
         if parent:
-            parent_rect = parent.geometry()
-            self.move(
-                parent_rect.center().x() - self.width() // 2,
-                parent_rect.center().y() - self.height() // 2,
-            )
+            # parent가 QTableView인 경우, 실제 메인 윈도우를 찾아야 함
+            main_window = None
+            if hasattr(parent, "window"):
+                main_window = parent.window()
+            elif parent is not None:
+                main_window = parent
+
+            if main_window and hasattr(main_window, "geometry"):
+                parent_rect = main_window.geometry()
+                # 중앙 좌표 계산
+                x = parent_rect.x() + (parent_rect.width() - self.width()) // 2
+                y = parent_rect.y() + (parent_rect.height() - self.height()) // 2
+                self.move(x, y)
         enable_modal_close_on_outside_click(self)
 
     def _accept(self):
@@ -681,14 +689,19 @@ class ExcelStyleTableHeaderView(QHeaderView):
         """[버그 수정] Proxy 모델 뒤의 Source 모델에 직접 접근하여 고유값을 초고속으로 추출합니다."""
         try:
             # -------------------
-            # ✅ [핵심 수정 1] Proxy 모델을 통해 실제 데이터가 있는 Source 모델을 가져옵니다.
-            proxy_model = self.table_view.model()
-            if not proxy_model:
+            # ✅ [핵심 수정 1] 프록시 모델 여부를 확인하여 적절한 모델 선택
+            model = self.table_view.model()
+            if not model:
                 return []
 
-            source_model = proxy_model.sourceModel()
-            if not source_model:
-                return []
+            # 프록시 모델인 경우 sourceModel()을 호출, 아니면 직접 사용
+            if hasattr(model, 'sourceModel'):
+                source_model = model.sourceModel()
+                if not source_model:
+                    return []
+            else:
+                # QStandardItemModel을 직접 사용하는 경우 (예: MARC_Extractor)
+                source_model = model
             # -------------------
 
             # ✅ [핵심 수정 2] Pandas 의존성 제거 및 성능 향상

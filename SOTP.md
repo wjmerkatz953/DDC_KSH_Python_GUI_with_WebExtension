@@ -1,5 +1,5 @@
 # SOTP – Status of the Project (자동 생성)
-> **생성 시각**: 2025-10-31 00:37:46
+> **생성 시각**: 2025-10-31 10:05:20
 > **상태**: All Green **All Green** > **AI 전용 초고속 컨텍스트 문서** | 30초 파악 완료
 
 ---
@@ -53,6 +53,7 @@
 - **10월 27일 델리게이트 패턴 복원** (`qt_TabView_Western.py` v1.0.2, `qt_TabView_Global.py` v1.0.2, `qt_TabView_NDL.py` v2.0.2)
 - **Find 매치 하이라이트 기능 구현** (모든 탭)
 - **BaseMatchHighlightDelegate 구현** (`qt_base_tab.py` v3.0.6)
+- **Hotfix: Find navigation crash** (qt_base_tab.py v3.0.6)
 - **브랜치 전략**:
 - **수정 파일**:
 - **기술적 인사이트**:

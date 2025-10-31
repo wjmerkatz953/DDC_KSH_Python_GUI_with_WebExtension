@@ -1670,7 +1670,7 @@ def show_cell_detail_dialog(cell_value, column_name, app_instance):
 
         dialog = QDialog(app_instance.main_window)
         dialog.setWindowTitle(f"상세 정보: {column_name}")
-        dialog.setMinimumSize(800, 750)
+        dialog.setMinimumSize(750, 650)
         dialog.setObjectName("DetailDialog")
 
         # 창 플래그/모달 성격도 동일하게
@@ -1776,6 +1776,22 @@ def show_cell_detail_dialog(cell_value, column_name, app_instance):
         close_button.setAutoDefault(True)
         close_button.setDefault(True)
         close_button.setFocus()
+
+        # ✅ [추가] 다이얼로그 위치를 부모 중앙에서 150px 아래로 이동
+        parent_widget = app_instance.main_window
+        if parent_widget and hasattr(parent_widget, "geometry") and callable(parent_widget.geometry):
+            dialog.adjustSize()
+            parent_rect = parent_widget.geometry()
+            dialog_size = dialog.size()
+
+            # 중앙 좌표 계산
+            x = parent_rect.x() + (parent_rect.width() - dialog_size.width()) // 2
+            y = parent_rect.y() + (parent_rect.height() - dialog_size.height()) // 2
+
+            # y 좌표를 150px 아래로 이동
+            y += 150
+
+            dialog.move(x, y)
 
         dialog.exec()
 

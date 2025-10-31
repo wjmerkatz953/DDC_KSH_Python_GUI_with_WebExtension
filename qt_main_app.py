@@ -525,7 +525,7 @@ class MainApplicationWindow(QMainWindow):
     def setup_ui(self):
         """UI 설정"""
         self.setWindowTitle(
-            "통합 검색 시스템 - Qt Model/View Edition V. 5.1.0 for PNU Library 자료조직팀 by InnovaNex"
+            "통합 검색 시스템 - Qt Model/View Edition V. 5.1.1 for PNU Library 자료조직팀 by InnovaNex"
         )
         self.setMinimumSize(1200, 850)
         self.resize(1850, 1000)
