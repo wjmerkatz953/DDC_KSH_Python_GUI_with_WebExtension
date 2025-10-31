@@ -16,6 +16,7 @@
 - **검색 파사드**: [search_query_manager.py](search_query_manager.py) v3.0.0 - `SearchManager` 클래스
 - **주요 데이터베이스**:
   - `nlk_concepts.sqlite` - KSH 개념 및 DDC 매핑 (FTS5 인덱스)
+  - `nlk_biblio.sqlite` - 국립중앙도서관 서지 레코드 (7.1M건, FTS5 인덱스)
   - `kdc_ddc_mapping.db` - KDC↔DDC 매핑 테이블
   - `glossary.db` - UI 레이아웃 설정 저장
   - `dewey_cache.db` - WorldCat DDC API 응답 캐시
@@ -105,6 +106,7 @@
 | **Western 검색** | `qt_TabView_Western.py` | 검색 | 서양권 통합 검색 |
 | **Global 통합검색** | `qt_TabView_Global.py` | 검색 | 글로벌 통합 검색 |
 | **납본 ID 검색** | `qt_TabView_LegalDeposit.py` | 검색 | 납본자료 검색 |
+| **저자 확인** | `qt_TabView_Author_Check.py` | 검색 | NLK Biblio 서지 검색 |
 | **저자전거 검색** | `qt_TabView_KACAuthorities.py` | 저작물/저자 | KAC 저자전거 |
 | **상세 저작물 정보** | `qt_TabView_ISNI_Detailed.py` | 저작물/저자 | ISNI 상세 정보 |
 | **간략 저작물 정보** | `qt_TabView_BriefWorks.py` | 저작물/저자 | 간략 서지 정보 |
@@ -206,7 +208,7 @@
 ## 6. 데이터베이스, 파이프라인 및 도구 (Database, Data Pipelines & Tooling)
 
 - **`database_manager.py` (v2.2.0)**: **데이터베이스 접근의 중앙 관문**입니다.
-    - `nlk_concepts.sqlite`, `kdc_ddc_mapping.db`, `glossary.db`, `dewey_cache.db` 등 여러 SQLite 데이터베이스 연결을 관리합니다.
+    - `nlk_concepts.sqlite`, `nlk_biblio.sqlite`, `kdc_ddc_mapping.db`, `glossary.db`, `dewey_cache.db` 등 여러 SQLite 데이터베이스 연결을 관리합니다.
     - PRAGMA 최적화, FTS5 인덱스 유지보수, 캐시 관리, 벡터 검색(FAISS) 연동 등 데이터베이스 관련 모든 저수준 작업을 처리합니다.
 
 - **빌드 및 유지보수 스크립트**:
@@ -350,7 +352,41 @@ settings 및 translations
 
 이 트리거들은 mapping_data 테이블에 데이터가 추가, 수정, 삭제될 때마다 mapping_data_fts 가상 테이블의 내용을 자동으로 동기화하는 역할을 합니다.
 
-6.4. glossary.db (UI 설정 및 용어집)
+6.4. nlk_biblio.sqlite (국립중앙도서관 서지 데이터베이스)
+
+이 데이터베이스는 국립중앙도서관(NLK)의 서지 레코드를 저장하며, FTS5 전문 검색 엔진을 통해 빠른 검색을 제공합니다.
+
+주요 테이블:
+
+    biblio
+
+        목적: 서지 레코드의 핵심 정보를 저장하는 메인 테이블입니다.
+
+    스키마: nlk_id (PRIMARY KEY), year, creator, dc_creator, dcterms_creator, title, author_names, kac_codes
+
+    레코드 수: 7,097,145건 (KAC 코드가 있는 레코드만 포함)
+
+    biblio_title_fts
+
+        목적: biblio 테이블의 전문 검색을 위한 FTS5 가상 테이블입니다.
+
+        특징: title, author_names, kac_codes 필드를 색인하며, nlk_id는 UNINDEXED로 설정됩니다.
+
+    External Content: content=biblio, content_rowid=rowid 설정으로 biblio 테이블 참조
+
+트리거 (3개):
+
+    biblio_ai, biblio_ad, biblio_au 트리거가 biblio 테이블의 데이터 변경 시 biblio_title_fts를 자동 동기화합니다.
+
+최적화:
+
+    FTS5 tokenizer: unicode61 remove_diacritics 2 설정으로 다국어 검색 지원
+
+    GROUP BY nlk_id + MIN(rank) 패턴으로 중복 제거하면서 FTS5 랭킹 유지
+
+    복수 검색 지원: 줄바꿈으로 구분된 여러 제목/KAC 코드를 단일 OR 쿼리로 일괄 검색
+
+6.5. glossary.db (UI 설정 및 용어집)
 
 이 데이터베이스는 프로젝트 문서의 qt_layout_settings_manager.py (이전 문서 내용 참조) 및 qt_main_app.py (이전 문서 내용 참조)와 연관되어, 애플리케이션의 설정과 UI 상태(창 크기, 스플리터 위치 등)를 저장하는 데 사용됩니다. 총 4개의 테이블, 0개의 인덱스, 0개의 뷰, 0개의 트리거로 구성된 비교적 단순한 구조입니다.
 
@@ -642,6 +678,7 @@ search_query_manager.py (SearchManager 파사드)
 ```
 database_manager.py (DatabaseManager v2.2.0)
 ├── nlk_concepts.sqlite (KSH 개념, FTS5)
+├── nlk_biblio.sqlite (NLK 서지 7.1M건, FTS5)
 ├── kdc_ddc_mapping.db (KDC↔DDC)
 ├── dewey_cache.db (API 캐시)
 ├── glossary.db (UI 설정)

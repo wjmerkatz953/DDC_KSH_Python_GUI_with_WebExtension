@@ -1,5 +1,5 @@
 # SOTP – Status of the Project (자동 생성)
-> **생성 시각**: 2025-10-31 10:05:20
+> **생성 시각**: 2025-10-31 21:42:07
 > **상태**: All Green **All Green** > **AI 전용 초고속 컨텍스트 문서** | 30초 파악 완료
 
 ---
@@ -16,7 +16,7 @@
 
 ---
 
-## 2. 탭 요약 (총 11개)
+## 2. 탭 요약 (총 13개)
 
 | 그룹 | 탭 | 파일 | 아이콘 |
 |------|----|------|-------|
@@ -28,7 +28,9 @@
 | **Extraction** | └─ `MARC Extractor` | `qt_TabView_MARC_Extractor.py` | 📄 |
 | **Integration** | ├─ `Global` | `qt_TabView_Global.py` | 🌐 |
 | **Integration** | ├─ `NDL` | `qt_TabView_NDL.py` | 📘 |
-| **Integration** | └─ `Western` | `qt_TabView_Western.py` | 🌍 |
+| **Integration** | ├─ `Western` | `qt_TabView_Western.py` | 🌍 |
+| **Integration** | ├─ `NLK 검색` | `qt_TabView_NLK.py` | 📖 |
+| **Integration** | └─ `저자 확인` | `qt_TabView_Author_Check.py` | 👤 |
 | **Legal** | └─ `Legal Deposit` | `qt_TabView_LegalDeposit.py` | ⚖️ |
 | **Local** | └─ `KSH Local` | `qt_TabView_KSH_Local.py` | 📂 |
 
@@ -138,6 +140,32 @@ database_manager.py (DatabaseManager v2.2.0)
 ├── dewey_cache.db (API 캐시)
 ├── glossary.db (UI 설정)
 └── FAISS 벡터 인덱스 (임베딩 검색)
+```
+
+---
+
+## 6. 브라우저 확장 프로그램 (Browser Extension)
+
+### 구성 파일
+| 파일 | 역할 |
+|------|------|
+| `manifest.json` | 확장 프로그램 메타데이터 (v6.5.6) |
+| `background.js` | 백그라운드 서비스 워커, 메시지 중계 |
+| `content.js` | KSH 패널 UI 및 MARC 650 필드 삽입 |
+| `search-addon.js` | DDC/KSH 검색 패널, ISBN 조회 |
+| `article-processor.js` | 정관사 처리, 090 청구기호 검색 |
+
+### 주요 기능
+- **KSH 패널**: MARC 650 필드 자동 삽입, 프리셋 관리, 082 필드 연동
+- **검색 패널**: DDC/KSH 검색 (Flask API 연동), ISBN 서지정보 조회
+- **정관사 처리**: 246 필드 정관사 제거 및 자동 변환
+- **단축키**: `Ctrl+Shift+Q` (KSH 패널), `Ctrl+Shift+S` (검색 패널)
+
+### Flask API 연동
+```
+extension_api_server.py (Flask, 포트 5000)
+├── GET /api/dewey/search?ddc={코드}
+└── GET /api/ksh/search?q={쿼리}
 ```
 
 ---

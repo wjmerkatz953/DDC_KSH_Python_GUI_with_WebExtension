@@ -923,10 +923,17 @@ def _search_in_author_check_tab(app_instance, title_text):
     print(f"[DEBUG] _search_in_author_check_tab() 호출됨 → '{title_text}'")
     print(f"[DEBUG] app_instance 타입: {type(app_instance).__name__}")
 
-    # ✅ [핵심 추가] QTextBrowser의 U+2029 paragraph separator를 \n으로 변환
-    # QTextCursor.selectedText()는 줄바꿈을 U+2029로 반환하므로 일반 \n으로 변환 필요
+    # ✅ [핵심 추가] 특수 구분자를 줄바꿈으로 변환
+    # - U+2029: QTextCursor.selectedText()의 paragraph separator
+    # - U+FDD0/U+FDD1: AI Feed의 커스텀 제목 구분자
     normalized_text = title_text.replace("\u2029", "\n")
-    print(f"[DEBUG] 정규화된 텍스트 (U+2029 → \\n): '{normalized_text}'")
+    normalized_text = normalized_text.replace("\ufdd0", "\n").replace("\ufdd1", "")
+
+    # 빈 줄 제거 및 정리
+    lines = [line.strip() for line in normalized_text.split("\n") if line.strip()]
+    normalized_text = "\n".join(lines)
+
+    print(f"[DEBUG] 정규화된 텍스트 (특수문자 → \\n): '{normalized_text}'")
 
     # ✅ app_instance가 실제 IntegratedSearchApp인지, 아니면 탭 인스턴스인지 확인
     if hasattr(app_instance, "main_window"):

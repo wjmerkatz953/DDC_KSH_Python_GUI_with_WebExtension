@@ -14,7 +14,7 @@ class QtAuthorCheckTab(BaseSearchTab):
     """
     저자 확인 탭
 
-    BaseSearchTab을 상속받아 nlk_biblio.db 검색 기능을 제공합니다.
+    BaseSearchTab을 상속받아 nlk_biblio.sqlite 검색 기능을 제공합니다.
     제목, 저자, KAC 코드, 연도 검색을 지원하며 복수 제목 일괄 검색이 가능합니다.
     """
 

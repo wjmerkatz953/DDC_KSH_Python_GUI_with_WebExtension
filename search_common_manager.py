@@ -1054,3 +1054,163 @@ class SearchCommonManager:
             if conn:
                 conn.close()
 
+    def search_nlk_biblio(
+        self,
+        title_query=None,
+        author_query=None,
+        kac_query=None,
+        year_query=None,
+    ):
+        """
+        nlk_biblio.sqlite 데이터베이스에서 서지 정보를 검색합니다.
+
+        ✅ 복수 검색 지원:
+        - title_query에 여러 제목을 줄바꿈으로 구분하여 입력 가능
+        - 단일 FTS5 쿼리로 일괄 검색
+
+        Args:
+            title_query (str): 제목 검색어 (줄바꿈으로 여러 개 가능)
+            author_query (str): 저자 검색어
+            kac_query (str): KAC 코드 검색어 (줄바꿈으로 여러 개 가능)
+            year_query (str): 연도 검색어
+
+        Returns:
+            list[dict]: 검색 결과 레코드 리스트
+        """
+        conn = None
+        try:
+            # 입력 검증
+            if not any([title_query, author_query, kac_query, year_query]):
+                logger.warning("검색어가 입력되지 않았습니다.")
+                return []
+
+            # DB 연결
+            conn = self.db_manager._get_nlk_biblio_connection()
+            cursor = conn.cursor()
+
+            # ✅ FTS5 쿼리 구성
+            fts_conditions = []
+            sql_conditions = []
+            params = []
+
+            # 제목 검색 (FTS5)
+            if title_query and title_query.strip():
+                # 줄바꿈으로 여러 제목 분리
+                titles = [t.strip() for t in title_query.split("\n") if t.strip()]
+                if titles:
+                    # FTS5 OR 쿼리 생성: "제목1" OR "제목2" OR "제목3"
+                    title_fts_query = " OR ".join([f'title:"{t}"' for t in titles])
+                    fts_conditions.append(f"({title_fts_query})")
+                    logger.info(
+                        f"제목 검색 ({len(titles)}개): {', '.join(titles[:3])}..."
+                    )
+
+            # 저자 검색 (FTS5)
+            if author_query and author_query.strip():
+                fts_conditions.append(f'author_names:"{author_query.strip()}"')
+
+            # KAC 코드 검색 (FTS5) - ✅ 복수 입력 지원
+            if kac_query and kac_query.strip():
+                # 줄바꿈으로 여러 KAC 코드 분리
+                kac_codes = [k.strip() for k in kac_query.split("\n") if k.strip()]
+                if kac_codes:
+                    # FTS5 OR 쿼리: "코드1" OR "코드2" OR "코드3"
+                    kac_fts_query = " OR ".join(
+                        [f'kac_codes:"{k}"' for k in kac_codes]
+                    )
+                    fts_conditions.append(f"({kac_fts_query})")
+                    logger.info(
+                        f"KAC 코드 검색 ({len(kac_codes)}개): "
+                        f"{', '.join(kac_codes[:3])}..."
+                    )
+
+            # ✅ FTS5 쿼리 실행
+            if fts_conditions:
+                fts_match = " AND ".join(fts_conditions)
+                query = """
+                    SELECT
+                        b.nlk_id,
+                        b.title,
+                        b.author_names,
+                        b.kac_codes,
+                        b.year,
+                        MIN(rank) as min_rank
+                    FROM biblio_title_fts fts
+                    JOIN biblio b ON fts.rowid = b.rowid
+                    WHERE biblio_title_fts MATCH ?
+                """
+                params.append(fts_match)
+
+                # 연도 필터 (SQL WHERE)
+                if year_query and year_query.strip():
+                    query += " AND b.year = ?"
+                    params.append(int(year_query.strip()))
+
+                # ✅ [중복 제거] nlk_id로 GROUP BY + rank 유지
+                query += """
+                    GROUP BY b.nlk_id
+                    ORDER BY b.kac_codes, min_rank
+                    LIMIT 500
+                """
+
+                logger.debug(f"FTS5 쿼리 실행: {fts_match}")
+                cursor.execute(query, params)
+
+            else:
+                # FTS5 조건이 없고 연도만 있는 경우
+                if year_query and year_query.strip():
+                    query = """
+                        SELECT nlk_id, title, author_names, kac_codes, year
+                        FROM biblio
+                        WHERE year = ?
+                        LIMIT 500
+                    """
+                    cursor.execute(query, (int(year_query.strip()),))
+                else:
+                    return []
+
+            # ✅ 결과 처리
+            rows = cursor.fetchall()
+
+            results = []
+            for row in rows:
+                # ✅ GROUP BY 쿼리는 6개 컬럼 반환 (min_rank 포함)
+                if len(row) == 6:
+                    nlk_id, title, author_names, kac_codes, year, _ = row
+                else:
+                    nlk_id, title, author_names, kac_codes, year = row
+
+                # ✅ UI 표시용으로 "nlk:" 프리픽스 제거
+                display_kac = kac_codes.replace("nlk:", "") if kac_codes else ""
+                # 링크용 nlk_id도 "nlk:" 프리픽스 제거
+                clean_nlk_id = nlk_id.replace("nlk:", "") if nlk_id else ""
+
+                results.append(
+                    {
+                        "제목": title or "",
+                        "저자": author_names or "",
+                        "KAC 코드": display_kac,
+                        "연도": str(year) if year else "",
+                        "식별자": nlk_id or "",  # ✅ [신규] 식별자 컬럼 추가
+                        "상세 링크": (
+                            f"https://www.nl.go.kr/NL/contents/search.do?"
+                            f"pageNum=1&pageSize=30&srchTarget=total&kwd={clean_nlk_id}"
+                            if clean_nlk_id
+                            else ""
+                        ),
+                        "nlk_id": nlk_id or "",  # 내부용 (하위 호환성)
+                    }
+                )
+
+            logger.info(f"검색 완료. {len(results)}건 결과 반환.")
+            return results
+
+        except Exception as e:
+            logger.error(f"NLK Biblio 검색 중 오류 발생: {e}")
+            import traceback
+            traceback.print_exc()
+            return []
+        finally:
+            if conn:
+                conn.close()
+

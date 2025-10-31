@@ -148,6 +148,7 @@ TAB_CONFIGURATIONS = {
             ("저자", "저자"),
             ("KAC 코드", "KAC 코드"),
             ("연도", "연도"),
+            ("식별자", "식별자"),  # ✅ [신규] nlk_id 컬럼 추가
             ("상세 링크", "상세 링크"),
         ],
         "search_function": search_nlk_biblio,  # ✅ nlk_biblio.db FTS5 검색 함수

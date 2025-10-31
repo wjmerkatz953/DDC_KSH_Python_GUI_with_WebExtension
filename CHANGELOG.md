@@ -1,5 +1,81 @@
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-10-31 (세션 3): NLK Biblio 데이터베이스 최적화 및 아키텍처 통합
+
+- **저자 확인 탭 추가** (`qt_TabView_Author_Check.py`, `Search_Author_Check.py`)
+  - **목적**: nlk_biblio.sqlite 데이터베이스에서 서지 정보를 검색하는 전용 탭
+  - **기능**:
+    - 제목, 저자, KAC 코드, 연도 검색 지원
+    - FTS5 전문 검색 엔진 활용
+    - 복수 검색어 입력 지원 (줄바꿈으로 구분)
+    - NLK 상세 링크 자동 생성
+  - **데이터**: 28,034,532건의 국립중앙도서관 서지 레코드
+
+- **nlk_biblio.sqlite 아키텍처 통합** (`database_manager.py`, `search_common_manager.py`, `Search_Author_Check.py`)
+  - **문제**: nlk_biblio.sqlite가 독립 모듈로 관리되어 다른 DB와 아키텍처가 불일치
+  - **해결**:
+    1. `database_manager.py`에 `_get_nlk_biblio_connection()` 메서드 추가
+    2. `search_common_manager.py`에 `search_nlk_biblio()` 쿼리 메서드 추가
+    3. `Search_Author_Check.py`를 래퍼 함수로 변경
+  - **효과**: 일관된 아키텍처로 유지보수성 향상, 중앙 집중식 DB 관리
+
+- **FTS5 인덱스 재구축** (`nlk_biblio.sqlite`)
+  - **문제**: FTS5 external content 테이블이 생성되었으나 인덱스가 비어있어 검색 결과 0건
+  - **원인**: External content FTS5는 명시적 REBUILD 필요
+  - **해결**: `INSERT INTO biblio_title_fts(biblio_title_fts) VALUES('rebuild')` 실행
+  - **효과**: 7,097,145건의 레코드가 FTS5 인덱스에 등록되어 검색 정상 작동
+
+- **일괄 검색 기능 수정** (`qt_context_menus.py`)
+  - **문제**: AI Feed에서 복수 제목 복사 시 일괄 검색이 작동하지 않음
+  - **원인**: AI Feed가 사용하는 특수 구분자 U+FDD0, U+FDD1이 줄바꿈으로 변환되지 않음
+  - **해결**: 컨텍스트 메뉴에서 `\ufdd0` → `\n`, `\ufdd1` → `` 변환 로직 추가
+  - **효과**: AI Feed에서 12개 제목 선택 시 정상적으로 12개 검색 수행
+
+- **UI 개선** (`qt_Tab_configs.py`, `search_common_manager.py`)
+  - **식별자 컬럼 추가**: nlk_id를 "식별자"라는 컬럼명으로 테이블에 표시
+  - **nlk_id 중복 제거**: `GROUP BY b.nlk_id` + `MIN(rank)` 패턴으로 FTS5 랭킹 유지하면서 중복 제거
+  - **성능 영향**: 1-5% 속도 하락 (허용 범위)
+  - **상세 링크 수정**: URL에서 "nlk:" 프리픽스 제거하여 NLK 웹사이트 링크 정상 작동
+
+- **데이터베이스 대규모 정리** (`rebuild_biblio_with_kac_clean.py`)
+  - **배경**: 전체 28M 레코드 중 74.68% (20.9M건)가 KAC 코드 없음
+  - **전략 비교**:
+    - DELETE 방식: 20.9M건 삭제 (1-2시간 소요)
+    - INSERT 방식: 7.1M건 복사 (15-30분 소요) ✅ **채택**
+  - **구현**: `rebuild_biblio_with_kac_clean.py` 스크립트 작성
+    - KAC 코드가 있는 레코드만 새 DB로 복사
+    - FTS5 인덱스 자동 생성
+    - VACUUM으로 최적화
+  - **결과**:
+    - 실행 시간: 약 30초
+    - 최종 레코드: 7,097,145건 (25.32%)
+    - 파일 크기: 28M → 7M 레코드로 75% 감소
+  - **다음 단계**: 원본 백업 후 새 DB로 교체 필요
+
+- **복수 검색 지원 강화** (`search_common_manager.py`)
+  - **제목 복수 검색**: 줄바꿈으로 구분된 여러 제목을 단일 FTS5 쿼리로 검색
+    - `title:"제목1" OR title:"제목2" OR title:"제목3"`
+  - **KAC 코드 복수 검색**: 줄바꿈으로 구분된 여러 KAC 코드 검색 지원
+    - `kac_codes:"코드1" OR kac_codes:"코드2" OR kac_codes:"코드3"`
+  - **성능**: 단일 쿼리로 일괄 처리하여 속도 향상
+
+- **Unicode 인코딩 이슈 해결** (`rebuild_biblio_with_kac_clean.py`)
+  - **문제**: Windows 콘솔(cp949)에서 이모지 문자 출력 시 `UnicodeEncodeError`
+  - **해결**: 스크립트에서 모든 이모지 제거 (✅, 🔄, 🗑️ 등)
+  - **효과**: 스크립트 정상 실행
+
+- **스크립트 파일**:
+  - `rebuild_biblio_with_kac_clean.py`: 새 DB 생성 스크립트 (이모지 제거 버전)
+  - `cleanup_empty_kac.py`: KAC 비어있는 레코드 삭제 스크립트 (대안)
+  - `test_nlk_biblio_integration.py`: 통합 테스트 스크립트
+
+- **수정 파일**:
+  - `database_manager.py` (nlk_biblio 연결 추가)
+  - `search_common_manager.py` (search_nlk_biblio 메서드 추가, 상세 링크 수정)
+  - `Search_Author_Check.py` v2.0.0 (래퍼 함수로 변경)
+  - `qt_Tab_configs.py` (식별자 컬럼 추가)
+  - `qt_context_menus.py` (U+FDD0/U+FDD1 처리 추가)
+
 - **2025-10-31: `QItemSelectionModel.ClearAndSelect` 사용법 수정** (`qt_base_tab.py` v3.0.7)
   - **문제**: `qt_base_tab.py` (line 1320)에서 `self.table_view.selectionModel().ClearAndSelect`를 사용했으나, `selectionModel()`이 반환하는 `QItemSelectionModel` 인스턴스에는 `ClearAndSelect` 속성이 없음. `ClearAndSelect`는 선택 플래그(enum)이므로 클래스 레벨에서 접근해야 함.
   - **해결**: `QItemSelectionModel.ClearAndSelect` (또는 `QItemSelectionModel.SelectionFlag.ClearAndSelect`)로 수정하여 올바른 선택 플래그를 사용하도록 변경.

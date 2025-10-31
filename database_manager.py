@@ -58,6 +58,7 @@ class DatabaseManager:
         self.concepts_db_path = concepts_db_path
         self.kdc_ddc_mapping_db_path = kdc_ddc_mapping_db_path
         self.glossary_db_path = "glossary.db"
+        self.nlk_biblio_db_path = "nlk_biblio.sqlite"  # ✅ [신규] NLK 서지 DB 경로
 
         # ✅ [동시성 개선] 히트 카운트 비동기 배치 업데이트
         from collections import defaultdict
@@ -127,7 +128,7 @@ class DatabaseManager:
 
             conn.commit()
             conn.close()
-            print("✅ Concepts DB Covering Index 생성 완료")
+            logger.info("Concepts DB Covering Index created")
 
             # 2. Mapping DB (KDC-DDC) 인덱스
             mapping_conn = self._get_mapping_connection()
@@ -158,8 +159,8 @@ class DatabaseManager:
             )
 
             # ✅ [추가] 키워드 검색 최적화를 위한 커버링 인덱스
-            print(
-                "⏳ 키워드 검색용 커버링 인덱스를 생성합니다. (시간이 다소 걸릴 수 있습니다)..."
+            logger.info(
+                "Creating Korean search covering index (may take a while)..."
             )
             mapping_cursor.execute(
                 """
@@ -175,14 +176,14 @@ class DatabaseManager:
                 );
                 """
             )
-            print("✅ 키워드 검색용 커버링 인덱스 확인/생성 완료.")
+            logger.info("Korean search covering index created")
 
             mapping_conn.commit()
             mapping_conn.close()
-            print("✅ Mapping DB Index 생성 완료")
+            logger.info("Mapping DB indexes created")
 
         except Exception as e:
-            print(f"⚠️ Covering Index 생성 중 오류 (무시 가능): {e}")
+            logger.warning(f"Covering Index creation error (ignorable): {e}")
 
     def _get_glossary_connection(self):
         """용어집 데이터베이스에 대한 새로운 연결을 반환합니다."""
@@ -209,6 +210,13 @@ class DatabaseManager:
     def _get_dewey_connection(self):
         """DDC 전용 데이터베이스에 대한 새로운 연결을 반환합니다."""
         conn = sqlite3.connect(self.dewey_db_path)
+        conn.row_factory = sqlite3.Row
+        apply_sqlite_pragmas(conn)  # ⚡ PRAGMA 최적화 적용
+        return conn
+
+    def _get_nlk_biblio_connection(self):
+        """NLK 서지 데이터베이스에 대한 새로운 연결을 반환합니다."""
+        conn = sqlite3.connect(self.nlk_biblio_db_path)
         conn.row_factory = sqlite3.Row
         apply_sqlite_pragmas(conn)  # ⚡ PRAGMA 최적화 적용
         return conn
