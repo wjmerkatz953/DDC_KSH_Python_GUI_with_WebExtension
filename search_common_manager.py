@@ -761,7 +761,7 @@ class SearchCommonManager:
             if "identifier" in df.columns:
                 df["nlk_link"] = df["identifier"].apply(
                     lambda x: (
-                        f"https://www.nl.go.kr/seoji/contents/S80100000000.do?schM=intgr_detail_view_isbn&isbn={x}"
+                        f"https://www.nl.go.kr/NL/contents/search.do?systemType=&pageNum=1&pageSize=10&srchTarget=total&kwd={x}"
                         if x
                         else ""
                     )
@@ -1031,7 +1031,7 @@ class SearchCommonManager:
                 if "identifier" in result_df.columns:
                     result_df["nlk_link"] = result_df["identifier"].apply(
                         lambda x: (
-                            f"https://www.nl.go.kr/NL/contents/search.do?pageNum=1&pageSize=30&srchTarget=total&kwd={x}#!"
+                            f"https://www.nl.go.kr/NL/contents/search.do?systemType=&pageNum=1&pageSize=10&srchTarget=total&kwd={x}"
                             if x
                             else ""
                         )

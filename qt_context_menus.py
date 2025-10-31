@@ -1670,7 +1670,7 @@ def show_cell_detail_dialog(cell_value, column_name, app_instance):
 
         dialog = QDialog(app_instance.main_window)
         dialog.setWindowTitle(f"상세 정보: {column_name}")
-        dialog.setMinimumSize(750, 650)
+        dialog.setMinimumSize(850, 700)
         dialog.setObjectName("DetailDialog")
 
         # 창 플래그/모달 성격도 동일하게

@@ -201,9 +201,14 @@ class QtKSHLocalSearchTab(BaseSearchTab):
         super().__init__(config, app_instance)
 
         # ✅ [핵심 추가] _concept_id를 column_headers에 추가 (숨김 처리용)
-        if "_concept_id" not in self.column_headers:
-            self.column_headers.append("_concept_id")
-            self.table_model.column_headers.append("_concept_id")
+        # ✅ [수정] 중복 방지를 위해 먼저 제거 후 추가
+        if "_concept_id" in self.column_headers:
+            self.column_headers.remove("_concept_id")
+        self.column_headers.append("_concept_id")
+
+        if "_concept_id" in self.table_model.column_headers:
+            self.table_model.column_headers.remove("_concept_id")
+        self.table_model.column_headers.append("_concept_id")
 
         editable_cols = config.get("editable_columns_top", [])
         self.editable_columns = {
@@ -443,6 +448,8 @@ class QtKSHLocalSearchTab(BaseSearchTab):
                 adjust_qtableview_columns(
                     self.table_view, df_concepts, df_cols, self.column_headers
                 )
+                # ✅ [핵심 추가] 내부 컬럼 숨기기
+                self._hide_internal_columns()
                 # -------------------
 
             # 하단 서지 DB 테이블 업데이트
@@ -958,7 +965,11 @@ class QtKSHLocalSearchTab(BaseSearchTab):
         """내부 관리용 컬럼을 숨깁니다."""
         model = self.table_model
         if not model:
+            self.app_instance.log_message("⚠️ table_model이 없어 내부 컬럼을 숨길 수 없습니다.", "WARNING")
             return
+
+        self.app_instance.log_message(f"🔍 현재 컬럼 헤더: {model.column_headers}", "DEBUG")
+        self.app_instance.log_message(f"🔍 숨길 컬럼 목록: {self.internal_columns}", "DEBUG")
 
         for col_name in self.internal_columns:
             try:
@@ -969,11 +980,14 @@ class QtKSHLocalSearchTab(BaseSearchTab):
                 self.table_view.setColumnHidden(col_index, True)
 
                 self.app_instance.log_message(
-                    f"ℹ️ 내부 컬럼 '{col_name}'를 숨겼습니다.", "DEBUG"
+                    f"✅ 내부 컬럼 '{col_name}' (인덱스 {col_index})를 숨겼습니다.", "INFO"
                 )
 
-            except ValueError:
+            except ValueError as e:
                 # 컬럼이 모델에 존재하지 않으면 건너뜁니다.
+                self.app_instance.log_message(
+                    f"⚠️ 내부 컬럼 '{col_name}'를 찾을 수 없습니다. 현재 헤더: {model.column_headers}", "WARNING"
+                )
                 continue
 
     # ===== 스레드 정리 메서드 =====

@@ -158,7 +158,7 @@ class KshLocalSearcher:
 
         # --- 이하 로직은 DB에서 조회하든, 인자로 받든 공통으로 적용되는 UI 가공 단계 ---
 
-        # 🔎 내부 처리에 사용할 concept_id 보존(표시는 숨김)
+        # ✅ [수정] concept_id가 아직 있으면 _concept_id로 변환 (하위 호환성 유지)
         if "concept_id" in df.columns:
             df.rename(columns={"concept_id": "_concept_id"}, inplace=True)
 
@@ -207,10 +207,12 @@ class KshLocalSearcher:
             "하위어",
             "동의어",
             "KSH 링크",
-            "_concept_id",
         ]
 
+        # ✅ [수정] UI 노출 컬럼만 선택하고, _concept_id는 마지막에 추가 (UI 비노출)
         final_cols = [col for col in ui_header_order if col in df.columns]
+        if "_concept_id" in df.columns:
+            final_cols.append("_concept_id")
         df = df[final_cols]
 
         self._emit(progress, 100)

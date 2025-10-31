@@ -35,6 +35,16 @@ class SearchKshManager(SearchCommonManager):
             # 표시용
             df["matched"] = df["ksh_korean"]
 
+            # ✅ [신규 추가] NLK 링크 생성 (identifier 기반)
+            if "identifier" in df.columns:
+                df["nlk_link"] = df["identifier"].apply(
+                    lambda x: (
+                        f"https://www.nl.go.kr/NL/contents/search.do?systemType=&pageNum=1&pageSize=10&srchTarget=total&kwd={x}"
+                        if x
+                        else ""
+                    )
+                )
+
             # ✅ [신규 추가] DDC 레이블 및 출현 카운트 매핑
             if "ddc" in df.columns:
                 # DDC 레이블 매핑
@@ -850,7 +860,7 @@ class SearchKshManager(SearchCommonManager):
 
             rows.append(
                 {
-                    "concept_id": concept_id,
+                    "_concept_id": concept_id,  # ✅ [수정] 처음부터 _concept_id로 생성 (UI 비노출용)
                     "subject": subject_with_code,
                     "main_category": row["main_category"] or "",
                     "classification_ddc": row["ddc_classification"] or "",
