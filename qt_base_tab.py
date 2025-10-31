@@ -720,6 +720,20 @@ class BaseSearchTab(QWidget):
             self.table_view.selectionModel().currentChanged.connect(handler)
 
     # ✅ [신규 추가] MARC 추출 데이터를 수신하는 표준 메서드
+    def clear_search_inputs(self):
+        """
+        ✅ [신규] 검색어 입력 위젯들을 초기화합니다.
+        데이터 전송 전에 qt_data_transfer_manager.py에서 호출됩니다.
+        """
+        if "title" in self.input_widgets:
+            self.input_widgets["title"].clear()
+        if "author" in self.input_widgets:
+            self.input_widgets["author"].clear()
+        if "isbn" in self.input_widgets:
+            self.input_widgets["isbn"].clear()
+        if "year" in self.input_widgets:
+            self.input_widgets["year"].clear()
+
     def receive_data(
         self,
         title=None,

@@ -163,6 +163,8 @@ def handle_ai_feed_to_gemini(ai_feed_tab):
 def _transfer_to_tabs(app_instance, tab_names, **data):
     """
     지정된 탭 목록에 데이터를 전송하는 내부 헬퍼 함수.
+
+    ✅ [추가] 데이터 전송 전에 각 탭의 검색어 입력 위젯을 초기화합니다.
     """
     if not hasattr(app_instance, "main_window"):
         return
@@ -175,6 +177,13 @@ def _transfer_to_tabs(app_instance, tab_names, **data):
             tab = main_window.get_tab_by_name(name)
             if tab and hasattr(tab, "receive_data"):
                 try:
+                    # ✅ [핵심 추가] 데이터 전송 전에 검색어 입력 위젯 초기화
+                    if hasattr(tab, "clear_search_inputs"):
+                        tab.clear_search_inputs()
+                        app_instance.log_message(
+                            f"정보: '{name}' 탭의 검색어 입력 필드를 초기화했습니다.", "DEBUG"
+                        )
+
                     tab.receive_data(**data)
                     app_instance.log_message(
                         f"정보: '{name}' 탭으로 데이터를 전송했습니다: {list(data.keys())}"

@@ -737,6 +737,16 @@ class QtDeweySearchTab(BaseSearchTab):
         """검색 시작 (BaseSearchTab 오버라이드)"""
         qt_dewey_logic.start_search(self)
 
+    def clear_search_inputs(self):
+        """
+        ✅ [신규] 검색어 입력 위젯들을 초기화합니다.
+        데이터 전송 전에 qt_data_transfer_manager.py에서 호출됩니다.
+        """
+        if hasattr(self, "dewey_ddc_entry"):
+            self.dewey_ddc_entry.clear()
+        if hasattr(self, "dewey_ksh_search_entry"):
+            self.dewey_ksh_search_entry.clear()
+
     def receive_data(
         self,
         title=None,
