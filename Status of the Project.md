@@ -735,4 +735,115 @@ database_manager.py (DatabaseManager v2.2.0)
 
 ---
 
+## 14. 브라우저 확장 프로그램 (Browser Extension)
+
+이 프로젝트는 **Chrome/Edge 웹 브라우저 확장 프로그램**을 제공하여 MARC 편집 시스템과 연동합니다. 확장 프로그램은 `extension_api_server.py`의 Flask API 서버(`localhost:5000`)와 통신하며, MARC 650 필드에 KSH 주제명을 원클릭으로 삽입하고 DDC/KSH 검색 기능을 제공합니다.
+
+### 14.1. 확장 프로그램 구성 파일
+
+| 파일 | 역할 |
+|------|------|
+| `manifest.json` | 확장 프로그램 메타데이터 (v6.5.6) |
+| `background.js` | 백그라운드 서비스 워커, 메시지 중계 |
+| `content.js` | KSH 패널 UI 및 MARC 필드 삽입 로직 |
+| `search-addon.js` | DDC/KSH 검색 패널 및 ISBN 조회 기능 |
+| `article-processor.js` | 원서 정관사 처리 및 090 청구기호 검색 |
+
+### 14.2. 주요 기능
+
+#### KSH 패널 (`content.js`)
+- **KSH 프리셋 관리**: 자주 사용하는 KSH 후보를 로컬 스토리지에 저장/불러오기/수정/삭제/Import/Export
+- **MARC 650 필드 자동 삽입**:
+  - 체크박스로 선택한 KSH 후보를 빈 650 필드에 일괄 삽입
+  - 650 필드가 부족하면 ALT+8 매크로로 자동 생성
+  - `▼a` 서브필드 형식으로 삽입
+- **082 필드 연동**: 082 버튼 클릭 시 MARC 082 필드의 DDC 번호를 자동으로 읽어와 검색창에 입력
+- **통합 검색**: 패널 내에서 DDC/KSH 검색 실행 및 결과를 검색 패널로 전송
+- **단축키**: `Ctrl+Shift+Q` (패널 토글)
+
+#### 검색 패널 (`search-addon.js`)
+- **DDC 검색**: localhost:5000 API를 통해 DDC 분류 정보 조회 및 표시
+- **KSH 검색**:
+  - 키워드 또는 DDC 번호로 KSH 주제명 검색
+  - 중복 제거 및 정규화 처리 (최대 200개 결과)
+  - 검색 결과를 KSH 패널로 전송하여 일괄 삽입 가능
+- **ISBN 서지정보 조회**:
+  - 020 필드 자동 읽기 버튼
+  - 국립중앙도서관 API를 통한 ISBN 검색
+  - MARC 020 필드 형식(`▼a{ISBN}▼g{부가기호} :▼c\{가격}▲`)으로 결과 표시
+- **082 필드 연동**: KSH 패널과 동일하게 082 버튼으로 DDC 자동 입력
+- **단축키**: `Ctrl+Shift+S` (패널 토글), `Ctrl+Shift+E` (대체 토글)
+- **UI**: KSH 패널 왼쪽에 고정 배치 (right: 425px)
+
+#### 정관사 처리 (`article-processor.js`)
+- **246 필드 정관사 제거**:
+  - 246 19 필드에서 정관사(The, A, Le, La 등)를 감지
+  - ALT+9 매크로로 새 246 3 9 필드 생성
+  - 정관사를 제거하고 첫 글자를 대문자로 변환하여 자동 삽입
+  - 지능형 DOM 감지로 필드 생성 완료 대기
+- **090 청구기호 검색**:
+  - CN-0, CN-1, CN-2 버튼으로 090 필드 청구기호 검색
+  - 마지막 N글자 제거 옵션 (0, 1, 2글자)
+  - 부산대 도서관 검색 URL로 자동 리다이렉트
+
+### 14.3. Flask API 서버 연동
+
+확장 프로그램은 `extension_api_server.py`(Flask, 포트 5000)를 통해 데스크톱 앱의 검색 기능에 접근합니다.
+
+**API 엔드포인트**:
+- `GET /api/dewey/search?ddc={코드}` - DDC 분류 정보 조회
+- `GET /api/ksh/search?q={쿼리}` - KSH 주제명 검색 (로컬 DB 및 웹 스크레이핑)
+- CORS 설정으로 브라우저에서 직접 호출 가능
+
+**권한 (manifest.json)**:
+- `scripting`, `activeTab`, `contextMenus` - 콘텐츠 스크립트 주입 및 메뉴 생성
+- `http://localhost:5000/*` - Flask API 호스트 접근
+
+### 14.4. 설치 및 사용
+
+1. **확장 프로그램 로드**:
+   - Chrome/Edge에서 `chrome://extensions` 접속
+   - 개발자 모드 활성화
+   - "압축해제된 확장 프로그램을 로드합니다" 클릭
+   - 프로젝트 루트 디렉토리 선택 (manifest.json 위치)
+
+2. **Flask 서버 시작**:
+   - 데스크톱 앱(`qt_main_app.py`) 실행 시 자동 시작
+   - 또는 `extension_api_server.py` 직접 실행
+
+3. **사용법**:
+   - MARC 편집 페이지에서 `Ctrl+Shift+Q` 또는 확장 프로그램 아이콘 클릭
+   - 우클릭 메뉴에서 "KSH 패널 토글", "검색 패널 토글" 선택 가능
+   - 선택한 텍스트로 우클릭 → "선택한 텍스트로 DDC/KSH 검색"
+
+### 14.5. 아키�ecture
+
+```
+브라우저 확장 프로그램 계층:
+background.js (Service Worker)
+├── 메시지 중계 (content ↔ 각 content script)
+├── 컨텍스트 메뉴 관리
+└── 단축키 명령 처리
+
+content.js (KSH 패널)
+├── 프리셋 관리 (localStorage)
+├── MARC 650 필드 감지 및 삽입
+├── ALT+8 매크로 (650 필드 생성)
+└── 검색 요청 전송
+
+search-addon.js (검색 패널)
+├── Flask API 호출 (localhost:5000)
+├── DDC 검색 및 표시
+├── KSH 검색 및 중복 제거
+├── ISBN 조회 (국립중앙도서관 API)
+└── 결과를 KSH 패널로 전송
+
+article-processor.js (유틸리티)
+├── 246 필드 정관사 처리
+├── ALT+9 매크로 (246 3 9 생성)
+└── 090 청구기호 검색
+```
+
+---
+
 **📌 중요**: 이 문서는 프로젝트의 전체 구조를 이해하기 위한 출발점입니다. 세부 구현은 각 모듈의 docstring과 주석을 참조하십시오.

@@ -309,6 +309,32 @@ database_manager.py (DatabaseManager v2.2.0)
 
 ---
 
+## 6. 브라우저 확장 프로그램 (Browser Extension)
+
+### 구성 파일
+| 파일 | 역할 |
+|------|------|
+| `manifest.json` | 확장 프로그램 메타데이터 (v6.5.6) |
+| `background.js` | 백그라운드 서비스 워커, 메시지 중계 |
+| `content.js` | KSH 패널 UI 및 MARC 650 필드 삽입 |
+| `search-addon.js` | DDC/KSH 검색 패널, ISBN 조회 |
+| `article-processor.js` | 정관사 처리, 090 청구기호 검색 |
+
+### 주요 기능
+- **KSH 패널**: MARC 650 필드 자동 삽입, 프리셋 관리, 082 필드 연동
+- **검색 패널**: DDC/KSH 검색 (Flask API 연동), ISBN 서지정보 조회
+- **정관사 처리**: 246 필드 정관사 제거 및 자동 변환
+- **단축키**: `Ctrl+Shift+Q` (KSH 패널), `Ctrl+Shift+S` (검색 패널)
+
+### Flask API 연동
+```
+extension_api_server.py (Flask, 포트 5000)
+├── GET /api/dewey/search?ddc={{코드}}
+└── GET /api/ksh/search?q={{쿼리}}
+```
+
+---
+
 > **자동 생성 완료** | `generate_sotp.py` 실행
 > **수정 금지** – 자동 갱신 전용
 """
