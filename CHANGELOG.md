@@ -1,5 +1,150 @@
 ## 8. 최근 변경 사항 (2025년 10월 기준)
 
+### 2025-11-01: nlk_biblio.sqlite 저자명 동기화 시스템 구축
+
+- **KAC 저자명 동기화 시스템 구축** (`sync_kac_authors.py`, `Final_build_kac_authority_and_biblio_db.py`)
+  - **배경**: author_names 컬럼 순서와 kac_codes 순서 불일치 문제
+    - 예: kac_codes = "KAC2020H3683;KAC200610166"일 때
+    - author_names = "리더주;정옥령;후수자오" (순서 틀림 + 누락 가능)
+  - **해결**: kac_authors 신규 컬럼 생성
+    - NLK_Authorities.sqlite에서 KAC 코드 → 저자명 정확히 매핑
+    - "저자명 KACcode" 형식으로 저장 (예: "후수자오 KAC2020H3683;리더주 KAC200610166")
+    - 세미콜론 구분자로 복수 저자 지원
+
+- **sync_kac_authors.py 스크립트 작성** (700줄)
+  - **핵심 기능**:
+    1. biblio 테이블에 kac_authors TEXT 컬럼 추가
+    2. kac_codes 파싱 (세미콜론 구분)
+    3. NLK_Authorities.sqlite에서 각 KAC → 저자명 조회
+    4. "저자명 KAC코드" 형식으로 결합하여 저장
+    5. FTS5 인덱스 자동 재구축 (kac_authors 필드 추가)
+
+  - **성능 최적화 (3단계)**:
+    1. **인메모리 KAC 캐싱** (가장 중요)
+       - `self._kac_cache = {}` 딕셔너리 캐시
+       - 동일 KAC 코드 반복 조회 시 DB 접근 회피
+       - 효과: 1,592 → 9,000+ row/s (5-6배 향상)
+       - 캐시 히트율: 95%+ (한 저자가 수백 개 레코드에 등장)
+
+    2. **배치 크기 증가**
+       - 10K → 50K → 100K → 300K (최종)
+       - 커밋 횟수 감소로 디스크 I/O 최소화
+       - 효과: +5% 속도 향상
+
+    3. **DB 연결 재사용**
+       - `_get_kac_author(authority_cursor=None)` 파라미터 추가
+       - 전체 처리 동안 단일 authority DB 연결 사용
+       - 캐시 미스 시에만 효과 (5% 케이스)
+       - 효과: +10-15% 속도 향상
+
+  - **최종 성능**:
+    - 처리 속도: ~10,500-11,000 row/s (7배 향상)
+    - 전체 소요 시간: 6,202,378건 기준 9-10분
+
+  - **버그 수정**:
+    - **문제**: 첫 10K 레코드만 처리하고 종료
+    - **원인**: 동일 cursor로 SELECT와 UPDATE 수행 시 커서 상태 손상
+    - **해결**: 별도 select_cursor 생성하여 격리
+      ```python
+      select_cursor = conn.cursor()
+      select_cursor.execute("SELECT rowid, kac_codes FROM biblio ...")
+      while True:
+          rows = select_cursor.fetchmany(batch_size)
+          cursor.executemany("UPDATE ...")
+      ```
+
+  - **FTS5 인덱스 재구축**:
+    ```python
+    CREATE VIRTUAL TABLE biblio_title_fts USING fts5(
+        nlk_id UNINDEXED,
+        title,
+        author_names,
+        kac_codes,
+        kac_authors,  -- 신규 추가!
+        content='biblio',
+        content_rowid='rowid',
+        tokenize='unicode61 remove_diacritics 2'
+    );
+    ```
+    - 트리거 자동 재생성 (INSERT/UPDATE/DELETE 시 FTS5 동기화)
+    - REBUILD 명령으로 기존 6.2M 레코드 인덱싱
+
+- **검색 통합: author_names → kac_authors 전환** (`search_common_manager.py`)
+  - **변경 내역**:
+    1. FTS5 검색 조건: `author_names:` → `kac_authors:`
+    2. SELECT 쿼리: `b.author_names` → `b.kac_authors`
+    3. 결과 파싱: `"저자": kac_authors` 사용
+  - **효과**: 정확한 저자명 + KAC 코드 표시, 순서 보장
+
+- **Final_build_kac_authority_and_biblio_db.py 업데이트**
+  - **KAC 필터링 추가** (lines 584-586):
+    ```python
+    if not final_kac_codes or final_kac_codes.strip() == "":
+        return  # KAC 없는 레코드 건너뛰기
+    ```
+
+  - **BIBLIO_SCHEMA 업데이트** (lines 322-330):
+    - 테이블명: `biblio_fts` → `biblio_title_fts`
+    - 컬럼 간소화: nlk_id UNINDEXED, title, author_names, kac_codes
+    - Tokenizer: unicode61 remove_diacritics 2
+
+  - **on_add_indexes 메서드 최적화** (lines 1244-1282):
+    - **3단계: CNTS 중복 제거** (FTS5 생성 전)
+      ```sql
+      DELETE FROM biblio
+      WHERE nlk_id LIKE 'nlk:CNTS%'
+      AND EXISTS (
+          SELECT 1 FROM biblio b2
+          WHERE b2.nlk_id LIKE 'nlk:KMO%'
+          AND b2.title = biblio.title
+          AND b2.kac_codes = biblio.kac_codes
+      );
+      ```
+    - **3-2단계: nlk: 프리픽스 제거**
+      ```sql
+      UPDATE biblio SET nlk_id = REPLACE(nlk_id, 'nlk:', '');
+      UPDATE biblio SET kac_codes = REPLACE(kac_codes, 'nlk:', '');
+      ```
+    - **효과**: FTS5 REBUILD 시 더 작은 데이터셋으로 속도 향상
+
+- **nlk: 프리픽스 영구 제거 결정**
+  - **배경**: 일부는 UI에서, 일부는 쿼리에서 제거 → 불일치
+  - **선택지**:
+    1. DB에서 영구 제거 (채택)
+    2. UI에서만 제거 (기각)
+  - **근거**:
+    - 일관성: 모든 코드에서 replace() 불필요
+    - 성능: DB 용량 28-56MB 절약
+    - 간결성: 쿼리 및 UI 코드 단순화
+  - **구현**:
+    - `Final_build_kac_authority_and_biblio_db.py` 업데이트
+    - `search_common_manager.py`에서 중복 replace() 제거
+
+- **CNTS 중복 제거 타이밍 최적화**
+  - **변경 전**: FTS5 생성 → REBUILD → CNTS 삭제
+  - **변경 후**: CNTS 삭제 → FTS5 생성 → REBUILD
+  - **효과**: 더 작은 데이터셋으로 REBUILD 속도 향상
+
+- **수정 파일**:
+  - `sync_kac_authors.py` (신규 생성, 700줄)
+  - `Final_build_kac_authority_and_biblio_db.py` (KAC 필터링, 스키마 업데이트, CNTS 삭제)
+  - `search_common_manager.py` (kac_authors 사용, nlk: prefix 제거 중복 제거)
+  - `rebuild_biblio_with_kac_clean.py` (참조용)
+  - `Status of the Project.md` (6.4절 nlk_biblio.sqlite 항목 업데이트)
+
+- **성능 메트릭**:
+  - KAC 캐시 히트율: 95%+
+  - 처리 속도: 10,500-11,000 row/s (7배 향상)
+  - 전체 처리 시간: 9-10분 (6.2M 레코드)
+  - DB 용량 절약: 28-56MB (nlk: 프리픽스 제거)
+
+- **교훈**:
+  - SQLite 커서 격리: SELECT와 UPDATE는 별도 커서 사용 필수
+  - 인메모리 캐싱: 반복 조회가 많은 경우 5-10배 성능 향상
+  - 배치 크기: 메모리가 충분하면 100K-300K 단위 권장
+  - DB 연결 재사용: 캐시 미스 시 연결 오버헤드 제거
+  - 데이터 정리 타이밍: FTS5 REBUILD 전에 DELETE 수행
+
 ### 2025-10-31 (세션 3): NLK Biblio 데이터베이스 최적화 및 아키텍처 통합
 
 - **저자 확인 탭 추가** (`qt_TabView_Author_Check.py`, `Search_Author_Check.py`)

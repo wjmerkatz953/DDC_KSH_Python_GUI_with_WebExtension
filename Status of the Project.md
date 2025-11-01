@@ -354,7 +354,7 @@ settings 및 translations
 
 6.4. nlk_biblio.sqlite (국립중앙도서관 서지 데이터베이스)
 
-이 데이터베이스는 국립중앙도서관(NLK)의 서지 레코드를 저장하며, FTS5 전문 검색 엔진을 통해 빠른 검색을 제공합니다.
+이 데이터베이스는 국립중앙도서관(NLK)의 서지 레코드를 저장하며, FTS5 전문 검색 엔진을 통해 빠른 검색을 제공합니다. KAC(한국예술종합학교) 저자전거 코드를 기준으로 필터링되어 있으며, 저자명 동기화 시스템을 통해 정확한 저자 정보를 제공합니다.
 
 주요 테이블:
 
@@ -362,21 +362,39 @@ settings 및 translations
 
         목적: 서지 레코드의 핵심 정보를 저장하는 메인 테이블입니다.
 
-    스키마: nlk_id (PRIMARY KEY), year, creator, dc_creator, dcterms_creator, title, author_names, kac_codes
+        스키마:
+            - nlk_id (PRIMARY KEY) - NLK 식별자 (nlk: 프리픽스 제거됨)
+            - year - 출판연도
+            - creator, dc_creator, dcterms_creator - 저자 원본 필드
+            - title - 서지 제목
+            - author_names - 원본 저자명 (순서 불일치 문제로 사용 중단)
+            - kac_codes - KAC 저자전거 코드 (nlk: 프리픽스 제거됨, 세미콜론으로 구분)
+            - kac_authors - KAC 기반 정확한 저자명 ("저자명 KAC코드" 형식, 세미콜론으로 구분) ⭐ 신규
 
-    레코드 수: 7,097,145건 (KAC 코드가 있는 레코드만 포함)
+        레코드 수: 6,202,378건 (KAC 코드가 있는 레코드만 포함)
+
+        데이터 정리:
+            - CNTS 중복 레코드 제거 (KMO 레코드와 제목+KAC 동일한 경우)
+            - nlk: 프리픽스 제거로 28-56MB 저장공간 절약
+            - 빈 KAC 코드 레코드 제외
 
     biblio_title_fts
 
         목적: biblio 테이블의 전문 검색을 위한 FTS5 가상 테이블입니다.
 
-        특징: title, author_names, kac_codes 필드를 색인하며, nlk_id는 UNINDEXED로 설정됩니다.
+        특징:
+            - 색인 필드: title, author_names, kac_codes, kac_authors
+            - nlk_id는 UNINDEXED로 설정 (저장만 하고 검색 제외)
 
-    External Content: content=biblio, content_rowid=rowid 설정으로 biblio 테이블 참조
+        External Content: content='biblio', content_rowid='rowid' 설정으로 biblio 테이블 참조
+
+        Tokenizer: tokenize='unicode61 remove_diacritics 2' (다국어 검색 지원)
 
 트리거 (3개):
 
-    biblio_ai, biblio_ad, biblio_au 트리거가 biblio 테이블의 데이터 변경 시 biblio_title_fts를 자동 동기화합니다.
+    biblio_ai (AFTER INSERT) - 새 레코드 삽입 시 FTS5 인덱스에 자동 추가
+    biblio_ad (AFTER DELETE) - 레코드 삭제 시 FTS5 인덱스에서 자동 제거
+    biblio_au (AFTER UPDATE) - 레코드 업데이트 시 FTS5 인덱스 자동 갱신
 
 최적화:
 
@@ -385,6 +403,99 @@ settings 및 translations
     GROUP BY nlk_id + MIN(rank) 패턴으로 중복 제거하면서 FTS5 랭킹 유지
 
     복수 검색 지원: 줄바꿈으로 구분된 여러 제목/KAC 코드를 단일 OR 쿼리로 일괄 검색
+
+    인메모리 KAC 캐싱: 95%+ 캐시 히트율로 검색 성능 5-10배 향상
+
+    대용량 배치 처리: 300K 단위 커밋으로 업데이트 성능 최적화
+
+데이터 동기화 스크립트:
+
+    sync_kac_authors.py (700줄)
+        목적: NLK_Authorities.sqlite에서 정확한 저자명을 조회하여 biblio.kac_authors 컬럼 생성
+
+        핵심 기능:
+            1. KAC 코드 파싱 및 순서 유지
+            2. NLK_Authorities.sqlite에서 KAC → 저자명 매핑
+            3. "저자명 KAC코드" 형식으로 결합 (예: "홍길동 KAC201512345")
+            4. 세미콜론으로 구분하여 저장
+
+        성능 최적화:
+            - 인메모리 KAC 캐시 (95%+ 히트율)
+            - DB 연결 재사용 (커넥션 오버헤드 제거)
+            - 300K 단위 대용량 배치 커밋
+            - 처리 속도: ~10,500-11,000 row/s (총 9-10분 소요)
+
+        FTS5 자동 재구축:
+            - kac_authors 컬럼 추가 후 FTS5 인덱스 자동 업데이트
+            - CREATE VIRTUAL TABLE에 kac_authors 필드 추가
+            - 트리거 자동 재생성으로 실시간 동기화 보장
+
+    rebuild_biblio_with_kac_clean.py
+        목적: KAC 코드가 있는 레코드만 새 DB로 복사 (DELETE 대신 INSERT 방식)
+
+        전략:
+            - DELETE 방식: 20.9M건 삭제 (1-2시간) ❌
+            - INSERT 방식: 6.2M건 복사 (15-30분) ✅
+
+        작업 흐름:
+            1. 테이블 스키마 복사
+            2. KAC 있는 레코드만 배치 INSERT (10K 단위)
+            3. 인덱스 생성
+            4. FTS5 가상 테이블 생성 및 트리거 설정
+            5. FTS5 REBUILD
+            6. VACUUM으로 최적화
+
+검색 통합:
+
+    search_common_manager.py의 search_nlk_biblio() 메서드
+        - 제목, 저자, KAC 코드, 연도 검색 지원
+        - FTS5 전문 검색 활용
+        - kac_authors 컬럼 기반 정확한 저자명 표시
+        - 복수 검색어 OR 쿼리 자동 변환
+        - GROUP BY로 중복 제거하면서 FTS5 랭킹 유지
+
+    qt_TabView_Author_Check.py - "저자 확인" 탭
+        - nlk_biblio.sqlite 전용 검색 UI
+        - NLK 상세 링크 자동 생성
+        - 식별자, 제목, 저자, KAC 코드, 연도 컬럼 표시
+
+아키텍처 통합:
+
+    database_manager.py에 _get_nlk_biblio_connection() 메서드 추가
+
+    search_common_manager.py에 search_nlk_biblio() 쿼리 메서드 추가
+
+    Search_Author_Check.py를 래퍼 함수로 변경 (일관된 아키텍처)
+
+주요 문제 해결:
+
+    문제 1: author_names 순서 불일치
+        - 원인: 원본 XML에서 추출한 저자명 순서가 kac_codes 순서와 불일치
+        - 해결: kac_authors 컬럼 생성으로 KAC 기반 정확한 저자명 제공
+
+    문제 2: nlk: 프리픽스 중복
+        - 원인: 일부 코드는 UI에서 제거, 일부는 쿼리에서 제거로 불일치
+        - 해결: DB에서 영구 제거 (28-56MB 절약 + 일관성 확보)
+
+    문제 3: CNTS 중복 레코드
+        - 원인: CNTS 레코드가 KMO 레코드와 중복 (동일 제목+KAC)
+        - 해결: FTS5 재구축 전에 DELETE로 제거 (인덱스 크기 감소)
+
+    문제 4: 처음 batch loop가 10K만 처리하고 종료
+        - 원인: 동일 커서로 SELECT와 UPDATE 실행 시 커서 상태 손상
+        - 해결: 별도 select_cursor 사용으로 격리
+
+성능 메트릭:
+
+    KAC 동기화:
+        - 캐시 적용 전: 1,592 row/s
+        - 캐시 적용 후: 9,000-11,000 row/s (5-10배 향상)
+        - 최종 처리 시간: 6.2M 레코드 9-10분
+
+    FTS5 검색:
+        - 단일 검색: < 100ms
+        - 복수 검색 (12개): < 500ms
+        - 중복 제거 오버헤드: 1-5% (허용 범위)
 
 6.5. glossary.db (UI 설정 및 용어집)
 

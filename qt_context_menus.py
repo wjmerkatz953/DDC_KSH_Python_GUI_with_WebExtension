@@ -746,7 +746,9 @@ def show_textbrowser_context_menu(tb: "QTextBrowser", viewport_pos, app_instance
 
     menu.addSeparator()
     act_nlk_search = menu.addAction("🔍 NLK 탭에서 제목 검색")  # ✅ 항상 추가
-    act_author_check_search = menu.addAction("🔍 저자 확인 탭에서 저작물 일괄 검색")  # ✅ 저자 확인 탭 검색 추가
+    act_author_check_search = menu.addAction(
+        "🔍 저자 확인 탭에서 저작물 일괄 검색"
+    )  # ✅ 저자 확인 탭 검색 추가
 
     menu.addSeparator()
     act_select_all = menu.addAction("🧲 Select All")
@@ -975,7 +977,9 @@ def _search_in_author_check_tab(app_instance, title_text):
 
         # 제목 개수 계산 (로그용)
         title_count = len([t for t in normalized_text.split("\n") if t.strip()])
-        print(f"[DEBUG] 제목 입력 완료: {title_count}개 제목 → input_widgets['title'] 사용")
+        print(
+            f"[DEBUG] 제목 입력 완료: {title_count}개 제목 → input_widgets['title'] 사용"
+        )
 
         # ✅ 타이밍 이슈 해결: GUI 이벤트 처리를 위해 약간의 지연 추가
         from PySide6.QtCore import QTimer
@@ -996,11 +1000,13 @@ def _search_in_author_check_tab(app_instance, title_text):
             # 로그 메시지에 제목 개수 표시
             if title_count > 1:
                 real_app.log_message(
-                    f"✅ 저자 확인 탭에서 {title_count}개 제목 일괄 검색을 시작합니다.", "INFO"
+                    f"✅ 저자 확인 탭에서 {title_count}개 제목 일괄 검색을 시작합니다.",
+                    "INFO",
                 )
             else:
                 real_app.log_message(
-                    f"✅ 저자 확인 탭에서 '{normalized_text}' 제목 검색을 시작합니다.", "INFO"
+                    f"✅ 저자 확인 탭에서 '{normalized_text}' 제목 검색을 시작합니다.",
+                    "INFO",
                 )
 
     except Exception as e:
@@ -1772,6 +1778,10 @@ def _format_text_for_detail_view(cell_value):
     elif "; " in content and content.count("; ") >= 1:
         content = content.replace("; ", "\n")
 
+    # 3-1. 일반 세미콜론 구분 데이터도 깔끔하게
+    elif ";" in content and content.count(";") >= 1:
+        content = content.replace(";", "\n")
+
     # 4. 파이프(|) 구분 데이터도 줄바꿈으로 교체
     elif " | " in content and content.count(" | ") >= 1:
         content = content.replace(" | ", "\n")
@@ -1902,7 +1912,11 @@ def show_cell_detail_dialog(cell_value, column_name, app_instance):
 
         # ✅ [추가] 다이얼로그 위치를 부모 중앙에서 150px 아래로 이동
         parent_widget = app_instance.main_window
-        if parent_widget and hasattr(parent_widget, "geometry") and callable(parent_widget.geometry):
+        if (
+            parent_widget
+            and hasattr(parent_widget, "geometry")
+            and callable(parent_widget.geometry)
+        ):
             dialog.adjustSize()
             parent_rect = parent_widget.geometry()
             dialog_size = dialog.size()

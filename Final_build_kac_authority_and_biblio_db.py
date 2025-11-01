@@ -314,21 +314,19 @@ CREATE TABLE IF NOT EXISTS biblio (
 -- FTS5가 커버하므로 title, creator, author_names, kac_codes 인덱스 제거
 CREATE INDEX IF NOT EXISTS idx_biblio_year ON biblio(year);
 
-/* [최종 FTS5 전략]
-  - 검색이 필요한 모든 텍스트 필드를 통합.
-  - tokenize='unicode61': CJK 및 세미콜론(;) 분리 지원.
-  - tokenchars=':': 'nlk:KAC...'를 단일 토큰으로 처리.
+/* [최종 FTS5 전략 - rebuild_biblio_with_kac_clean.py와 동일]
+  - 검색 핵심 필드만 FTS5에 포함: title, author_names, kac_codes
+  - nlk_id는 UNINDEXED (검색 대상 아님, 결과 표시용)
+  - tokenize='unicode61 remove_diacritics 2': CJK 및 발음 구별 부호 제거
 */
-CREATE VIRTUAL TABLE IF NOT EXISTS biblio_fts USING fts5(
+CREATE VIRTUAL TABLE IF NOT EXISTS biblio_title_fts USING fts5(
+    nlk_id UNINDEXED,
     title,
-    creator,
-    dc_creator,
-    dcterms_creator,
     author_names,
     kac_codes,
     content='biblio',
-    content_rowid='rowid', -- biblio 테이블의 내부 rowid와 연결
-    tokenize = 'unicode61 remove_diacritics 0 tokenchars ":"'
+    content_rowid='rowid',
+    tokenize='unicode61 remove_diacritics 2'
 );
 """
 
@@ -581,6 +579,11 @@ def upsert_biblio(
     final_kac_codes = ";".join(sorted(kac_codes_list))
     # -------------------
 
+    # ✅ [필터링] KAC 코드가 없는 레코드는 건너뛰기
+    if not final_kac_codes or final_kac_codes.strip() == "":
+        return
+    # -------------------
+
     title = _pick_best_text(rec.get("title"))
     raw_json_str = json.dumps(rec, ensure_ascii=False)
 
@@ -651,20 +654,18 @@ def upsert_biblio(
             if rowid_result:
                 biblio_rowid = rowid_result[0]
                 # 기존 FTS 데이터 삭제 (rowid 기준)
-                cur.execute("DELETE FROM biblio_fts WHERE rowid=?", (biblio_rowid,))
-                # 새 FTS 데이터 삽입 (rowid 기준)
+                cur.execute("DELETE FROM biblio_title_fts WHERE rowid=?", (biblio_rowid,))
+                # 새 FTS 데이터 삽입 (rowid 기준) - 새 스키마: nlk_id, title, author_names, kac_codes
                 cur.execute(
-                    """INSERT INTO biblio_fts (
-                                rowid, title, creator, dc_creator, dcterms_creator, author_names, kac_codes
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                    """INSERT INTO biblio_title_fts (
+                                rowid, nlk_id, title, author_names, kac_codes
+                            ) VALUES (?, ?, ?, ?, ?)""",
                     (
                         biblio_rowid,
+                        nlk_id or "",
                         title or "",
-                        creator_str or "",
-                        dc_creator_str or "",
-                        dcterms_creator_str or "",
-                        final_author_names or "",  # ✅ author_names 추가
-                        final_kac_codes or "",  # ✅ kac_codes 추가
+                        final_author_names or "",
+                        final_kac_codes or "",
                     ),
                 )
             # =======================================================
@@ -1216,21 +1217,22 @@ class BuilderGUI(QWidget):
                 conn.close()
                 self.append_log(f"[✓] Authority DB processed: {auth_path}")
 
-            # --- Biblio DB (Compromise Strategy - No advanced tokenizer) ---
+            # --- Biblio DB (rebuild_biblio_with_kac_clean.py와 동일한 전략) ---
             if bib_path and os.path.exists(bib_path):
                 self.append_log(
-                    f"[*] Processing Biblio DB (Compromise FTS): {bib_path}"
+                    f"[*] Processing Biblio DB (Final FTS Strategy): {bib_path}"
                 )
                 conn = sqlite3.connect(bib_path)
+
+                # [1-2단계: 기존 FTS/트리거/인덱스 정리]
                 conn.executescript(
                     """
-                    /* [1단계: 기존 FTS 및 트리거 정리 (오류 발생 시 무시)] */
                     DROP TRIGGER IF EXISTS biblio_ai;
                     DROP TRIGGER IF EXISTS biblio_au;
                     DROP TRIGGER IF EXISTS biblio_ad;
-                    DROP TABLE IF EXISTS biblio_fts; /* Use DROP TABLE for virtual tables */
+                    DROP TABLE IF EXISTS biblio_fts;
+                    DROP TABLE IF EXISTS biblio_title_fts;
 
-                    /* [2단계: 중복 B-Tree 인덱스 삭제 (선택적)] - 그대로 유지 */
                     DROP INDEX IF EXISTS idx_biblio_creator;
                     DROP INDEX IF EXISTS idx_biblio_dc_creator;
                     DROP INDEX IF EXISTS idx_biblio_dcterms_creator;
@@ -1238,54 +1240,74 @@ class BuilderGUI(QWidget):
                     DROP INDEX IF EXISTS idx_biblio_author_names;
                     DROP INDEX IF EXISTS idx_biblio_kac_codes;
                     CREATE INDEX IF NOT EXISTS idx_biblio_year ON biblio(year);
+                """
+                )
 
-                    /* [3단계: 새로운 FTS5 테이블 (타협안 - tokenize 옵션 없음)] */
-                    CREATE VIRTUAL TABLE biblio_fts USING fts5(
+                # [3단계: CNTS 중복 제거 - FTS5 생성 전에 삭제하면 REBUILD 속도 향상]
+                self.append_log("[*] Removing duplicate CNTS records (KMO overlap)...")
+                cursor = conn.cursor()
+                cursor.execute(
+                    """
+                    DELETE FROM biblio
+                    WHERE nlk_id LIKE 'nlk:CNTS%'
+                    AND EXISTS (
+                        SELECT 1 FROM biblio b2
+                        WHERE b2.nlk_id LIKE 'nlk:KMO%'
+                        AND b2.title = biblio.title
+                        AND b2.kac_codes = biblio.kac_codes
+                    )
+                """
+                )
+                deleted_count = cursor.rowcount
+                conn.commit()
+                if deleted_count > 0:
+                    self.append_log(f"[✓] Removed {deleted_count:,} duplicate CNTS records")
+
+                # [3-2단계: nlk: 프리픽스 제거 - UI 표시 및 저장 공간 최적화]
+                self.append_log("[*] Removing 'nlk:' prefix from nlk_id and kac_codes...")
+                cursor.execute("UPDATE biblio SET nlk_id = REPLACE(nlk_id, 'nlk:', '')")
+                cursor.execute("UPDATE biblio SET kac_codes = REPLACE(kac_codes, 'nlk:', '')")
+                conn.commit()
+                self.append_log("[✓] Prefixes removed")
+
+                # [4-7단계: FTS5 생성, 트리거, REBUILD, 최적화]
+                self.append_log("[*] Creating FTS5 table and rebuilding index...")
+                conn.executescript(
+                    """
+                    CREATE VIRTUAL TABLE biblio_title_fts USING fts5(
+                        nlk_id UNINDEXED,
                         title,
-                        creator,
-                        dc_creator,
-                        dcterms_creator,
                         author_names,
                         kac_codes,
                         content='biblio',
-                        content_rowid='rowid'
-                        /* tokenize 옵션 제거됨 */
+                        content_rowid='rowid',
+                        tokenize='unicode61 remove_diacritics 2'
                     );
 
-                    /* 3-2 ~ 3-4: 트리거 생성 (이전과 동일) */
-                    CREATE TRIGGER IF NOT EXISTS biblio_ai AFTER INSERT ON biblio BEGIN
-                      INSERT INTO biblio_fts(
-                        rowid, title, creator, dc_creator, dcterms_creator, author_names, kac_codes
-                      ) VALUES (
-                        new.rowid, new.title, new.creator, new.dc_creator, new.dcterms_creator, new.author_names, new.kac_codes
-                      );
-                    END;
-                    CREATE TRIGGER IF NOT EXISTS biblio_au AFTER UPDATE ON biblio BEGIN
-                      UPDATE biblio_fts
-                      SET title = new.title,
-                          creator = new.creator,
-                          dc_creator = new.dc_creator,
-                          dcterms_creator = new.dcterms_creator,
-                          author_names = new.author_names,
-                          kac_codes = new.kac_codes
-                      WHERE rowid = old.rowid;
-                    END;
-                    CREATE TRIGGER IF NOT EXISTS biblio_ad AFTER DELETE ON biblio BEGIN
-                      DELETE FROM biblio_fts WHERE rowid = old.rowid;
+                    CREATE TRIGGER biblio_ai AFTER INSERT ON biblio BEGIN
+                        INSERT INTO biblio_title_fts(rowid, nlk_id, title, author_names, kac_codes)
+                        VALUES (new.rowid, new.nlk_id, new.title, new.author_names, new.kac_codes);
                     END;
 
-                    /* [4단계: 기존 데이터 인덱싱] (이전과 동일) */
-                    DELETE FROM biblio_fts;
-                    INSERT INTO biblio_fts(rowid, title, creator, dc_creator, dcterms_creator, author_names, kac_codes)
-                    SELECT rowid, title, creator, dc_creator, dcterms_creator, author_names, kac_codes FROM biblio;
+                    CREATE TRIGGER biblio_ad AFTER DELETE ON biblio BEGIN
+                        DELETE FROM biblio_title_fts WHERE rowid = old.rowid;
+                    END;
 
-                    /* [5단계: 최적화] (이전과 동일) */
-                    INSERT INTO biblio_fts(biblio_fts) VALUES('optimize');
+                    CREATE TRIGGER biblio_au AFTER UPDATE ON biblio BEGIN
+                        UPDATE biblio_title_fts
+                        SET title = new.title,
+                            author_names = new.author_names,
+                            kac_codes = new.kac_codes
+                        WHERE rowid = new.rowid;
+                    END;
+
+                    INSERT INTO biblio_title_fts(biblio_title_fts) VALUES('rebuild');
+                    INSERT INTO biblio_title_fts(biblio_title_fts) VALUES('optimize');
                 """
                 )
                 conn.commit()
                 conn.close()
-                self.append_log(f"[✓] Biblio DB processed (Compromise FTS): {bib_path}")
+                self.append_log(f"[✓] Biblio DB processed (Final FTS): {bib_path}")
 
             # --- Completion ---
             self.progress.setRange(0, 100)  # Indicate completion

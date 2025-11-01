@@ -1105,9 +1105,9 @@ class SearchCommonManager:
                         f"제목 검색 ({len(titles)}개): {', '.join(titles[:3])}..."
                     )
 
-            # 저자 검색 (FTS5)
+            # 저자 검색 (FTS5) - kac_authors 사용
             if author_query and author_query.strip():
-                fts_conditions.append(f'author_names:"{author_query.strip()}"')
+                fts_conditions.append(f'kac_authors:"{author_query.strip()}"')
 
             # KAC 코드 검색 (FTS5) - ✅ 복수 입력 지원
             if kac_query and kac_query.strip():
@@ -1131,7 +1131,7 @@ class SearchCommonManager:
                     SELECT
                         b.nlk_id,
                         b.title,
-                        b.author_names,
+                        b.kac_authors,
                         b.kac_codes,
                         b.year,
                         MIN(rank) as min_rank
@@ -1160,7 +1160,7 @@ class SearchCommonManager:
                 # FTS5 조건이 없고 연도만 있는 경우
                 if year_query and year_query.strip():
                     query = """
-                        SELECT nlk_id, title, author_names, kac_codes, year
+                        SELECT nlk_id, title, kac_authors, kac_codes, year
                         FROM biblio
                         WHERE year = ?
                         LIMIT 500
@@ -1176,26 +1176,22 @@ class SearchCommonManager:
             for row in rows:
                 # ✅ GROUP BY 쿼리는 6개 컬럼 반환 (min_rank 포함)
                 if len(row) == 6:
-                    nlk_id, title, author_names, kac_codes, year, _ = row
+                    nlk_id, title, kac_authors, kac_codes, year, _ = row
                 else:
-                    nlk_id, title, author_names, kac_codes, year = row
+                    nlk_id, title, kac_authors, kac_codes, year = row
 
-                # ✅ UI 표시용으로 "nlk:" 프리픽스 제거
-                display_kac = kac_codes.replace("nlk:", "") if kac_codes else ""
-                # 링크용 nlk_id도 "nlk:" 프리픽스 제거
-                clean_nlk_id = nlk_id.replace("nlk:", "") if nlk_id else ""
-
+                # ✅ DB에서 이미 "nlk:" 프리픽스가 제거되어 있음 (더 이상 replace 불필요)
                 results.append(
                     {
                         "제목": title or "",
-                        "저자": author_names or "",
-                        "KAC 코드": display_kac,
+                        "저자": kac_authors or "",  # author_names → kac_authors
+                        "KAC 코드": kac_codes or "",
                         "연도": str(year) if year else "",
-                        "식별자": nlk_id or "",  # ✅ [신규] 식별자 컬럼 추가
+                        "식별자": nlk_id or "",
                         "상세 링크": (
                             f"https://www.nl.go.kr/NL/contents/search.do?"
-                            f"pageNum=1&pageSize=30&srchTarget=total&kwd={clean_nlk_id}"
-                            if clean_nlk_id
+                            f"pageNum=1&pageSize=30&srchTarget=total&kwd={nlk_id}"
+                            if nlk_id
                             else ""
                         ),
                         "nlk_id": nlk_id or "",  # 내부용 (하위 호환성)
